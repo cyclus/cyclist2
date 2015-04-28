@@ -312,8 +312,11 @@ public class InventoryChart extends VBox {
 			for (Pair<Integer, Double> value : values) {
 				double v = value.v2/_scale;
 				if (first) {
-					if (value.v1 > 0)
+					if (value.v1 > 0) {
+						if (value.v1 > 1)
+							list.add(new XYChart.Data<Number, Number>(0, 0));
 						list.add(new XYChart.Data<Number, Number>(value.v1-1, 0));
+					}
 					else
 						prev = v;
 					first = false;
