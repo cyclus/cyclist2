@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Set;
 
 import javafx.scene.image.Image;
 
@@ -13,6 +12,7 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
+import javax.json.JsonValue.ValueType;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -30,10 +30,16 @@ public class XMLReader {
 	static skinSet SC2 = new skinSet(){
 		{
 			name = "SC2";
-			images.put("reactor", new Image(new File("./skinImages/reactorSC2.jpg").toURI().toString()));
-			images.put("facility", new Image(new File("./skinImages/sourceFacSC2.jpg").toURI().toString()));
+			images.put("reactor", new Image(new File("skinImages/reactor.png").toURI().toString()));
+			images.put("facility", new Image(new File("skinImages/sourceFacSC2.jpg").toURI().toString()));
 		}
 	};
+	
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 */
 	 public static skinSet loadSkin(String path){
 		skinSet skin = new skinSet(){
 			{
@@ -68,9 +74,11 @@ public class XMLReader {
 			add("StubFacility/cyclus/StubInst/cyclus/StubRegion:StubRegion:StubRegion");
 			add("StubFacility/cyclus/StubInst:StubInst:StubInst");
 			add("StubFacility:StubFacility:StubFacility");
-			add(":cycamore:DeployInst");
-			add(":cycamore:BatchReactor");
 			add(":cycaless:BatchReactor");
+			add(":cycamore:BatchReactor");
+			//add(":cycamore:DeployInst");
+			//add(":cycamore:Separations");
+			add("commodconverter:CommodConverter:CommodConverter");
 		}
 	};
 	
@@ -79,18 +87,7 @@ public class XMLReader {
 	 */
 	static ArrayList<String> facilityList = new ArrayList<String>(){
 		{
-			/*add(":Brightlite:ReactorFacility");
-			add(":Brightlite:FuelfabFacility");
-			add(":Brightlite:ReprocessFacility");
-			add(":cycaless:BatchReactor");
-			add(":cycamore:EnrichmentFacility");
-			add(":cycamore:Sink");
-			add(":cycamore:Source");
-			add(":agents:Source");
-			add(":agents:Sink");
-			add(":agents:KFacility");
-			add(":agents:Prey");
-			add(":agents:Predator");*/
+			
 		}
 	};
 	
@@ -99,9 +96,7 @@ public class XMLReader {
 	 */
 	static ArrayList<String> regionList = new ArrayList<String>(){
 		{
-			/*add(":cycamore:GrowthRegion");
-			add(":agents:NullRegion");*/
-			
+		
 		}
 	};
 	
@@ -110,32 +105,43 @@ public class XMLReader {
 	 */
 	static ArrayList<String> institutionList = new ArrayList<String>(){
 		{
-			/*add(":cycaless:DeployInst");
-			add(":cycamore:ManagerInst");
-			add(":agents:NullInst");*/
+
 		}
 	};
+	
 	
 	/**
 	 * 
 	 * @param xmlSchema
 	 * @return
 	 */
-	static ArrayList<Object> readSchema(String xmlSchema){
-		ArrayList<Object> schema = new ArrayList<Object>();
+	static ArrayList<String> readSchema_new(String xmlSchema){
+		ArrayList<String> schema = new ArrayList<String>();
 		try{
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			InputSource is = new InputSource(new StringReader(xmlSchema));
 			Document doc = dBuilder.parse(is);
 			NodeList top = doc.getChildNodes();
-			if(top.item(0).getNodeName() == "interleave"){
-				for(int i = 0; i < top.getLength(); i++){
-					schema = nodeListener(top.item(i), schema);			
-				}
-			} else {
-				for(int i = 0; i < doc.getChildNodes().getLength(); i++){
-					schema = nodeListener(doc, schema);
+			NodeList node = top.item(0).getChildNodes();
+			for(int i = 1; i < node.getLength(); i+=2){
+				switch (node.item(i).getNodeName()){
+				case "optional":
+					Node temp_node = node.item(i).getChildNodes().item(1);
+					for(int k = 0; k < temp_node.getAttributes().getLength(); k++){
+						if (( temp_node).getAttributes().item(k).getNodeName() == "name"){
+							System.out.println(temp_node.getAttributes().item(k).getNodeValue());
+							schema.add((temp_node).getAttributes().item(k).getNodeValue());
+						} 
+					}
+					break;
+				default:
+					for(int j = 0; j < node.item(i).getAttributes().getLength(); j++){
+						if (node.item(i).getAttributes().item(j).getNodeName() == "name"){
+							System.out.println(node.item(i).getAttributes().item(j).getNodeValue());
+							schema.add(node.item(i).getAttributes().item(j).getNodeValue());
+						} 
+					}
 				}
 			}
 
@@ -143,25 +149,6 @@ public class XMLReader {
 			ex.printStackTrace();
 		}
 		return schema;
-	}
-	
-	/**
-	 * 
-	 * @param jsonSchema
-	 * @param xmlschema
-	 * @return
-	 */
-	static ArrayList<Object> annotationReader(String jsonSchema, ArrayList<Object> xmlschema){
-		Reader schema = new StringReader(jsonSchema);
-		JsonReader jsonReader = Json.createReader(schema);
-		JsonObject jsonObject = jsonReader.readObject();
-		jsonReader.close();
-		JsonObject vars = jsonObject.getJsonObject("vars");
-		for(int i = 0; i < xmlschema.size(); i++){
-			//System.out.println(xmlschema);
-			combiner((ArrayList<Object>)xmlschema.get(i), vars);		
-		}
-		return xmlschema;
 	}
 	
 	/**
@@ -191,78 +178,7 @@ public class XMLReader {
 		JsonString string = jsonObject.getJsonString("niche");		
 		return string.toString();
 	}
-	/**
-	 * 
-	 * @param dataArray
-	 * @param json
-	 */
-	@SuppressWarnings("unchecked")
-	static void combiner(ArrayList<Object> dataArray, JsonObject json){
-		JsonObject json_pass;
-		if(dataArray.get(0) instanceof ArrayList){
-			for(int i = 0; i < dataArray.size(); i++){
-				combiner((ArrayList<Object>)dataArray.get(i), json);
-			}
-		} else if(dataArray.get(1) instanceof ArrayList){
-			if(json.get((String)dataArray.get(0)) instanceof JsonString){
-				json_pass = json.getJsonObject(json.getJsonString((String)dataArray.get(0)).toString().replaceAll("\"", ""));
-			} else {
-				json_pass = json.getJsonObject((String)dataArray.get(0));
-			}
-			cycicResize(dataArray);
-			if(dataArray.get(2) == "oneOrMore" || dataArray.get(2) == "zeroOrMore" ){
-				cycicResize((ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(0));
-				if(json_pass.get("uitype") instanceof JsonArray){
-					JsonArray array = json_pass.getJsonArray("uitype");
-					for(int i = 0; i < ((ArrayList<Object>) dataArray.get(1)).size(); i++){
-						String string = array.get(i+1).toString().replaceAll("\"", "");
-						cycicResize((ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(i));
-						((ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(i)).set(2, string);
-					}
-				} else if(json_pass.get("uitype") != null){
-					((ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(0)).set(2, json_pass.get("uitype").toString().replace("\"", ""));
-				}
-				if(json_pass.get("default") instanceof JsonArray){
-					JsonArray array = json_pass.getJsonArray("default");
-					for(int i = 0; i < ((ArrayList<Object>) dataArray.get(1)).size(); i++){
-						String string = array.get(i+1).toString().replaceAll("\"", "");
-						cycicResize((ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(i));
-						((ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(i)).set(2, string);
-					}
-				} else if(json_pass.get("default") instanceof JsonObject){
-					JsonObject object = json_pass.getJsonObject("default");
-					Set<String> keys = object.keySet();
-					for(int i = 0; i < ((ArrayList<Object>) dataArray.get(1)).size(); i++){
-						cycicResize((ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(i));
-					}
-					((ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(0)).set(5, keys.toArray()[0].toString());
-					((ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(1)).set(5, object.get(keys.toArray()[0]).toString());
-				} else if(json_pass.get("default") != null) {
-									
-				}
-				//cycicInfoControl(json_pass, (ArrayList<Object>) ((ArrayList<Object>) dataArray.get(1)).get(0));
-			}
-			combiner((ArrayList<Object>)dataArray.get(1), json);
-			try{
-				cycicInfoControl(json_pass, dataArray);
-			} catch (Exception ex){
-				
-			}
-		} else {	
-			cycicResize(dataArray);
-			if(json.get((String)dataArray.get(0)) instanceof JsonString){
-				json_pass = json.getJsonObject(json.getJsonString((String)dataArray.get(0)).toString().replaceAll("\"", ""));
-			} else {
-				json_pass = json.getJsonObject((String)dataArray.get(0));
-			}
-			try{
-				cycicInfoControl(json_pass, dataArray);
-			} catch (Exception ex) {
-				//ex.printStackTrace();
-			}	
-		}
-	}
-	
+
 	/**
 	 * 
 	 * @param dataArray
@@ -273,108 +189,522 @@ public class XMLReader {
 			if(dataArray.size() == 6){
 				dataArray.add(0);
 			}
+			if(dataArray.size() == 3){
+				if(dataArray.get(2) == null){
+					//dataArray.set(2, dataArray.get(1));
+				}
+			}
 			dataArray.add(null);
 		}
 		return dataArray;
 	}
 	
 	
-	/**
-	 * 
-	 * @param jsonPass
-	 * @param dataArray
-	 * @return
-	 */
-	static ArrayList<Object> cycicInfoControl(JsonObject jsonPass, ArrayList<Object> dataArray){
-		if(dataArray.get(2) == null){
-			dataArray.set(2, "");
-			if(jsonPass.get("uitype") != null){
-				dataArray.set(2, jsonPass.get("uitype").toString().replace("\"", ""));
+	static ArrayList<Object> nodeBuilder(JsonObject anno, ArrayList<Object> facArray, ArrayList<String> vars){
+		for(int i = 0; i < vars.size(); i++){
+			String var = vars.get(i);	
+			System.out.println(var);
+			if(anno.get(var).getValueType() == ValueType.STRING){
+				ArrayList<String> tempArray = new ArrayList<String>();
+				tempArray.add(anno.getString(var));
+				nodeBuilder(anno, facArray, tempArray);
+				break;
+			}
+			JsonObject anno1 = anno.getJsonObject(var);
+			System.out.println(anno1);
+			ValueType test = anno1.get("type").getValueType();
+			String doc_s = (anno1.getJsonString("doc") != null) ? anno1.getString("doc") : null;
+			if(test == ValueType.ARRAY){
+				JsonArray type = anno1.getJsonArray("type");
+				JsonArray alias = anno1.getJsonArray("alias");
+				JsonArray uitype = anno1.getJsonArray("uitype");
+				JsonArray units = anno1.getJsonArray("units");
+				JsonArray range = anno1.getJsonArray("range");
+				if(range == null){
+					range = anno1.getJsonArray("categorical");
+				}
+				JsonArray defType = anno1.getJsonArray("default");
+				JsonArray userLevel = anno1.getJsonArray("userlevel");
+				JsonArray tooltip = anno1.getJsonArray("tooltip");
+				JsonArray uilabel = anno1.getJsonArray("uilabel");
+				ArrayList<Object> newArray = new ArrayList<Object>();
+				newArray = annotationBuilder(type, alias, uitype, var,units, range, defType, 
+						userLevel, tooltip, uilabel, newArray);
+				newArray.set(8, doc_s);
+				System.out.println(newArray);
+				facArray.add(newArray);
+			} else {
+				String alias_s, uitype_s, units_s, range_s, defType_s, tooltip_s, uilabel_s;
+				int userLevel_s;
+				JsonString type = anno1.getJsonString("type");
+				JsonString alias = anno1.getJsonString("alias");
+				JsonString uitype = anno1.getJsonString("uitype");
+				units_s = (anno1.getJsonString("units") != null) ? anno1.getString("units") : null;
+				range_s = (anno1.getJsonString("range") != null) ? anno1.getString("range") : null;
+				if(range_s == null){
+					range_s = (anno1.getJsonString("categorical") != null) ? anno1.getString("categorical") : null;
+				}
+				userLevel_s = (anno1.get("userlevel") != null) ? anno1.getInt("userlevel") : 0;
+				defType_s = (anno1.get("default") != null) ? anno1.get("default").toString() : null;
+				userLevel_s = (anno1.get("userlevel") != null) ? anno1.getInt("userlevel") : 0;
+				tooltip_s = (anno1.getJsonString("tooltip") != null) ? anno1.getString("tooltip") : null;
+				uilabel_s = (anno1.getJsonString("uilabel") != null) ? anno1.getString("uilabel") : null;
+				ArrayList<Object> newArray = new ArrayList<Object>();
+				if(alias == null){
+					alias_s = var;
+				} else {
+					alias_s = alias.toString();
+				}
+				if (uitype == null){
+					uitype_s = type.toString();
+				} else {
+					uitype_s = uitype.toString();
+				}
+				newArray = stringAnnotationReq(type.toString(), alias_s, uitype_s, newArray);
+				newArray = stringAnnotationHelp(userLevel_s, tooltip_s, newArray);
+				newArray = stringAnnotationCos(units_s, range_s, defType_s, uilabel_s, newArray);
+				newArray.set(8, doc_s);
+				System.out.println(newArray);
+				facArray.add(newArray);
+				
 			}
 		}
-		if(jsonPass.get("units") != null){
-			dataArray.set(3, jsonPass.get("units").toString());
-		}
-		if(jsonPass.get("range") != null){
-			dataArray.set(4, jsonPass.get("range").toString());
-		}
-		if(jsonPass.get("default") != null){
-			dataArray.set(6, 1);
-			dataArray.set(5, jsonPass.get("default").toString());
-		}
-		if(jsonPass.get("userlevel") != null){
-			dataArray.set(6, Integer.parseInt(jsonPass.get("userlevel").toString()));
-		}
-		if(jsonPass.get("tooltip") != null){
-			dataArray.set(7, jsonPass.get("tooltip").toString());
-		}
-		if(jsonPass.get("doc") != null){
-			dataArray.set(8, jsonPass.get("doc").toString());
-		}
-		if(jsonPass.get("uilabel") != null){
-			dataArray.set(9, jsonPass.get("uilabel").toString().replaceAll("\"", ""));
-		} 
-		return dataArray;
+		return facArray;
 	}
 	
 	/**
 	 * 
-	 * @param node
-	 * @param array
+	 * @param type
+	 * @param alias
+	 * @param uitype
+	 * @param facArray
 	 * @return
 	 */
-	static ArrayList<Object> nodeListener(Node node, ArrayList<Object> array){
-		NodeList nodes = node.getChildNodes();
-		for (int i = 0; i < nodes.getLength(); i++){
-			if(nodes.item(i).getNodeName() == "oneOrMore" || nodes.item(i).getNodeName() == "zeroOrMore"){
-				try{
-					if(nodes.item(i).getParentNode().getParentNode().getNodeName().equalsIgnoreCase("config")){
-						ArrayList<Object> newArray = new ArrayList<Object>();
-						newArray = nodeListener(nodes.item(i), newArray);
-						array.add(newArray);
+	static ArrayList<Object> annotationBuilder(JsonArray type, JsonArray alias, JsonArray uitype, String var, JsonArray units,
+			JsonArray range, JsonArray defType, JsonArray userLevel, JsonArray tooltip, JsonArray uilabel,
+			ArrayList<Object> facArray){
+		System.out.println(type.getJsonString(0).toString());
+		switch (type.getJsonString(0).toString().replaceAll("\"", "")){
+		case "std::map":
+			ArrayList<Object> structArray = new ArrayList<Object>();
+			for(int i = 1; i < type.size(); i++){
+				if(type.get(i) instanceof JsonArray){
+					ArrayList<Object> tempArray = new ArrayList<Object>();
+					JsonArray unitsArray = (units == null) ? null : units.getJsonArray(i);
+					JsonArray rangeArray = (units == null) ? null : range.getJsonArray(i);
+					JsonArray defTypeArray = (units == null) ? null : defType.getJsonArray(i);
+					JsonArray userLevelArray = (units == null) ? null : userLevel.getJsonArray(i);
+					tempArray = annotationBuilder(type.getJsonArray(i), alias.getJsonArray(i), uitype.getJsonArray(i), var,
+							unitsArray, rangeArray, defTypeArray, userLevelArray,
+							tooltip.getJsonArray(i), uilabel.getJsonArray(i), tempArray);
+					structArray.add(tempArray);
+				} else {
+					String alias_s, uitype_s, units_s, range_s, defType_s, tooltip_s, doc_s, uilabel_s;
+					int userLevel_s;
+					ArrayList<Object> tempArray = new ArrayList<Object>();
+					alias_s = aliasTest(alias, i);
+					uitype_s = uitypeTest(uitype, type, i);
+					units_s = unitsTest(units, i);
+					range_s = rangeTest(range, i);
+					if(defType instanceof JsonObject){
+						defType_s = null;
+					} else {
+						defType_s = defaultTest(defType);
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				ArrayList<Object> newArray = new ArrayList<Object>();
-				newArray = nodeListener(nodes.item(i), newArray);
-				array.add(newArray);
-				array.add(nodes.item(i).getNodeName());
-			}
-			if(nodes.item(i).getNodeName() == "element"){
-				ArrayList<Object> newArray = new ArrayList<Object>();
-				for(int j = 0; j < nodes.item(i).getAttributes().getLength(); j++){
-					if (nodes.item(i).getAttributes().item(j).getNodeName() == "name"){
-						newArray.add(nodes.item(i).getAttributes().item(j).getNodeValue());
-					}
-				}
-				array.add(nodeListener(nodes.item(i), newArray));
-			}
-			if(nodes.item(i).getNodeName() == "optional"){
-				Node newNode = nodes.item(i).getChildNodes().item(1);
-				ArrayList<Object> newArray = new ArrayList<Object>();
-				for(int j = 0; j < newNode.getAttributes().getLength(); j++){
-					if (newNode.getAttributes().item(j).getNodeName() == "name"){
-						newArray.add(newNode.getAttributes().item(j).getNodeValue());
-					}
-				}
-				array.add(nodeListener(newNode, newArray));
-			}
-			if(nodes.item(i).getNodeName() == "data"){
-				for(int j = 0; j < nodes.item(i).getAttributes().getLength(); j++){
-					if(nodes.item(i).getAttributes().item(j).getNodeName() == "type"){
-						array.add(1, nodes.item(i).getAttributes().item(j).getNodeValue());
-					}
+					userLevel_s = userLevelTest(userLevel, i);
+					tooltip_s = tooltipTest(tooltip, i);
+					uilabel_s = labelTest(uilabel, i);
+					tempArray = stringAnnotationReq(type.getString(i), alias_s, uitype_s, tempArray);
+					tempArray = stringAnnotationHelp(userLevel_s, tooltip_s, tempArray);
+					tempArray = stringAnnotationCos(units_s, range_s, defType_s, uilabel_s, tempArray);
+					structArray.add(tempArray);
+					
 				}
 			}
+			if(alias == null){
+				facArray.add(var);		
+			} else {
+				System.out.println(alias);
+				facArray.add(alias.getJsonArray(0).getString(0));		
+			}
+			facArray.add(structArray);
+			facArray.add("oneOrMore");
+			cycicResize(facArray);
+			if(userLevel == null){
+				facArray.add(0);		
+			} else {
+				System.out.println(userLevel);
+				facArray.set(6, userLevel.getJsonArray(0).getString(0));		
+			}
+			if(tooltip == null){
+				facArray.add("");		
+			} else {
+				System.out.println(tooltip);
+				facArray.set(7, tooltip.getJsonArray(0).getString(0));		
+			}
+			if(uilabel == null){
+				facArray.add(var);		
+			} else {
+				System.out.println(uilabel);
+				facArray.set(9, uilabel.getJsonArray(0).getString(0));		
+			}
+			break;
+		case "std::pair":
+			ArrayList<Object> structArrayPair = new ArrayList<Object>();
+			for(int i = 1; i < type.size(); i++){
+				if(type.get(i) instanceof JsonArray){
+					ArrayList<Object> tempArray = new ArrayList<Object>();
+					JsonArray unitsArray = (units == null) ? null : units.getJsonArray(i);
+					JsonArray rangeArray = (units == null) ? null : range.getJsonArray(i);
+					JsonArray defTypeArray = (units == null) ? null : defType.getJsonArray(i);
+					JsonArray userLevelArray = (units == null) ? null : userLevel.getJsonArray(i);
+					tempArray = annotationBuilder(type.getJsonArray(i), alias.getJsonArray(i), uitype.getJsonArray(i), var,
+							unitsArray, rangeArray, defTypeArray, userLevelArray,
+							tooltip.getJsonArray(i), uilabel.getJsonArray(i), tempArray);
+					structArrayPair.add(tempArray);
+				} else {
+					ArrayList<Object> tempArray = new ArrayList<Object>();
+					String alias_s, uitype_s, units_s, range_s, defType_s, tooltip_s, doc_s, uilabel_s;
+					int userLevel_s;
+					alias_s = aliasTest(alias, i);
+					uitype_s = uitypeTest(uitype, type, i);
+					units_s = unitsTest(units, i);
+					range_s = rangeTest(range, i);
+					if(defType instanceof JsonObject){
+						defType_s = null;
+					} else {
+						defType_s = defaultTest(defType);
+					}
+					userLevel_s = userLevelTest(userLevel, i);
+					tooltip_s = tooltipTest(tooltip, i);
+					uilabel_s = labelTest(uilabel, i);
+					tempArray = stringAnnotationReq(type.getString(i), alias_s, uitype_s, tempArray);
+					tempArray = stringAnnotationHelp(userLevel_s, tooltip_s, tempArray);
+					tempArray = stringAnnotationCos(units_s, range_s, defType_s, uilabel_s, tempArray);
+					structArrayPair.add(tempArray);
+				}
+			}
+			if(alias == null){
+				facArray.add(var);		
+			} else {
+				facArray.add(alias.getString(0));		
+			}
+			facArray.add(structArrayPair);
+			facArray.add("pair");
+			cycicResize(facArray);
+			if(userLevel == null){
+				facArray.add(0);		
+			} else {
+				System.out.println(userLevel);
+				facArray.set(6, userLevel.getString(0));		
+			}
+			if(tooltip == null){
+				facArray.add("");		
+			} else {
+				System.out.println(tooltip);
+				facArray.set(7, tooltip.getString(0));		
+			}
+			if(uilabel == null){
+				facArray.add(var);		
+			} else {
+				System.out.println(uilabel);
+				facArray.set(9, uilabel.getString(0));		
+			}
+			break;
+		case "std::vector":
+			ArrayList<Object> structArrayVector = new ArrayList<Object>();
+			if(type.get(1) instanceof JsonArray){
+				ArrayList<Object> tempArray = new ArrayList<Object>();
+				JsonArray unitsArray = (units == null) ? null : units.getJsonArray(1);
+				JsonArray rangeArray = (units == null) ? null : range.getJsonArray(1);
+				JsonArray defTypeArray = (units == null) ? null : defType.getJsonArray(1);
+				JsonArray userLevelArray = (units == null) ? null : userLevel.getJsonArray(1);
+				tempArray = annotationBuilder(type.getJsonArray(1), alias.getJsonArray(1), uitype.getJsonArray(1), var,
+						unitsArray, rangeArray, defTypeArray, userLevelArray, tooltip.getJsonArray(1), 
+						uilabel.getJsonArray(1), tempArray);
+				structArrayVector.add(tempArray);
+			} else {
+				String alias_s, uitype_s, units_s, range_s, defType_s, tooltip_s, doc_s, uilabel_s;
+				int userLevel_s;
+				ArrayList<Object> tempArray = new ArrayList<Object>();
+				alias_s = aliasTest(alias);
+				uitype_s = uitypeTest(uitype, type);
+				units_s = unitsTest(units);
+				range_s = rangeTest(range);
+				if(defType instanceof JsonArray){
+					defType_s = null;
+				} else {
+					defType_s = defaultTest(defType);
+				}
+				userLevel_s = userLevelTest(userLevel);
+				tooltip_s = tooltipTest(tooltip);
+				uilabel_s = labelTest(uilabel);
+				tempArray = stringAnnotationReq(type.getString(1), alias_s, uitype_s, tempArray);
+				tempArray = stringAnnotationHelp(userLevel_s, tooltip_s, tempArray);
+				tempArray = stringAnnotationCos(units_s, range_s, defType_s, uilabel_s, tempArray);
+				structArrayVector.add(tempArray);
+			}
+			if(alias == null){
+				facArray.add(var);
+			} else {
+				facArray.add(alias.getString(0));
+			}
+			facArray.add(structArrayVector);
+			facArray.add("oneOrMore");
+			cycicResize(facArray);
+			break;
+		case "std::string":
+		case "int":
+		case "double":
+			ArrayList<Object> tempArray = new ArrayList<Object>();
+			String alias_s, uitype_s, units_s, range_s, defType_s, tooltip_s, doc_s, uilabel_s;
+			int userLevel_s;
+			alias_s = aliasTest(alias);
+			uitype_s = uitypeTest(uitype, type);
+			units_s = unitsTest(units);
+			range_s = rangeTest(range);
+			defType_s = defaultTest(defType);
+			userLevel_s = userLevelTest(userLevel);
+			tooltip_s = tooltipTest(tooltip);
+			uilabel_s = labelTest(uilabel);
+			tempArray = stringAnnotationReq(type.getString(1), alias_s, uitype_s, tempArray);
+			tempArray = stringAnnotationHelp(userLevel_s, tooltip_s, tempArray);
+			tempArray = stringAnnotationCos(units_s, range_s, defType_s, uilabel_s, tempArray);
+			break;
+		default : 
+			System.out.println("Default");
+			System.out.println("HEY RADIO YOU FORGOT " + type.getJsonString(0).toString());
+			break;
 		}
-		return array;
+		return facArray;		
 	}
 	
-	static ArrayList<Object> orMoreInfoControl(JsonObject jsonPass, ArrayList<Object> dataArray){
-		
-		
-		return dataArray;
-		
+	static ArrayList<Object> stringAnnotationReq(String type, String alias, String uitype, ArrayList<Object> facArray){
+		cycicResize(facArray);
+		facArray.set(0, alias);
+		facArray.set(1, type);
+		if(uitype == null){
+			facArray.set(2, type);
+		} else {
+			facArray.set(2, uitype.toString().replaceAll("\"", ""));
+		}
+		return facArray;
+	}
+	
+	static ArrayList<Object> stringAnnotationCos(String units, String range, String defType, String uilabel, ArrayList<Object> facArray){
+		facArray.set(3, units);
+		facArray.set(4, range);
+		facArray.set(5, defType);
+		if(defType != null){
+			facArray.set(6, 1);
+		}
+		facArray.set(9, uilabel);
+		return facArray;
+	}
+	
+	static ArrayList<Object> stringAnnotationHelp(int userLevel, String tooltip, ArrayList<Object> facArray){
+		facArray.set(6, userLevel);
+		facArray.set(7, tooltip);
+		return facArray;
+	}
+	
+	static String aliasTest(JsonArray alias){
+		String alias_string;
+		if(alias == null){
+			alias_string = "key";
+		} else {
+			alias_string = alias.getString(1);
+		}
+		return alias_string;
+	}
+	
+	static String aliasTest(JsonArray alias, int i){
+		String alias_string;
+		if(alias == null){
+			alias_string = "key";
+		} else {
+			alias_string = alias.getString(i);
+		}
+		return alias_string;
+	}
+	
+	static String uitypeTest(JsonArray uitype, JsonArray type){
+		String uitype_s;
+		if (uitype == null){
+			uitype_s = type.getString(1);
+		} else {
+			uitype_s = uitype.getString(1);
+		}
+		return uitype_s;
+	}
+	
+	static String uitypeTest(JsonArray uitype, JsonArray type, int i){
+		String uitype_s;
+		if (uitype == null){
+			uitype_s = type.getString(i);
+		} else {
+			uitype_s = uitype.getString(i);
+		}
+		return uitype_s;
+	}
+	
+	static String defaultTest(JsonArray defType){
+		String defType_s; 
+		if(defType == null){
+			defType_s = null;
+		} else {
+			defType_s = defType.getString(1);
+		}
+		return defType_s;
+	}
+	
+	static String defaultTest(JsonArray defType, int i){
+		String defType_s; 
+		if(defType == null){
+			defType_s = null;
+		} else {
+			defType_s = defType.getString(i);
+		}
+		return defType_s;
+	}
+	
+	static String tooltipTest(JsonArray tooltip){
+		String tooltip_s; 
+		if(tooltip == null){
+			tooltip_s = null;
+		} else {
+			tooltip_s = tooltip.getString(1);
+		}
+		return tooltip_s;
+	}
+	
+	static String tooltipTest(JsonArray tooltip, int i){
+		String tooltip_s; 
+		if(tooltip == null){
+			tooltip_s = null;
+		} else {
+			tooltip_s = tooltip.getString(i);
+		}
+		return tooltip_s;
+	}
+	
+	static String helpTest(JsonArray help){
+		String help_s; 
+		if(help == null){
+			help_s = null;
+		} else {
+			help_s = help.getString(1);
+		}
+		return help_s;
+	}
+	
+	static String helpTest(JsonArray help, int i){
+		String help_s; 
+		if(help == null){
+			help_s = null;
+		} else {
+			help_s = help.getString(i);
+		}
+		return help_s;
+	}
+	
+	static int userLevelTest(JsonArray userLevel){
+		int userLevel_s; 
+		if(userLevel == null){
+			userLevel_s = 0;
+		} else {
+			userLevel_s = userLevel.getInt(1);
+		}
+		return userLevel_s;
+	}
+	
+	static int userLevelTest(JsonArray userLevel, int i){
+		int userLevel_s; 
+		if(userLevel == null){
+			userLevel_s = 0;
+		} else {
+			userLevel_s = userLevel.getInt(i);
+		}
+		return userLevel_s;
+	}
+	
+	static String unitsTest(JsonArray units){
+		String units_s; 
+		if(units == null){
+			units_s = null;
+		} else {
+			units_s = units.getString(1);
+		}
+		return units_s;
+	}
+	
+	static String unitsTest(JsonArray units, int i){
+		String units_s; 
+		if(units == null){
+			units_s = null;
+		} else {
+			units_s = units.getString(i);
+		}
+		return units_s;
+	}
+	
+	static String labelTest(JsonArray uilabel){
+		String label_s; 
+		if(uilabel == null){
+			label_s = null;
+		} else {
+			label_s = uilabel.getString(1);
+		}
+		return label_s;
+	}
+	
+	static String labelTest(JsonArray uilabel, int i){
+		String label_s; 
+		if(uilabel == null){
+			label_s = null;
+		} else {
+			label_s = uilabel.getString(i);
+		}
+		return label_s;
+	}
+	
+	static String rangeTest(JsonArray range){
+		String range_s; 
+		if(range == null){
+			range_s = null;
+		} else {
+			range_s = range.getString(1);
+		}
+		return range_s;
+	}
+	
+	static String rangeTest(JsonArray range, int i){
+		String range_s; 
+		if(range == null){
+			range_s = null;
+		} else {
+			range_s = range.getString(i);
+		}
+		return range_s;
+	}
+	
+	static String categoricalTest(JsonArray categorical){
+		String categorical_s; 
+		if(categorical == null){
+			categorical_s = null;
+		} else {
+			categorical_s = categorical.getString(1);
+		}
+		return categorical_s;
+	}
+	
+	static String categoricalTest(JsonArray categorical, int i){
+		String categorical_s; 
+		if(categorical == null){
+			categorical_s = null;
+		} else {
+			categorical_s = categorical.getString(i);
+		}
+		return categorical_s;
 	}
 }

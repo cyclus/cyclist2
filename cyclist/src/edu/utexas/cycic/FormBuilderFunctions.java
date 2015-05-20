@@ -1,11 +1,13 @@
 package edu.utexas.cycic;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -15,6 +17,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 /**
  * This class is built to handle all of the functions used in building the forms for CYCIC. 
@@ -79,6 +83,7 @@ public class FormBuilderFunctions {
 	static TextField textFieldBuilder(final ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
 		
 		TextField textField = new TextField();
+		textField.setMaxWidth(150);
 		textField.setText(defaultValue.get(0).toString());
 		if(facArray.get(1) != null){
 			textField.setPromptText(facArray.get(1).toString());
@@ -150,6 +155,7 @@ public class FormBuilderFunctions {
 		textName.textProperty().addListener(new ChangeListener<String>(){         
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				node.name = newValue;
+				node.institutionShape.text.setText(newValue);
 			}
 		});
 		return textName;
@@ -265,27 +271,33 @@ public class FormBuilderFunctions {
 		cb.setMinWidth(80);
 		cb.setOnMousePressed(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
+				/*for(facilityNode facility: DataArrays.FacilityNodes){
+					for(int i =0; i < facility.cycicCircle.incommods.size(); i++){
+						if(facility.cycicCircle.incommods.get(i) == cb.getValue()){
+							facility.cycicCircle.incommods.remove(i);
+						}
+					}
+				}*/
 				cb.getItems().clear();
 
-				for (CommodityNode label: DataArrays.CommoditiesList){
+				for(CommodityNode label: DataArrays.CommoditiesList){
 					cb.getItems().add(label.name.getText());
 				}
-				//cb.getItems().add("New Commodity");
+				cb.getItems().add("New Commodity");
 				
-				if ( defaultValue.get(0) != "") {
+				if(!defaultValue.get(0).equals("")) {
 					cb.setValue((String) defaultValue.get(0));
 				}
 			}
 		});
-		if ( defaultValue.get(0) != "") {
+		if(defaultValue.get(0) != "") {
 			cb.setValue((String) defaultValue.get(0));
 		}
 		cb.setPromptText("Select a commodity");
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-
 				if (newValue == "New Commodity"){
-					// Tell Commodity Window to add a new commodity 
+					Cycic.addNewCommodity();
 				} else {
 					facNode.cycicCircle.incommods.add(newValue);
 					defaultValue.set(0, newValue);
@@ -311,17 +323,24 @@ public class FormBuilderFunctions {
 	 * @return ComboBox containing all of the commodities currently linked to markets, with the value shown being the current outcommodity for the facNode.
 	 */
 	static ComboBox<String> comboBoxOutCommod(final facilityNode facNode, final ArrayList<Object> defaultValue){
-		// Create and fill the comboBox
+		///TODO Fix quick hack.
 		final ComboBox<String> cb = new ComboBox<String>();
 		cb.setMinWidth(80);
 				
 		cb.setOnMousePressed(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
+				for(facilityNode facility: DataArrays.FacilityNodes){
+					for(int i =0; i < facility.cycicCircle.outcommods.size(); i++){
+						if(facility.cycicCircle.outcommods.get(i) == cb.getValue()){
+							facility.cycicCircle.outcommods.remove(i);
+						}
+					}
+				}
 				cb.getItems().clear();
 				for (CommodityNode label: DataArrays.CommoditiesList){
 					cb.getItems().add(label.name.getText());
 				}
-				//cb.getItems().add("New Commodity");
+				cb.getItems().add("New Commodity");
 				
 				if (defaultValue.get(0) != "") {
 					cb.setValue((String) defaultValue.get(0));
@@ -335,7 +354,7 @@ public class FormBuilderFunctions {
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				if (newValue == "New Commodity"){
-					// Tell Commodity Window to add a new commodity 
+					Cycic.addNewCommodity(); 
 				} else {
 					facNode.cycicCircle.outcommods.add(newValue);
 					defaultValue.set(0, newValue);
@@ -361,7 +380,7 @@ public class FormBuilderFunctions {
 	 */
 	static ComboBox<String> recipeComboBox(facilityNode facNode, final ArrayList<Object> defaultValue){
 		final ComboBox<String> cb = new ComboBox<String>();
-		
+		cb.setPromptText("Select a recipe");
 		cb.setValue((String) defaultValue.get(0));
 		
 		cb.setOnMousePressed(new EventHandler<MouseEvent>(){
@@ -435,6 +454,52 @@ public class FormBuilderFunctions {
 	
 	/**
 	 * 
+	 * @param dataArray
+	 * @return
+	 */
+	static TextField fileTextField(ArrayList<Object> dataArray){
+		TextField textField = new TextField();
+		textField.setText((String) dataArray.get(0)); 
+		textField.textProperty().addListener(new ChangeListener<String>(){
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
+				dataArray.set(0, newValue);
+			}
+		});
+		return textField;
+	}
+	
+	/**
+	 * 
+	 * @param textField
+	 * @return
+	 */
+	static Button fileChooserButton(TextField textField){
+		Button button = new Button("Choose File");
+		Window window = null;
+		
+		FileChooser fileChooser = new FileChooser();
+		//Set extension filter
+		/*FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+		fileChooser.getExtensionFilters().add(extFilter);
+		fileChooser.setTitle("Please save as Cyclus input file.");
+		fileChooser.setInitialFileName("*.xml");*/
+		//Show save file dialog
+		button.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+				File file = fileChooser.showOpenDialog(window);
+				textField.setText(file.getAbsolutePath());
+				textField.setText("ADFASDF");
+			}
+		});
+		
+		
+		return button;
+	}
+	
+	/**
+	/**
+	/**
+	 * 
 	 * @param grid
 	 * @param formNode
 	 * @param facArray
@@ -444,24 +509,29 @@ public class FormBuilderFunctions {
 	 * @return
 	 */
 	static GridPane cycicTypeTest(GridPane grid, facilityNode formNode, ArrayList<Object> facArray, ArrayList<Object> dataArray, int col, int row){
+		col = 1+col;
 		switch ((String) facArray.get(2).toString().toLowerCase()) {
 		case "incommodity":
-			grid.add(FormBuilderFunctions.comboBoxInCommod(formNode, dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.comboBoxInCommod(formNode, dataArray), col, row);
 			break;
 		case "outcommodity":
-			grid.add(FormBuilderFunctions.comboBoxOutCommod(formNode, dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.comboBoxOutCommod(formNode, dataArray), col, row);
 			break;
 		case "inrecipe": case "outrecipe": case "recipe":
-			grid.add(FormBuilderFunctions.recipeComboBox(formNode, dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.recipeComboBox(formNode, dataArray), col, row);
 			break;
 		case "commodity":
-			grid.add(FormBuilderFunctions.comboBoxCommod(dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.comboBoxCommod(dataArray), col, row);
 			break;
 		case "prototype":
-			grid.add(comboBoxFac(dataArray), 1+col, row);
+			grid.add(comboBoxFac(dataArray), col, row);
 			break;
+		case "filechooser":
+			TextField fileField = fileTextField(dataArray);
+			grid.add(fileField, col, row);
+			grid.add(fileChooserButton(fileField), col+1, row);
 		default:
-			grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), col, row);
 			break;
 		}
 		return grid;

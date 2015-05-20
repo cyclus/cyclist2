@@ -7,7 +7,10 @@ import javafx.scene.effect.Bloom;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.Light.Distant;
 import javafx.scene.effect.Lighting;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 /**
  * Contains all of the generic and misc visualization functions 
@@ -139,20 +142,21 @@ public class VisFunctions {
 	 * @param source
 	 * @param target
 	 */
-	static void linkFacToFac(FacilityCircle source, FacilityCircle target){
+	static void linkFacToFac(FacilityCircle source, FacilityCircle target, String commod){
 		nodeLink link = new nodeLink();
 		link.source = source;
 		link.target = target;
 		Line line = link.line;
+		link.line.text.setText(commod);
 		line.setStartX(source.getCenterX());
 		line.setStartY(source.getCenterY());
 		line.setEndX(target.getCenterX());
 		line.setEndY(target.getCenterY());
-
 		link.line.updatePosition();
 		CycicScenarios.workingCycicScenario.Links.add(link);
 		Cycic.pane.getChildren().addAll(link.line, link.line.left, link.line.right);
 		Cycic.pane.getChildren().addAll(link.line.left1, link.line.right1);
+		Cycic.pane.getChildren().add(link.line.text);
 		link.line.toBack();
 	}
 
@@ -183,7 +187,7 @@ public class VisFunctions {
 				for (facilityNode inFac: CycicScenarios.workingCycicScenario.FacilityNodes) {
 					for (int j = 0; j < inFac.cycicCircle.incommods.size(); j++) {
 						if (outFac.cycicCircle.outcommods.get(i) == inFac.cycicCircle.incommods.get(j)){
-							linkFacToFac(outFac.cycicCircle, inFac.cycicCircle);
+							linkFacToFac(outFac.cycicCircle, inFac.cycicCircle, inFac.cycicCircle.incommods.get(j));
 						}
 					}
 				}

@@ -1,11 +1,7 @@
 package edu.utexas.cycic;
 
 import java.util.ArrayList;
-import java.util.UUID;
-
 import edu.utah.sci.cyclist.core.ui.components.ViewBase;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -22,7 +18,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 /**
  * A View Class for generating the form required for interacting with a Cyclus region.

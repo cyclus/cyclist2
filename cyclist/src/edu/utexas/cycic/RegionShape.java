@@ -45,18 +45,14 @@ public class RegionShape extends Rectangle {
 	Object name;
 	Label text = new Label("");
 	MenuBar menuBar = new MenuBar();
+	static regionNode regionBackTrace;
 	ArrayList<Integer> rgbColor = new ArrayList<Integer>();
-	ListView<String> facilityList = new ListView<String>();
-	ListView<String> institutionList = new ListView<String>();
-	{
-		setId("this");
-	}
 
 	static RegionShape addRegion(final String name, final regionNode region) {
 		final RegionShape rect = new RegionShape();
 		
 		RegionCorralView.workingRegion = region;
-		
+		regionBackTrace = region;
 		// Set properties of regionNode
 		region.name = name;
 		
@@ -218,7 +214,6 @@ public class RegionShape extends Rectangle {
 
 				menuBar.setLayoutX(getX()+getHeight()*0.2);
 				menuBar.setLayoutY(getY()+getHeight()*0.2);
-
 			}
 		});
 

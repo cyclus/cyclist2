@@ -1,36 +1,20 @@
 package edu.utexas.cycic;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Optional;
-
-import org.controlsfx.dialog.Dialogs;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
@@ -39,12 +23,17 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import edu.utah.sci.cyclist.core.event.dnd.DnD;
 import edu.utah.sci.cyclist.core.ui.components.ViewBase;
-import edu.utexas.cycic.tools.RegionViewTool;
 
 public class RegionCorralView extends ViewBase {
 
+	/**
+	 * 
+	 */
 	static regionNode workingRegion = null; 
 
+	/**
+	 * 
+	 */
 	static Pane corralPane = new Pane(){
 		{
 			setPrefHeight(375);
@@ -83,45 +72,32 @@ public class RegionCorralView extends ViewBase {
 		}
 	};
 
+	/**
+	 * 
+	 */
 	static GridPane regionCorralGrid = new GridPane(){
 		{
 			setHgap(10);
 			setVgap(5);
 		}
 	};
+	
+	/**
+	 * 
+	 */
 	static HBox unassociatedFacilityList = new HBox(10);
 	
+	/**
+	 * 
+	 */
 	public static void addUnassInstit(){
 		unassociatedFacilityList.getChildren().add(new Circle());
 	}
+	
+	/**
+	 * 
+	 */
 	public RegionCorralView() {
-		
-		if (DataArrays.simRegions.size() < 1) {
-			String string;
-			for(int i = 0; i < XMLReader.regionList.size(); i++){
-				StringBuilder sb = new StringBuilder();
-				StringBuilder sb1 = new StringBuilder();
-				Process proc;
-				try {
-					proc = Runtime.getRuntime().exec("cyclus --agent-schema "+XMLReader.regionList.get(i)); 
-					BufferedReader read = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-					while((string = read.readLine()) != null){
-						sb.append(string);
-					}
-					Process proc1 = Runtime.getRuntime().exec("cyclus --agent-annotations "+XMLReader.regionList.get(i));
-					BufferedReader read1 = new BufferedReader(new InputStreamReader(proc1.getInputStream()));
-					while((string = read1.readLine()) != null){
-						sb1.append(string);
-					}
-					regionStructure test = new regionStructure();
-					test.regionName = XMLReader.regionList.get(i).replace(":", " ").trim();
-					test.regionStruct = XMLReader.annotationReader(sb1.toString(), XMLReader.readSchema(sb.toString()));
-					DataArrays.simRegions.add(test);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
 		
 		// Create content for RegionCorralView header 
 		final Label regionLabel = new Label("Region Name:");
@@ -131,7 +107,7 @@ public class RegionCorralView extends ViewBase {
 		final TextField regionText = new TextField();
 		regionCorralGrid.add(regionText, 1, 0);
 
-		final ComboBox typeOptions = new ComboBox();
+		final ComboBox<String> typeOptions = new ComboBox<String>();
 		typeOptions.getItems().clear();
 		for(int i = 0; i < DataArrays.simRegions.size(); i++){
 			typeOptions.getItems().add(DataArrays.simRegions.get(i).regionName);
@@ -140,6 +116,7 @@ public class RegionCorralView extends ViewBase {
 
 		final Button corralButton = new Button();
 		corralButton.setText("Add");
+		/** TODO THIS BUTTON DOES NOTHING AT ALL */
 		regionCorralGrid.add(corralButton, 3, 0);
 
 		final Label regionPrototypeLabel = new Label("Region Prototypes:");
@@ -177,26 +154,6 @@ public class RegionCorralView extends ViewBase {
 		}
 		scroll.setContent(nodesPane);
 
-		/* Create content of RegionCorral footer 
-
-		Label unassociatedInstitutions = new Label("Unassociated Institutions:"){
-			{
-				setFont(new Font(12));
-			}
-		};
-		regionCorralGrid.add(unassociatedInstitutions, 4, 1);
-		
-	
-		HBox unassociatedInstitList = new HBox(10);
-
-		ScrollPane root2 = new ScrollPane(){
-			{
-				setMinHeight(50);
-				setMaxHeight(50);
-			}
-		};
-		root2.setContent(unassociatedInstitList);
-		regionCorralGrid.add(root2, 5, 1);*/
 		regionCorralGrid.autosize();
 
 		/* Place RegionCorralView header, corralPane, and footer on main corralVBox */
@@ -205,7 +162,7 @@ public class RegionCorralView extends ViewBase {
 		mainCorralVBox.getChildren().addAll(regionCorralGrid, scroll, corralPane);
 		setContent(mainCorralVBox);
 
-		EventHandler addRegion = new EventHandler<MouseEvent>(){
+		EventHandler<MouseEvent> addRegion = new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent event) {
 				final regionNode region = new regionNode();
 				region.type = (String) typeOptions.getValue();

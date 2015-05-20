@@ -35,12 +35,20 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
+import javax.swing.AbstractAction;
 
 import javafx.geometry.Insets;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -51,6 +59,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
@@ -80,6 +89,9 @@ public class Cycic extends ViewBase{
 		}
 		init();
 	}
+	/**
+	 * 
+	 */
 	public static final String TITLE = "Cycic";
 	static Pane pane = new Pane();
 	Pane nodesPane = new Pane();
@@ -94,6 +106,7 @@ public class Cycic extends ViewBase{
     static CyclusJob _remoteDashA;
     private static Object monitor = new Object();
 	
+    
 	/**
 	 * 
 	 */
@@ -184,6 +197,7 @@ public class Cycic extends ViewBase{
 		}
 	};
 	
+
 	/**
 	 * Initiates the Pane and GridPane.
 	 */
@@ -197,6 +211,44 @@ public class Cycic extends ViewBase{
 		} catch (IOException e1) {
 			log.warn("Could not read default meta data. Please use DISCOVER ARCHETYPES button. Thanks!");
 		}
+		pane.setOnMouseClicked(new EventHandler<MouseEvent>(){
+			public void handle(MouseEvent e){
+				if(e.getButton().equals(MouseButton.SECONDARY)){
+					/** TODO Turn this into a menu. Should menu move with cursor or rebuild menu each time? 
+					 * Also this should save the previous color and cancel should return you to that color.*/
+
+					if (e.isShiftDown() == true){
+						ColorPicker cP = new ColorPicker();
+						cP.setOnAction(new EventHandler<ActionEvent>(){
+							public void handle(ActionEvent e){
+								for(nodeLink node: DataArrays.Links){
+									node.line.updateColor(cP.getValue());
+								}
+							}
+						});
+						Dialog dg = new Dialog();
+						ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
+						dg.getDialogPane().setContent(cP);
+						dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+						dg.show();
+					} else {
+						ColorPicker cP = new ColorPicker();
+						cP.setOnAction(new EventHandler<ActionEvent>(){
+							public void handle(ActionEvent e){
+								String background = "-fx-background-color: #";
+								background += cP.getValue().toString().substring(2, 8);
+								pane.setStyle(background);
+							}
+						});
+						Dialog dg = new Dialog();
+						ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
+						dg.getDialogPane().setContent(cP);
+						dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+						dg.show();
+					}
+				}
+			}
+		});
 		pane.setOnDragOver(new EventHandler <DragEvent>(){
 			public void handle(DragEvent event){
 				event.acceptTransferModes(TransferMode.ANY);
@@ -237,6 +289,8 @@ public class Cycic extends ViewBase{
 					
 					facility.sorterCircle = SorterCircles.addNode((String)facility.name, facility, facility);
 					FormBuilderFunctions.formArrayBuilder(facility.facilityStructure, facility.facilityData);			
+				} else {
+					event.consume();
 				}
 			}
 		});
@@ -249,10 +303,11 @@ public class Cycic extends ViewBase{
 		
 		VBox cycicBox = new VBox();
 		cycicBox.autosize();
-		Cycic.pane.autosize();
-		Cycic.pane.setId("cycicPane");
-		Cycic.pane.setPrefSize(1000, 600);
-		Cycic.pane.setStyle("-fx-background-color: white;");
+
+		pane.autosize();
+		pane.setId("cycicPane");
+		pane.setPrefSize(1000, 600);
+		pane.setStyle("-fx-background-color: white;");
 		
 		// Temp Toolbar //
 		final GridPane grid = new GridPane();
@@ -312,6 +367,7 @@ public class Cycic extends ViewBase{
 		
 		skins.getItems().add("Default Skin");
 		skins.setValue("Default Skin");
+		DataArrays.visualizationSkins.add(XMLReader.SC2);
 		DataArrays.visualizationSkins.add(XMLReader.loadSkin(path));
 		for(int i = 0; i < DataArrays.visualizationSkins.size(); i++){
 			skins.getItems().add(DataArrays.visualizationSkins.get(i).name);
@@ -352,10 +408,11 @@ public class Cycic extends ViewBase{
 			}
 		});
 		grid.add(imageButton, 2, 1);
+		opSwitch.getToggles().clear();
         opSwitch.getToggles().addAll(localToggle, remoteToggle);
         try {
             Process readproc = Runtime.getRuntime().exec("cyclus -V");
-            BufferedReader schema = new BufferedReader(new InputStreamReader(readproc.getInputStream()));
+            new BufferedReader(new InputStreamReader(readproc.getInputStream()));
             localToggle.setSelected(true);
         } catch (RuntimeException | IOException e) {
             localToggle.setSelected(false);
@@ -380,8 +437,7 @@ public class Cycic extends ViewBase{
 		                + "-fx-border-color: black");
 			}
 		};
-		//ScrollPane commodScroll = new ScrollPane();
-		//commodScroll.setContent(commodBox); 
+
 		sideView.getChildren().addAll(simDetailBox, archetypeGrid, commodBox);
 		mainView.getChildren().addAll(sideView, cycicBox);
 		
@@ -400,12 +456,11 @@ public class Cycic extends ViewBase{
         JsonObject schemas = metadata.getJsonObject("schema");
         JsonObject annotations = metadata.getJsonObject("annotations");
             
-        String string;
         DataArrays.simFacilities.clear();
         DataArrays.simRegions.clear();
         DataArrays.simInstitutions.clear();
         for(javax.json.JsonString specVal : metadata.getJsonArray("specs").getValuesAs(JsonString.class)){
-            String spec = specVal.getString();
+        	String spec = specVal.getString();
             boolean test = true;
             for(int j = 0; j < XMLReader.blackList.size(); j++){
                 if(spec.equalsIgnoreCase(XMLReader.blackList.get(j))){
@@ -415,6 +470,8 @@ public class Cycic extends ViewBase{
             if(test == false){
                 continue;
             }
+            
+            
             String schema = schemas.getString(spec);
             String pattern1 = "<!--.*?-->";
             Pattern p = Pattern.compile(pattern1, Pattern.DOTALL);
@@ -427,23 +484,25 @@ public class Cycic extends ViewBase{
             JsonObject anno = annotations.getJsonObject(spec);
             switch(anno.getString("entity")){
             case "facility":
+                log.info("Adding archetype "+spec);
                 facilityStructure node = new facilityStructure();
                 node.facAnnotations = anno.toString();
                 node.facilityArch = spec;
                 node.niche = anno.getString("niche", "facility");
-                node.facStruct = XMLReader.annotationReader(anno.toString(), 
-                    XMLReader.readSchema(schema));
+                JsonObject facVars = anno.getJsonObject("vars");
+                ArrayList<Object> facArray = new ArrayList<Object>();
+                node.facStruct = XMLReader.nodeBuilder(facVars, facArray, XMLReader.readSchema_new(schema));
                 node.facilityName = spec.replace(":", " ");
                 DataArrays.simFacilities.add(node);
-                log.info("Adding archetype "+spec);
                 break;
             case "region":
                 log.info("Adding archetype "+spec);
                 regionStructure rNode = new regionStructure();
                 rNode.regionAnnotations = anno.toString();
                 rNode.regionArch = spec;
-                rNode.regionStruct = XMLReader.annotationReader(anno.toString(),
-                    XMLReader.readSchema(schema));
+                JsonObject regionVars = anno.getJsonObject("vars");
+                ArrayList<Object> regionArray = new ArrayList<Object>();
+                rNode.regionStruct = XMLReader.nodeBuilder(regionVars, regionArray, XMLReader.readSchema_new(schema));
                 rNode.regionName = spec.replace(":", " ");
                 DataArrays.simRegions.add(rNode);
                 break;
@@ -452,8 +511,9 @@ public class Cycic extends ViewBase{
                 institutionStructure iNode = new institutionStructure();
                 iNode.institArch = spec;
                 iNode.institAnnotations = anno.toString();
-                iNode.institStruct = XMLReader.annotationReader(anno.toString(),
-                    XMLReader.readSchema(schema));
+                JsonObject instVars = anno.getJsonObject("vars");
+                ArrayList<Object> instArray = new ArrayList<Object>();
+                iNode.institStruct = XMLReader.nodeBuilder(instVars, instArray, XMLReader.readSchema_new(schema));
                 iNode.institName = spec.replace(":", " ");
                 DataArrays.simInstitutions.add(iNode);
                 break;
@@ -478,18 +538,20 @@ public class Cycic extends ViewBase{
 		circle.setFill(Color.web("#CF5300"));
 		circle.setCenterX(45+(i*90));
 		circle.setCenterY(50);
-		circle.text.setText(name);
+		circle.text.setText(name.split(" ")[2]);
 		circle.text.setWrapText(true);
 		circle.text.setMaxWidth(60);
 		circle.text.setLayoutX(circle.getCenterX()-circle.getRadius()*0.7);
 		circle.text.setLayoutY(circle.getCenterY()-circle.getRadius()*0.6);	
 		circle.text.setTextAlignment(TextAlignment.CENTER);
 		circle.text.setMouseTransparent(true);
+		circle.text.setMaxWidth(circle.getRadius()*1.4);
+		circle.text.setMaxHeight(circle.getRadius()*1.2);
 		circle.setOnDragDetected(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
 				Dragboard db = circle.startDragAndDrop(TransferMode.COPY);
 				ClipboardContent content = new ClipboardContent();				
-				content.put(DnD.VALUE_FORMAT, circle.text.getText());
+				content.put(DnD.VALUE_FORMAT, name);
 				db.setContent(content);
 				e.consume();
 			}
@@ -527,7 +589,21 @@ public class Cycic extends ViewBase{
 			removeCommod.setGraphic(GlyphRegistry.get(AwesomeIcon.TRASH_ALT, "10px"));
 			removeCommod.setOnAction(new EventHandler<ActionEvent>(){
 				public void handle(ActionEvent e){
+					String commod = Cycic.workingScenario.CommoditiesList.get(index).name.getText();
 					Cycic.workingScenario.CommoditiesList.remove(index);
+					for(facilityNode facility: DataArrays.FacilityNodes){
+						for(int i =0; i < facility.cycicCircle.incommods.size(); i++){
+							if(facility.cycicCircle.incommods.get(i) == commod){
+								facility.cycicCircle.incommods.remove(i);
+							}
+						}
+						for(int i =0; i < facility.cycicCircle.outcommods.size(); i++){
+							if(facility.cycicCircle.outcommods.get(i) == commod){
+								facility.cycicCircle.outcommods.remove(i);
+							}
+						}
+					}
+					VisFunctions.marketHide();
 					buildCommodPane();
 				}
 			});	
@@ -693,7 +769,7 @@ public class Cycic extends ViewBase{
                     try {
                         File temp = File.createTempFile(cycicTemp, ".xml");
                         FileWriter fileOutput = new FileWriter(temp);
-                        BufferedWriter buffOut = new BufferedWriter(fileOutput);
+                        new BufferedWriter(fileOutput);
                         Process p = Runtime.getRuntime().exec("cyclus -o "+cycicTemp +".sqlite "+cycicTemp);
                         p.waitFor();
                         String line = null;
@@ -737,8 +813,7 @@ public class Cycic extends ViewBase{
 							return;
 						}
 						facilityStructure test = DataArrays.simFacilities.get(i);
-						String string;
-						StringBuilder sb = new StringBuilder();
+						new StringBuilder();
 						try {
 							test.loaded = true;
 							FacilityCircle circle = new FacilityCircle();
@@ -828,6 +903,7 @@ public class Cycic extends ViewBase{
 	        stringBuilder.append( ls );
 	    }
 	    reader.close();
+	    
 		retrieveSchema(stringBuilder.toString());
 	}
 }

@@ -5,13 +5,14 @@ import edu.utah.sci.cyclist.core.presenter.ViewPresenter;
 import edu.utah.sci.cyclist.core.tools.Tool;
 import edu.utah.sci.cyclist.core.ui.View;
 import edu.utah.sci.cyclist.core.util.AwesomeIcon;
-import edu.utexas.cycic.InstitutionView;
+import edu.utexas.cycic.InstitutionCorralView;
+import edu.utexas.cycic.presenter.InstitutionCorralViewPresenter;
 
-public class InstitutionViewTool implements Tool {
+public class InstitutionCorralViewTool implements Tool {
 
-	public static final String ID 			= "edu.utexas.cycic.InstitutionViewTool";
-    public static final String TOOL_NAME    = "Institution View";
-    public static final AwesomeIcon ICON    = AwesomeIcon.INFO;
+	public static final String ID 			= "edu.utexas.cycic.InstitutionCorralViewTool";
+    public static final String TOOL_NAME    = "Institution Corral";
+    public static final AwesomeIcon ICON    = AwesomeIcon.GLOBE;
 	
 	private View _view = null;
 	private ViewPresenter _presenter = null;
@@ -29,15 +30,14 @@ public class InstitutionViewTool implements Tool {
 	@Override
 	public View getView() {
 		if (_view == null) 
-			_view = new InstitutionView();
+			_view = new InstitutionCorralView();
 		return _view;
 	}
 
 	@Override
 	public ViewPresenter getPresenter(EventBus bus) {
 		if (_presenter == null)
-			_presenter = new ViewPresenter(bus);
+			_presenter = new InstitutionCorralViewPresenter(bus);
 		return _presenter;
 	}
-
 }

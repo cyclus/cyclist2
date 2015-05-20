@@ -187,6 +187,7 @@ class nodeLink {
 	Object source;
 	Object target;
 	ConnectorLine line = new ConnectorLine();
+	
 }
 
 /**
@@ -221,7 +222,7 @@ class instituteNode{
 	ArrayList<Object> institStruct  = new ArrayList<Object>();
 	ArrayList<Object> institData  = new ArrayList<Object>();
 	ArrayList<facilityItem> availFacilities = new ArrayList<facilityItem>();
-	ArrayList<String> availPrototypes = new ArrayList<String>();
+	InstitutionShape institutionShape = new InstitutionShape();
 }
 
 /**
@@ -232,7 +233,12 @@ class instituteNode{
  */
 class facilityItem{
 	String name;
-	String number;	
+	String number;
+	
+	facilityItem(String name, int number){
+		this.name = name;
+		this.number = Integer.toString(number);
+	}
 }
 
 /**

@@ -332,7 +332,8 @@ public class OutPut {
 					facilityDataElement(doc, rootElement, (ArrayList<Object>) structArray.get(i), (ArrayList<Object>) dataArray.get(i));
 				}
 			} else {
-				Element name = doc.createElement((String) structArray.get(0).toString().replace(" ", ""));
+				System.out.println((String) structArray.get(0).toString());
+				Element name = doc.createElement((String) structArray.get(0).toString().replace(" ", "").replace("\"", ""));
 				name.appendChild(doc.createTextNode((String)dataArray.get(0)));
 				rootElement.appendChild(name);
 			}

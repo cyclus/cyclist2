@@ -3,6 +3,7 @@ package edu.utexas.cycic;
 import java.util.ArrayList;
 
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
@@ -36,6 +37,7 @@ public class FacilityCircle extends Circle {
 	Object name; 
 	Boolean childrenShow;
 	Tooltip tooltip = new Tooltip();
+	String niche; 
 	{
 		setId("cycicNode");
 	}
