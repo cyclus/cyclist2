@@ -240,6 +240,6 @@ public class Clones {
 				parent.facilityClones.remove(i);
 			}
 		}
-		VisFunctions.marketHide();
+		VisFunctions.redrawPane();
 	}
 }

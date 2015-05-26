@@ -230,6 +230,7 @@ public class Cycic extends ViewBase{
 						ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
 						dg.getDialogPane().setContent(cP);
 						dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+						dg.setResizable(true);
 						dg.show();
 					} else {
 						ColorPicker cP = new ColorPicker();
@@ -603,7 +604,7 @@ public class Cycic extends ViewBase{
 							}
 						}
 					}
-					VisFunctions.marketHide();
+					VisFunctions.redrawPane();
 					buildCommodPane();
 				}
 			});	

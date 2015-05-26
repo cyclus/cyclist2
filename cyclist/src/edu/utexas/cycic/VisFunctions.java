@@ -163,7 +163,7 @@ public class VisFunctions {
 	/**
 	 * Reloads the CYCIC pane without Markets.
 	 */
-	static void marketHide(){
+	static void redrawPane(){
 		Cycic.pane.getChildren().remove(0, Cycic.pane.getChildren().size());
 		for(int i = 0; i < CycicScenarios.workingCycicScenario.FacilityNodes.size(); i++){
 			Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle);

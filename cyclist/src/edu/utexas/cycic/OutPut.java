@@ -281,6 +281,9 @@ public class OutPut {
 				facilityDataElement(doc, configType, (ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
 			} else {
 				// Adding the label
+				if((Boolean) facArray.get(10) == false){
+					break;
+				}
 				Element heading = doc.createElement((String) facArray.get(0));
 				heading.appendChild(doc.createTextNode((String) dataArray.get(0)));
 				configType.appendChild(heading);
@@ -311,31 +314,36 @@ public class OutPut {
 	 * input document.
 	 * @param rootElement The element that will serve as the heading for 
 	 * substructures built in this function.
-	 * @param structArray ArrayList<Object> containing the 
+	 * @param facArray ArrayList<Object> containing the 
 	 * facility input field information.
 	 * @param dataArray ArrayList<Object> containing the data associated 
 	 * with the input field information.
 	 */
 	@SuppressWarnings("unchecked")
-	public static void facilityDataElement(Document doc, Element rootElement, ArrayList<Object> structArray, ArrayList<Object> dataArray){
+	public static void facilityDataElement(Document doc, Element rootElement, ArrayList<Object> facArray, ArrayList<Object> dataArray){
 		for (int i = 0; i < dataArray.size(); i++){
 			if (dataArray.get(i) instanceof ArrayList){
-				if (structArray.size() > 2 && !(structArray.get(2) instanceof ArrayList)){ 
-					if (indentCheck((String) structArray.get(2))){
-						Element tempElement = doc.createElement((String) structArray.get(0).toString().replace(" ", ""));
+				if (facArray.size() > 2 && !(facArray.get(2) instanceof ArrayList)){ 
+					if((Boolean) facArray.get(10) == false){
+						break;
+					}
+					if (indentCheck((String) facArray.get(2))){
+						Element tempElement = doc.createElement((String) facArray.get(0).toString().replace(" ", ""));
 						rootElement.appendChild(tempElement);
 						for(int j = 0; j < dataArray.size(); j++){
-							facilityDataElement(doc, tempElement, (ArrayList<Object>) structArray.get(1), (ArrayList<Object>) dataArray.get(j));
+							facilityDataElement(doc, tempElement, (ArrayList<Object>) facArray.get(1), (ArrayList<Object>) dataArray.get(j));
 						}
 						break;
 						
 					}
 				} else {
-					facilityDataElement(doc, rootElement, (ArrayList<Object>) structArray.get(i), (ArrayList<Object>) dataArray.get(i));
+					facilityDataElement(doc, rootElement, (ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
 				}
 			} else {
-				System.out.println((String) structArray.get(0).toString());
-				Element name = doc.createElement((String) structArray.get(0).toString().replace(" ", "").replace("\"", ""));
+				if((Boolean) facArray.get(10) == false){
+					break;
+				}
+				Element name = doc.createElement((String) facArray.get(0).toString().replace(" ", "").replace("\"", ""));
 				name.appendChild(doc.createTextNode((String)dataArray.get(0)));
 				rootElement.appendChild(name);
 			}
@@ -431,7 +439,7 @@ public class OutPut {
 			}
 			
 			NodeList marketList = doc.getElementsByTagName("marketNode");
-			VisFunctions.marketHide();
+			VisFunctions.redrawPane();
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -523,7 +531,7 @@ public class OutPut {
 				tempNode.name = element.getElementsByTagName("name").item(0).getTextContent();
 				tempNode.cycicCircle = CycicCircles.addNode((String) tempNode.name, tempNode);
 			}	
-			VisFunctions.marketHide();
+			VisFunctions.redrawPane();
 		} catch (Exception e){
 			e.printStackTrace();
 		}

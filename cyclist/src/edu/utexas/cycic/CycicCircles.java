@@ -119,7 +119,7 @@ public class CycicCircles{
 				dg.setContentText("ADSFA");
 				Optional<String> result = dg.showAndWait();
 				if (result.isPresent()){
-				    System.out.println("Your name: " + result.get());
+				    System.out.println("test");
 				}
 				circle.menu.setVisible(false);
 			}
@@ -354,7 +354,7 @@ public class CycicCircles{
 				CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.get(ii).parentIndex = i;
 			}
 		}
-		VisFunctions.marketHide();
+		VisFunctions.redrawPane();
 
 	}
 }

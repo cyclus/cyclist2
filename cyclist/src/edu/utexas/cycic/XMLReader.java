@@ -13,6 +13,7 @@ import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
+import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -131,7 +132,6 @@ public class XMLReader {
 					Node temp_node = node.item(i).getChildNodes().item(1);
 					for(int k = 0; k < temp_node.getAttributes().getLength(); k++){
 						if (( temp_node).getAttributes().item(k).getNodeName() == "name"){
-							System.out.println(temp_node.getAttributes().item(k).getNodeValue());
 							schema.add((temp_node).getAttributes().item(k).getNodeValue());
 						} 
 					}
@@ -139,7 +139,6 @@ public class XMLReader {
 				default:
 					for(int j = 0; j < node.item(i).getAttributes().getLength(); j++){
 						if (node.item(i).getAttributes().item(j).getNodeName() == "name"){
-							System.out.println(node.item(i).getAttributes().item(j).getNodeValue());
 							schema.add(node.item(i).getAttributes().item(j).getNodeValue());
 						} 
 					}
@@ -186,9 +185,12 @@ public class XMLReader {
 	 * @return
 	 */
 	static ArrayList<Object> cycicResize(ArrayList<Object> dataArray){
-		while(dataArray.size() < 10){
+		while(dataArray.size() < 11){
 			if(dataArray.size() == 6){
 				dataArray.add(0);
+			}
+			if(dataArray.size() == 10){
+				dataArray.add(true);
 			}
 			if(dataArray.size() == 3){
 				if(dataArray.get(2) == null){
@@ -204,7 +206,6 @@ public class XMLReader {
 	static ArrayList<Object> nodeBuilder(JsonObject anno, ArrayList<Object> facArray, ArrayList<String> vars){
 		for(int i = 0; i < vars.size(); i++){
 			String var = vars.get(i);	
-			System.out.println(var);
 			if(anno.get(var).getValueType() == ValueType.STRING){
 				ArrayList<String> tempArray = new ArrayList<String>();
 				tempArray.add(anno.getString(var));
@@ -212,7 +213,6 @@ public class XMLReader {
 				break;
 			}
 			JsonObject anno1 = anno.getJsonObject(var);
-			System.out.println(anno1);
 			ValueType test = anno1.get("type").getValueType();
 			String doc_s = (anno1.getJsonString("doc") != null) ? anno1.getString("doc") : null;
 			if(test == ValueType.ARRAY){
@@ -224,37 +224,39 @@ public class XMLReader {
 				if(range == null){
 					range = anno1.getJsonArray("categorical");
 				}
-				JsonArray defType;
-				if(type.getJsonString(0).toString().replace("\"", "").equalsIgnoreCase("std::map")){
-					if(anno1.get("default") != null){
-						defType = Json.createArrayBuilder()
-								.add("")
-								.add("")
-								.add("")
-								/*.add(Json.createArrayBuilder()
+				JsonArray defType = null;
+				if(anno1.get("default") != null){
+					if(anno1.get("default").getValueType() == JsonValue.ValueType.OBJECT){
+						System.out.println("OBJECT "  + anno1.getJsonObject("default"));
+						JsonObject defTypeObj = anno1.getJsonObject("default");
+						if(defTypeObj.size() == 0){
+							defType = Json.createArrayBuilder()
+									.add("false")
 									.add("")
-									.add(""))*/
-								.build();
-					} else {
-						defType = null;
-					}
-				} else if (type.getJsonString(0).toString().replace("\"", "").equalsIgnoreCase("std::pair")){
-					if(anno1.get("default") != null){
-						defType = Json.createArrayBuilder()
-								.add("")
-								.add("")
-								.add("")
-								/*.add(Json.createArrayBuilder()
 									.add("")
-									.add(""))*/
-								.build();
-					} else {
-						defType = null;
-					}
-				} else {
-					defType = anno1.getJsonArray("default");
+									.build();
+						} else {
+							defTypeObj.keySet().toArray();
+							defTypeObj.values().toArray();
+							//TODO add method for walking arrays. 
+						}
+					} else if(anno1.get("default").getValueType() == JsonValue.ValueType.ARRAY){
+						System.out.println("ARRAY "  + anno1.getJsonArray("default"));
+						JsonArray defTypeArray = anno1.getJsonArray("default");
+						if(defTypeArray.size() == 0){
+							defType = Json.createArrayBuilder()
+									.add("false")
+									.add("")
+									.build();
+						} else {
+							//TODO add method for walking arrays
+						}
+					} else if(anno1.get("default").getValueType() == JsonValue.ValueType.STRING){
+						System.out.println("STRING "  + anno1.getJsonString("default"));
+					} else if(anno1.get("default").getValueType() == JsonValue.ValueType.NUMBER){
+						System.out.println("NUMBER "  + anno1.getJsonNumber("default"));
+					} 
 				}
-				//defType = null;
 				JsonArray userLevel = anno1.getJsonArray("userlevel");
 				JsonArray tooltip = anno1.getJsonArray("tooltip");
 				JsonArray uilabel = anno1.getJsonArray("uilabel");
@@ -262,7 +264,6 @@ public class XMLReader {
 				newArray = annotationBuilder(type, alias, uitype, var,units, range, defType, 
 						userLevel, tooltip, uilabel, newArray);
 				newArray.set(8, doc_s);
-				System.out.println(newArray);
 				facArray.add(newArray);
 			} else {
                 String alias_s, uitype_s, units_s, range_s, defType_s, tooltip_s, uilabel_s, cat_s;
@@ -313,7 +314,6 @@ public class XMLReader {
 	static ArrayList<Object> annotationBuilder(JsonArray type, JsonArray alias, JsonArray uitype, String var, JsonArray units,
 			JsonArray range, JsonArray defType, JsonArray userLevel, JsonArray tooltip, JsonArray uilabel,
 			ArrayList<Object> facArray){
-		System.out.println(type.getJsonString(0).toString());
 		switch (type.getJsonString(0).toString().replaceAll("\"", "")){
 		case "std::map":
 			ArrayList<Object> structArray = new ArrayList<Object>();
@@ -356,7 +356,6 @@ public class XMLReader {
 				facArray.add(var);
 				itemArray.add("item");
 			} else {
-				System.out.println(alias);
 				facArray.add(alias.getJsonArray(0).getString(0));	
 				itemArray.add(alias.getJsonArray(0).getString(1));
 			}
@@ -364,24 +363,28 @@ public class XMLReader {
 			itemArray.add("item");
 			cycicResize(itemArray);
 			facArray.add(itemArray);
-			facArray.add("oneOrMoreMap");
 			cycicResize(facArray);
-			if(userLevel == null){
-				facArray.add(0);		
+			if(defType != null){
+				facArray.set(5, defType.getString(0));
+				facArray.set(2, "zeroOrMore");
+				facArray.set(6, 1);
+				facArray.set(10, false);
 			} else {
-				System.out.println(userLevel);
-				facArray.set(6, userLevel.getJsonArray(0).getString(0));		
-			}
+				facArray.set(2, "oneOrMoreMap");
+				if(userLevel == null){
+					facArray.set(6, 0);		
+				} else {
+					facArray.set(6, userLevel.getJsonArray(0).getString(0));		
+				}
+			} 
 			if(tooltip == null){
 				facArray.add("");
 			} else {
-				System.out.println(tooltip);
 				facArray.set(7, tooltip.getJsonArray(0).getString(0));		
 			}
 			if(uilabel == null){
 				facArray.add(var);		
 			} else {
-				System.out.println(uilabel);
 				facArray.set(9, uilabel.getJsonArray(0).getString(0));		
 			}
 			break;
@@ -428,22 +431,27 @@ public class XMLReader {
 			facArray.add(structArrayPair);
 			facArray.add("pair");
 			cycicResize(facArray);
-			if(userLevel == null){
-				facArray.add(0);		
+			if(defType != null){
+				facArray.set(5, defType.getString(0));
+				facArray.set(2, "zeroOrMore");
+				facArray.set(6, 1);
+				facArray.set(10, false);
 			} else {
-				System.out.println(userLevel);
-				facArray.set(6, userLevel.getString(0));		
-			}
+				facArray.set(2, "oneOrMore");
+				if(userLevel == null){
+					facArray.set(6, 0);		
+				} else {
+					facArray.set(6, userLevel.getJsonArray(0).getString(0));		
+				}
+			} 
 			if(tooltip == null){
 				facArray.add("");		
 			} else {
-				System.out.println(tooltip);
 				facArray.set(7, tooltip.getString(0));		
 			}
 			if(uilabel == null){
 				facArray.add(var);	
 			} else {
-				System.out.println(uilabel);
 				facArray.set(9, uilabel.getString(0));		
 			}
 			break;
@@ -488,6 +496,30 @@ public class XMLReader {
 			facArray.add(structArrayVector);
 			facArray.add("oneOrMore");
 			cycicResize(facArray);
+			cycicResize(facArray);
+			if(defType != null){
+				facArray.set(5, defType.getString(0));
+				facArray.set(2, "zeroOrMore");
+				facArray.set(6, 1);
+				facArray.set(10, false);
+			} else {
+				facArray.set(2, "oneOrMore");
+				if(userLevel == null){
+					facArray.set(6, 0);		
+				} else {
+					facArray.set(6, userLevel.getJsonArray(0).getString(0));		
+				}
+			} 
+			if(tooltip == null){
+				facArray.add("");		
+			} else {
+				facArray.set(7, tooltip.getString(0));		
+			}
+			if(uilabel == null){
+				facArray.add(var);	
+			} else {
+				facArray.set(9, uilabel.getString(0));		
+			}
 			break;
 		case "std::string":
 		case "int":
@@ -533,6 +565,7 @@ public class XMLReader {
 		facArray.set(5, defType);
 		if(defType != null){
 			facArray.set(6, 1);
+			if(defType.replace("\"", "").equalsIgnoreCase("")){facArray.set(10, false);}
 		}
 		facArray.set(9, uilabel);
 		return facArray;
@@ -742,5 +775,10 @@ public class XMLReader {
 			categorical_s = categorical.getString(i);
 		}
 		return categorical_s;
+	}
+	
+	static JsonArray defaultBuilder(JsonArray defArray){
+		
+		return defArray;
 	}
 }

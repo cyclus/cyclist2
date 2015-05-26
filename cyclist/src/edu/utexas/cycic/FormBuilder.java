@@ -37,7 +37,7 @@ public class FormBuilder extends ViewBase {
 		super();
 		formNode = Cycic.workingNode;
 		TITLE = (String) Cycic.workingNode.name;
-		System.out.println(formNode.facilityStructure);
+		//System.out.println(formNode.facilityStructure);
 		formBuilder(grid, formNode.facilityStructure, formNode.facilityData);
 		
 		Button button = new Button();
@@ -114,6 +114,7 @@ public class FormBuilder extends ViewBase {
 		
 		button.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
+				facArray.set(10, true);
  				FormBuilderFunctions.formArrayBuilder(facArray, (ArrayList<Object>) dataArray);
 				grid.getChildren().clear();
 				rowNumber = 0;
@@ -132,13 +133,39 @@ public class FormBuilder extends ViewBase {
 	 * @return Button that is used to remove the structure, and redraw
 	 * the GridPane to update the form.
 	 */
-	public Button arrayListRemove(final GridPane grid, final ArrayList<Object> dataArray, final int dataArrayNumber){
+	public Button arrayListRemove(final GridPane grid, final ArrayList<Object> dataArray, final int dataArrayNumber, ArrayList<Object> facArray){
 		Button button = new Button();
 		button.setText("Remove");
 		
 		button.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e) {
+				if(facArray.get(2).toString().toLowerCase() == "incommodity"){
+					System.out.println("in commodity");
+					for(int i = 0; i < formNode.cycicCircle.incommods.size(); i++){
+						System.out.println(formNode.cycicCircle.incommods.get(i));
+						if(formNode.cycicCircle.incommods.get(i) == dataArray.get(0)){
+							System.out.println(dataArray.get(0));
+							formNode.cycicCircle.incommods.remove(i);
+							break;
+						}
+					}
+					VisFunctions.redrawPane();
+				} else if(facArray.get(2).toString().toLowerCase() == "outcommodity"){
+					System.out.println("Outcommodity");
+					for(int i = 0; i < formNode.cycicCircle.outcommods.size(); i++){
+						System.out.println(formNode.cycicCircle.outcommods.get(i));
+						if(formNode.cycicCircle.outcommods.get(i) == dataArray.get(0)){
+							formNode.cycicCircle.outcommods.remove(i);
+							break;
+						}
+					}
+					VisFunctions.redrawPane();
+				}
 				dataArray.remove(dataArrayNumber);
+				if(dataArray.size() == 0){
+					System.out.println("TEST");
+					facArray.set(10, false);
+				}
 				grid.getChildren().clear();
 				rowNumber = 0;
 				formBuilder(grid, formNode.facilityStructure, formNode.facilityData);
@@ -159,8 +186,8 @@ public class FormBuilder extends ViewBase {
 	 */
 	@SuppressWarnings("unchecked")
 	public void formBuilder(GridPane grid, ArrayList<Object> facArray, ArrayList<Object> dataArray){
-		System.out.println(facArray);
-		System.out.println(dataArray);
+		//System.out.println(facArray);
+		//System.out.println(dataArray);
 		for (int i = 0; i < facArray.size(); i++){
 			if (facArray.get(i) instanceof ArrayList && facArray.get(0) instanceof ArrayList) {
 				formBuilder(grid, (ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
@@ -193,7 +220,8 @@ public class FormBuilder extends ViewBase {
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								grid.add(arrayListRemove(grid, dataArray, ii), columnNumber+2, rowNumber);
+								System.out.println(facArray);
+								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
 							}
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
@@ -232,7 +260,8 @@ public class FormBuilder extends ViewBase {
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								grid.add(arrayListRemove(grid, dataArray, ii), columnNumber+2, rowNumber);
+								System.out.println(facArray);
+								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
 							}
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
@@ -252,7 +281,8 @@ public class FormBuilder extends ViewBase {
 						// Indenting a sub structure
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
-							grid.add(arrayListRemove(grid, dataArray, ii), columnNumber+2, rowNumber);
+							System.out.println(facArray);
+							grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
 						}
@@ -302,13 +332,13 @@ public class FormBuilder extends ViewBase {
 						// If statement to test for a continuous range for sliders.
 						if (facArray.get(4).toString().split("[...]").length > 1){
 							Slider slider = FormBuilderFunctions.sliderBuilder(facArray.get(4).toString(), dataArray.get(0).toString());
-							TextField textField = FormBuilderFunctions.sliderTextFieldBuilder(slider, dataArray);
+							TextField textField = FormBuilderFunctions.sliderTextFieldBuilder(slider, facArray, dataArray);
 							grid.add(slider, 1+columnNumber, rowNumber);
 							grid.add(textField, 2+columnNumber, rowNumber);
 							columnEnd = 2+columnNumber+1;
 						// Slider with discrete steps
 						} else {
-							ComboBox<String> cb = FormBuilderFunctions.comboBoxBuilder(facArray.get(4).toString(), dataArray);
+							ComboBox<String> cb = FormBuilderFunctions.comboBoxBuilder(facArray.get(4).toString(), facArray, dataArray);
 							grid.add(cb, 1+columnNumber, rowNumber);
 							columnEnd = 2 + columnNumber;
 						}
