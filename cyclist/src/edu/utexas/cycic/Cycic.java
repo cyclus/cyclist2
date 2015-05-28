@@ -540,7 +540,7 @@ public class Cycic extends ViewBase{
 		circle.setFill(Color.rgb(circle.rgbColor.get(0),circle.rgbColor.get(1),circle.rgbColor.get(2)));
 		circle.setCenterX(45+(i*90));
 		circle.setCenterY(50);
-		circle.text.setText(name.split(" ")[2]);
+		circle.text.setText(name.split(" ")[2] + " (" + name.split(" ")[1] + ")");
 		circle.text.setWrapText(true);
 		circle.text.setMaxWidth(60);
 		circle.text.setLayoutX(circle.getCenterX()-circle.getRadius()*0.7);
