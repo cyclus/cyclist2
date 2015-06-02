@@ -3,6 +3,7 @@ package edu.utexas.cycic;
 import java.io.File;
 import java.util.ArrayList;
 
+import edu.utah.sci.cyclist.core.presenter.SelectionModel;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -10,6 +11,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -236,13 +238,11 @@ public class FormBuilderFunctions {
 	static ComboBox<String> comboBoxBuilder(String string, ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
 		
 		final ComboBox<String> cb = new ComboBox<String>();
-		
 		for(String value : string.split(",")){
 			cb.getItems().add(value.trim());
 		}
 		cb.setPromptText("Select value");
 		cb.setValue(defaultValue.get(0).toString());
-		
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				defaultValue.set(0, cb.getValue());

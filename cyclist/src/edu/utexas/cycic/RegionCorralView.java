@@ -1,7 +1,5 @@
 package edu.utexas.cycic;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -12,7 +10,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -129,6 +126,7 @@ public class RegionCorralView extends ViewBase {
 		for(int i = 0; i < DataArrays.simRegions.size(); i++){
 			RegionRectangle region = new RegionRectangle();
 			String regName = DataArrays.simRegions.get(i).regionName;
+			region.name = regName;
 			String regLabel = regName.split(" ")[2] + " (" + regName.split(" ")[1] + ")";
 			ArrayList<Integer> rgbColor = VisFunctions.stringToColor(regLabel);
 			region.setFill(VisFunctions.pastelize(Color.rgb(rgbColor.get(0),rgbColor.get(1),rgbColor.get(2))));
@@ -145,7 +143,7 @@ public class RegionCorralView extends ViewBase {
 				public void handle(MouseEvent e){
 					Dragboard db = region.startDragAndDrop(TransferMode.COPY);
 					ClipboardContent content = new ClipboardContent();				
-					content.put(DnD.VALUE_FORMAT, region.text.getText());
+					content.put(DnD.VALUE_FORMAT, region.name);
 					db.setContent(content);
 					e.consume();
 				}

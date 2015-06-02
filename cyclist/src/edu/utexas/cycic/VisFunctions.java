@@ -112,10 +112,10 @@ public class VisFunctions {
             heightRatio = 1.2;
             widthRatio = -2*shiftX;
         } else {
-            shiftX = -1.0;
+            shiftX = -0.8;
             shiftY = -0.6;
             heightRatio = 1.2;
-            widthRatio = -2*shiftX;
+            widthRatio = -2.*shiftX;
         }
         
         circle.text.setLayoutX(circle.getCenterX()+circle.getRadius()*shiftX);

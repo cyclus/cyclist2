@@ -22,7 +22,7 @@ public class InstitutionEllipse extends Ellipse{
 			public void handle(MouseEvent e){
 				Dragboard db = startDragAndDrop(TransferMode.COPY);
 				ClipboardContent content = new ClipboardContent();				
-				content.put(DnD.VALUE_FORMAT, text.getText());
+				content.put(DnD.VALUE_FORMAT, name);
 				db.setContent(content);
 				e.consume();
 			}
