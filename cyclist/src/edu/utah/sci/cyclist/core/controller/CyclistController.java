@@ -691,17 +691,20 @@ public class CyclistController {
 		}
 		
 		if(dirty){
-			SaveWsWizard wizard = new SaveWsWizard();
-			ObjectProperty<Boolean> selection = wizard.show(_screen.getParent().getScene().getWindow());
-			selection.addListener(new ChangeListener<Boolean>(){
-				@Override
-				public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldVal,Boolean newVal) {
-					if(newVal){
-						save();
-					}
-					System.exit(0);
-				}
-			});
+			// TODO: fix the issue with the dividers. For now always save the data
+			save();
+			System.exit(0);
+//			SaveWsWizard wizard = new SaveWsWizard();
+//			ObjectProperty<Boolean> selection = wizard.show(_screen.getParent().getScene().getWindow());
+//			selection.addListener(new ChangeListener<Boolean>(){
+//				@Override
+//				public void changed(ObservableValue<? extends Boolean> arg0, Boolean oldVal,Boolean newVal) {
+//					if(newVal){
+//						save();
+//					}
+//					System.exit(0);
+//				}
+//			});
 		}else{
 			System.exit(0);
 		}
