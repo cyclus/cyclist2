@@ -55,6 +55,7 @@ public class XMLReader {
 				images.put("mine", new Image(new File(path + "/skinImages/fuelcycle_mine.png").toURI().toString()));
 				images.put("reactor", new Image(new File(path + "/skinImages/fuelcycle_rxtr.png").toURI().toString(), true));
 				images.put("reprocessing", new Image(new File(path + "/skinImages/fuelcycle_sep.png").toURI().toString()));
+				images.put("separations", new Image(new File(path + "/skinImages/fuelcycle_sep.png").toURI().toString()));
 			}
 		};
 		return skin;

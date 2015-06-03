@@ -4,19 +4,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.utah.sci.cyclist.core.controller.IMemento;
-import edu.utah.sci.cyclist.core.presenter.Presenter;
-import edu.utah.sci.cyclist.core.presenter.ViewPresenter;
 import edu.utah.sci.cyclist.core.presenter.VisWorkspacePresenter;
-import edu.utah.sci.cyclist.core.presenter.WorkspacePresenter;
 import edu.utah.sci.cyclist.core.ui.components.ViewBase;
-import edu.utah.sci.cyclist.core.ui.views.VisWorkspace;
 
 public class Perspective {
 	public String name;
 	public String type;
 	public List<String> tools;
 	public ViewBase workspace;
-	public WorkspacePresenter presenter;
+	public VisWorkspacePresenter presenter;
 	public Boolean initialized = false;
 	public int id;
 	public double[] toolsPositions = new double[0];

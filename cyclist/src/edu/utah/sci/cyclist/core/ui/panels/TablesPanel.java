@@ -25,6 +25,10 @@ package edu.utah.sci.cyclist.core.ui.panels;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import org.mo.closure.v1.Closure;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -43,6 +47,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
@@ -52,7 +57,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
+import edu.utah.sci.cyclist.core.event.Pair;
 import edu.utah.sci.cyclist.core.event.dnd.DnD;
+import edu.utah.sci.cyclist.core.model.Simulation;
 import edu.utah.sci.cyclist.core.model.Table;
 import edu.utah.sci.cyclist.core.ui.wizards.TableEditorWizard;
 import edu.utah.sci.cyclist.core.util.AwesomeIcon;
@@ -70,9 +77,12 @@ public class TablesPanel extends TitledPanel  {
 	private ObservableList<Table> _items;
 	private ObjectProperty<Table> _tableProperty = new SimpleObjectProperty<>();
 	private Entry _selected = null;
-	private ObjectProperty<Boolean> _editTableProperty = new SimpleObjectProperty<>();
+	private ObjectProperty<Boolean> _editTableProperty = new SimpleObjectProperty<>();	
 	private ContextMenu _menu = new ContextMenu();
 	private Entry _selectedForEdit = null;
+	private Consumer<Pair<String, Table>> _actionOnTable;
+
+	
 	private InvalidationListener _listener = new InvalidationListener() {
 		
 		@Override
@@ -125,6 +135,22 @@ public class TablesPanel extends TitledPanel  {
 	 
 	public void setEditTable(Boolean value) {
 		 _editTableProperty.set(value);
+	}
+	
+	public void setTableActions(List<String> actions, Consumer<Pair<String, Table>> callback) {
+		_actionOnTable = callback;
+		int pos = 0;
+		for (String name: actions) {
+			MenuItem item = new MenuItem(name);
+			 item.setOnAction(new EventHandler<ActionEvent>() {
+				public void handle(ActionEvent e) { 
+					_actionOnTable.accept(new Pair<String, Table>(name, _selectedForEdit.table));
+				}
+			 });
+			 _menu.getItems().add(pos++, item);
+		}
+		 
+		_menu.getItems().add(pos, new SeparatorMenuItem());
 	}
 	
 	private void resetContent() {
@@ -258,22 +284,23 @@ public class TablesPanel extends TitledPanel  {
 	 * Creates a menu to edit or delete a table.
 	 */
 	private void createMenu(){
+		 
 		 MenuItem deleteTable = new MenuItem("Delete Table");
 		 deleteTable.setOnAction(new EventHandler<ActionEvent>() {
-		 							public void handle(ActionEvent e) { 
-		 								removeTable(_selectedForEdit);
-		 								setEditTable(true);
-		 								_selectedForEdit = null;
-		 							}
+			public void handle(ActionEvent e) { 
+				removeTable(_selectedForEdit);
+				setEditTable(true);
+				_selectedForEdit = null;
+			}
 		 });
 		 _menu.getItems().add(deleteTable);
 
 		 MenuItem editTable = new MenuItem("Edit Table");
 		 editTable.setOnAction(new EventHandler<ActionEvent>() {
-				public void handle(ActionEvent e) { 
-					editTable(_selectedForEdit);
-					_selectedForEdit = null;
-				}
+			public void handle(ActionEvent e) { 
+				editTable(_selectedForEdit);
+				_selectedForEdit = null;
+			}
 		 });
 		 _menu.getItems().add(editTable);
 	}

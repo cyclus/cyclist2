@@ -70,11 +70,11 @@ import edu.utah.sci.cyclist.core.model.Simulation;
 import edu.utah.sci.cyclist.core.model.Table;
 import edu.utah.sci.cyclist.core.presenter.DatasourcesPresenter;
 import edu.utah.sci.cyclist.core.presenter.InputPresenter;
+import edu.utah.sci.cyclist.core.presenter.Presenter;
 import edu.utah.sci.cyclist.core.presenter.SchemaPresenter;
 import edu.utah.sci.cyclist.core.presenter.SimulationPresenter;
 import edu.utah.sci.cyclist.core.presenter.ToolsPresenter;
 import edu.utah.sci.cyclist.core.presenter.VisWorkspacePresenter;
-import edu.utah.sci.cyclist.core.presenter.WorkspacePresenter;
 import edu.utah.sci.cyclist.core.services.CyclusService;
 import edu.utah.sci.cyclist.core.tools.ToolFactory;
 import edu.utah.sci.cyclist.core.ui.MainScreen;
@@ -97,7 +97,7 @@ public class CyclistController {
 
 	private final EventBus _eventBus;
 	private MainScreen _screen;
-	public static WorkspacePresenter _presenter;
+	public static VisWorkspacePresenter _presenter;
 	private Model _model = new Model();
 	private String SAVE_FILE = "workspace-config.xml";
 	private SessionController _sessionController;
@@ -165,6 +165,22 @@ public class CyclistController {
 		ds.setTables(_model.getTables());
 		ds.setPanel(screen.getDatasourcesPanel());
 		
+		screen.getDatasourcesPanel().setTableActions(Arrays.asList("Plot"), 
+				action -> {
+					try {
+						for (ToolFactory factory : 	ToolsLibrary.factories) {
+							if (factory.getToolName().equals(action.v1)) {
+								Presenter p = _presenter.addTool(factory.create());
+								p.addTable(action.v2);
+								return;
+							}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return;
+				});
+		
 		// Schema panel
 		SchemaPresenter sp = new SchemaPresenter(_eventBus);
 		sp.setPanel(screen.getFieldsPanel());
@@ -197,7 +213,6 @@ public class CyclistController {
         
         // Builder perspectives
        
-		
 		for (Perspective p : _perspectives) {
 			ViewBase view;
 //			if (p.type == "Vis") {

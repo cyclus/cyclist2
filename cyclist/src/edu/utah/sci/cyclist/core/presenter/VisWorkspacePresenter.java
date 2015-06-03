@@ -56,7 +56,7 @@ import edu.utah.sci.cyclist.core.ui.components.ViewBase;
 import edu.utah.sci.cyclist.core.ui.views.FilterPanel;
 import edu.utah.sci.cyclist.core.ui.views.VisWorkspace;
 
-public class VisWorkspacePresenter extends CyclistViewPresenter implements WorkspacePresenter {
+public class VisWorkspacePresenter extends CyclistViewPresenter {
 
 	private List<ViewPresenter> _presenters = new ArrayList<>();
 	private List<FilterPresenter> _filterPresenters = new ArrayList<>();
@@ -203,8 +203,8 @@ public class VisWorkspacePresenter extends CyclistViewPresenter implements Works
 	/*
 	 * addTool
 	 */
-	public void addTool(Tool tool) {
-		addTool(tool, 100, 100);
+	public Presenter addTool(Tool tool) {
+		return addTool(tool, 100, 100);
 	}
 	
 	@Override

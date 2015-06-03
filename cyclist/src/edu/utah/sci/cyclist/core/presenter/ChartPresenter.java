@@ -77,6 +77,13 @@ public class ChartPresenter extends CyclistViewPresenter {
 	}
 	
 	/**
+	 * @parm Table
+	 */
+	public void addTable(Table table) {
+		getView().addTable(table, false, true);
+	}
+	
+	/**
 	 * setView
 	 * @param view
 	 */

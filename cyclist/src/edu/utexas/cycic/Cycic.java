@@ -430,6 +430,7 @@ public class Cycic extends ViewBase{
 				facilityNode facility = new facilityNode();
 				facility.facilityType = structureCB.getValue();
 				facility.facilityType.trim();
+				addArcheToBar(facility.facilityType);
 				for (int i = 0; i < DataArrays.simFacilities.size(); i++){
 					if(DataArrays.simFacilities.get(i).facilityName.equalsIgnoreCase(facility.facilityType)){
 						facility.facilityStructure = DataArrays.simFacilities.get(i).facStruct;
@@ -846,6 +847,34 @@ public class Cycic extends ViewBase{
         simInfo.add(toggleBox, 1, 7);
     }
 
+
+    public void addArcheToBar(String archeType){
+        
+		for(int i = 0; i < DataArrays.simFacilities.size(); i++){
+			if(DataArrays.simFacilities.get(i).facilityName.equalsIgnoreCase(archeType)){
+				if(DataArrays.simFacilities.get(i).loaded == true){
+					return;
+				}
+				facilityStructure test = DataArrays.simFacilities.get(i);
+				try {
+					test.loaded = true;
+					FacilityCircle circle = new FacilityCircle();
+					int pos = 0;
+					for(int k = 0; k < DataArrays.simFacilities.size(); k++){
+						if(DataArrays.simFacilities.get(k).loaded == true){
+							pos+=1;
+						}
+					}
+					buildDnDCircle(circle, pos-1, test.facilityName);
+					nodesPane.getChildren().addAll(circle, circle.text);
+				} catch (Exception eq) {
+					
+				}
+			}
+		}
+
+    }
+
 	public void createArchetypeBar(GridPane grid){
 		ComboBox<String> archetypes = new ComboBox<String>();
 		for(int i = 0; i < DataArrays.simFacilities.size(); i++){
@@ -861,29 +890,7 @@ public class Cycic extends ViewBase{
 		});
 		archetypes.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
-				for(int i = 0; i < DataArrays.simFacilities.size(); i++){
-					if(DataArrays.simFacilities.get(i).facilityName.equalsIgnoreCase(archetypes.getValue())){
-						if(DataArrays.simFacilities.get(i).loaded == true){
-							return;
-						}
-						facilityStructure test = DataArrays.simFacilities.get(i);
-						new StringBuilder();
-						try {
-							test.loaded = true;
-							FacilityCircle circle = new FacilityCircle();
-							int pos = 0;
-							for(int k = 0; k < DataArrays.simFacilities.size(); k++){
-								if(DataArrays.simFacilities.get(k).loaded == true){
-									pos+=1;
-								}
-							}
-							buildDnDCircle(circle, pos-1, test.facilityName);
-							nodesPane.getChildren().addAll(circle, circle.text);
-						} catch (Exception eq) {
-							
-						}
-					}
-				}
+				addArcheToBar(archetypes.getValue());
 			}
 		});
 
