@@ -641,7 +641,7 @@ public class Cycic extends ViewBase{
 		for(int i = 0; i < 12; i++ ){
 			startMonth.getItems().add(monthList.get(i));
 		}
-		Cycic.workingScenario.simulationData.startMonth = "1";
+		Cycic.workingScenario.simulationData.startMonth = "0";
 		startMonth.setValue(monthList.get(Integer.parseInt(Cycic.workingScenario.simulationData.startMonth)));
 		startMonth.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
