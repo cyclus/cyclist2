@@ -54,30 +54,30 @@ import edu.utah.sci.cyclist.core.ui.View;
 import edu.utah.sci.cyclist.core.ui.components.CyclistViewBase;
 import edu.utah.sci.cyclist.core.ui.components.ViewBase;
 import edu.utah.sci.cyclist.core.ui.views.FilterPanel;
-import edu.utah.sci.cyclist.core.ui.views.Workspace;
+import edu.utah.sci.cyclist.core.ui.views.VisWorkspace;
 
-public class WorkspacePresenter extends CyclistViewPresenter {
+public class VisWorkspacePresenter extends CyclistViewPresenter {
 
 	private List<ViewPresenter> _presenters = new ArrayList<>();
 	private List<FilterPresenter> _filterPresenters = new ArrayList<>();
 	ObservableList<Tool> _tools = FXCollections.observableArrayList();
 	private EventBus _localBus;
 
-	public WorkspacePresenter(EventBus bus/*, Model model*/) {
+	public VisWorkspacePresenter(EventBus bus/*, Model model*/) {
 		super(bus);
 		build();
 		_localBus = /*getWorkspace().isToplevel() ? getEventBus() : */ new SimpleEventBus();
 		addListeners();
 	}
 
-	public Workspace getWorkspace() {
-		return (Workspace) getView();
+	public VisWorkspace getWorkspace() {
+		return (VisWorkspace) getView();
 	}
 
 	public void setView(View view) {
 		super.setView(view);
 
-		if (view instanceof Workspace) {
+		if (view instanceof VisWorkspace) {
 			
 			_tools.addListener(new ListChangeListener<Tool>(){
 				@Override
@@ -87,7 +87,7 @@ public class WorkspacePresenter extends CyclistViewPresenter {
 			});
 			
 			
-			Workspace workspace = getWorkspace();
+			VisWorkspace workspace = getWorkspace();
 
 
 			if (getWorkspace().isToplevel())
@@ -203,8 +203,8 @@ public class WorkspacePresenter extends CyclistViewPresenter {
 	/*
 	 * addTool
 	 */
-	public void addTool(Tool tool) {
-		addTool(tool, 100, 100);
+	public Presenter addTool(Tool tool) {
+		return addTool(tool, 100, 100);
 	}
 	
 	@Override
@@ -635,8 +635,8 @@ public class WorkspacePresenter extends CyclistViewPresenter {
 		 for (ViewPresenter presenter : presenters) {
 			 removeView(presenter.getId());
 			 //If the presenter itself is a workspace - clear it's contents as well.
-			 if(presenter instanceof WorkspacePresenter){
-				 ((WorkspacePresenter) presenter).clearWorkspace();
+			 if(presenter instanceof VisWorkspacePresenter){
+				 ((VisWorkspacePresenter) presenter).clearWorkspace();
 			 }
 		 }
 	 }

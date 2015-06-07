@@ -3,6 +3,7 @@ package edu.utah.sci.cyclist.core.presenter;
 import edu.utah.sci.cyclist.core.event.notification.CyclistNotification;
 import edu.utah.sci.cyclist.core.event.notification.CyclistNotificationHandler;
 import edu.utah.sci.cyclist.core.event.notification.EventBus;
+import edu.utah.sci.cyclist.core.model.Table;
 
 public class PresenterBase implements Presenter {
 	private static int _idCounter = 0;
@@ -13,6 +14,10 @@ public class PresenterBase implements Presenter {
 	public PresenterBase(EventBus bus) {
 		_id = "presenter"+_idCounter++;
 		_eventBus = bus;
+	}
+	
+	@Override
+	public void addTable(Table table) {	
 	}
 	
 	@Override

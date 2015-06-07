@@ -67,7 +67,7 @@ public class Clones {
 		clone.rgbColor.set(0, (int)(clone.rgbColor.get(0)*VisFunctions.colorMultiplierTest(clone.rgbColor.get(0))));
 		clone.rgbColor.set(1, (int)(clone.rgbColor.get(1)*VisFunctions.colorMultiplierTest(clone.rgbColor.get(1))));
 		clone.rgbColor.set(2, (int)(clone.rgbColor.get(2)*VisFunctions.colorMultiplierTest(clone.rgbColor.get(2))));
-		clone.setFill(Color.rgb(clone.rgbColor.get(0), clone.rgbColor.get(1), clone.rgbColor.get(2)));
+		clone.setFill(VisFunctions.pastelize(Color.rgb(clone.rgbColor.get(0), clone.rgbColor.get(1), clone.rgbColor.get(2))));
 		
 		// Setting font color for visibility //
 		if(VisFunctions.colorTest(clone.rgbColor) == true){
@@ -94,11 +94,7 @@ public class Clones {
 				removeClone(cloneNode, parent);
 			}
 		});
-		menu1.getItems().addAll(facForm, delete);
-		clone.menu.getMenus().add(menu1);
-		clone.menu.setLayoutX(clone.getCenterX());
-		clone.menu.setLayoutY(clone.getCenterY());
-		clone.menu.setVisible(false);
+		clone.menu.getItems().addAll(facForm, delete);
 		// Adding circle.text to be shown in the CYCIC pane.
 		clone.text.setText(name.toString());
 		clone.text.setLayoutX(clone.getCenterX()-clone.getRadius()*0.6);
@@ -168,8 +164,7 @@ public class Clones {
 				if(clone.getCenterX() >= Cycic.pane.getLayoutBounds().getMaxX()-clone.getRadius()){
 					clone.setCenterX(Cycic.pane.getLayoutBounds().getMaxX()-clone.getRadius());
 				}
-				clone.menu.setLayoutX(clone.getCenterX());
-				clone.menu.setLayoutY(clone.getCenterY());
+
 				clone.text.setLayoutX(clone.getCenterX()-clone.getRadius()*0.6);
 				clone.text.setLayoutY(clone.getCenterY());
 				parentChild.line.setEndX(clone.getCenterX());
@@ -189,7 +184,7 @@ public class Clones {
 			@Override
 			public void handle(MouseEvent event){
 				if(event.getButton().equals(MouseButton.SECONDARY)){
-					clone.menu.setVisible(true);
+					clone.menu.show(clone, event.getX(), event.getY());
 				}
 				if(event.getButton().equals(MouseButton.PRIMARY)){
 					for(int i = 0; i < Cycic.pane.getChildren().size(); i++){
@@ -211,7 +206,6 @@ public class Clones {
 		int childIndex = parent.cycicCircle.childrenList.size();
 		if(parentChildShow == true){	
 			Cycic.pane.getChildren().add(parent.cycicCircle.childrenList.get(childIndex-1));
-			Cycic.pane.getChildren().add(parent.cycicCircle.childrenList.get(childIndex-1).menu);
 			Cycic.pane.getChildren().add(parent.cycicCircle.childrenList.get(childIndex-1).text);
 			Cycic.pane.getChildren().add(parentChild.line);
 			parentChild.line.toBack();
@@ -240,6 +234,6 @@ public class Clones {
 				parent.facilityClones.remove(i);
 			}
 		}
-		VisFunctions.marketHide();
+		VisFunctions.redrawPane();
 	}
 }

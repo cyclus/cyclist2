@@ -122,11 +122,23 @@ public class DropArea extends HBox implements Observable {
 		_preOccupiedFields.addAll(fields);
 	}
 	
+	private boolean compatible() {
+		Field field = getLocalClipboard().get(DnD.FIELD_FORMAT, Field.class);
+		if (field == null
+			|| (_acceptedRoles == AcceptedRoles.DIMENSION && (field.getRole() != Role.DIMENSION && field.getRole() != Role.INT_TIME))
+			|| isPreOccupiedField(field)
+			|| (getFields().size() > 0 && _policy == Policy.MULTIPLE && field.getRole() != getFields().get(0).getRole())) 
+		{
+			return false;
+		}
+		return true;
+	}
+	
 	/**
      * @name setDragAndDropModes
      * @param sourcesTransferModes - Maps for each possible source the accepted drag and drop transfer modes.
      */
-	public void setDragAndDropModes( Map<Class<?>, TransferMode[]> sourcesTransferModes){
+	public void setDragAndDropModes( Map<Class<?>, TransferMode[]> sourcesTransferModes) {
 		_sourcesTransferModes = sourcesTransferModes;
 	}
 	
@@ -160,7 +172,7 @@ public class DropArea extends HBox implements Observable {
                     	//predefined accepted transfer modes.
 						if(getLocalClipboard().hasContent(DnD.DnD_SOURCE_FORMAT)){
                         	Class<?> key = getLocalClipboard().getType(DnD.DnD_SOURCE_FORMAT);
-                    	    if(key != null && _sourcesTransferModes!= null && _sourcesTransferModes.containsKey(key) ){
+                    	    if(key != null && _sourcesTransferModes!= null && _sourcesTransferModes.containsKey(key)  && compatible()) {
                     	    	event.acceptTransferModes(_sourcesTransferModes.get(key));
                     	    }
                         }
@@ -197,7 +209,7 @@ public class DropArea extends HBox implements Observable {
 					if(_acceptedRoles == AcceptedRoles.DIMENSION && (field.getRole() != Role.DIMENSION && field.getRole() != Role.INT_TIME)){
 						log.warn("Cannot add non-discrete field to this drop area");
 						status = false;
-					} else if(isPreOccupiedField(field, event)){
+					} else if(isPreOccupiedField(field)) {
 						log.warn("Field already exists in another drop area");
 						status = false;
 					}else if (getFields().size() == 0) {
@@ -206,6 +218,9 @@ public class DropArea extends HBox implements Observable {
 					} else if(_policy == Policy.SINGLE){
 						getFields().set(0, field);
 						status = true;
+					} else if (field.getRole() != getFields().get(0).getRole()) {
+						log.warn("Field is incompatible with existing fields");
+						status = false;
 					} else {
 						getFields().add(field);
 						status = true;
@@ -217,6 +232,7 @@ public class DropArea extends HBox implements Observable {
 			}
 			
 		});
+		
 		
 		tableProperty().addListener(new InvalidationListener() {
 			
@@ -350,7 +366,7 @@ public class DropArea extends HBox implements Observable {
 	 * Returns: Boolean. Returns true if the field already exists in another drop area, false if not.
      * Description: Checks if the specified field is already used by other drop areas.
      */
-	private Boolean isPreOccupiedField(Field testedField, DragEvent event){
+	private Boolean isPreOccupiedField(Field testedField){
 		
 		//Check if the field was dragged from another drop area.
 		//If it came from another drop area - if the transfer mode is "Move" the source drop area is going to remove the field anyway at the end of the drag and drop.

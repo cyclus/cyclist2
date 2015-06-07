@@ -2,12 +2,14 @@ package edu.utexas.cycic;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javafx.scene.control.Label;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -20,8 +22,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import edu.utah.sci.cyclist.core.ui.views.ChartView;
 /**
  * Output class for the CYCIC GUI.
  * @author Robert
@@ -60,10 +60,10 @@ public class OutPut {
 				rootElement.appendChild(facID);
 			}
 			// Regions
+			
 			for(regionNode region : CycicScenarios.workingCycicScenario.regionNodes) {
 				Element regionID = doc.createElement("region");
 				rootElement.appendChild(regionID);
-
 				regionBuilder(doc, regionID, region.name, region.regionStruct, region.regionData, region.archetype.split(":")[2]);
 				// Building the institutions within regions.
 				for (instituteNode institution: CycicScenarios.workingCycicScenario.institNodes){
@@ -71,18 +71,20 @@ public class OutPut {
 						if (institution.name.equalsIgnoreCase(instit)) {
 							Element institID = doc.createElement("institution");
 							regionID.appendChild(institID);
-							Element initFacList = doc.createElement("initialfacilitylist");
-							for(facilityItem facility: institution.availFacilities) {
-								Element entry = doc.createElement("entry");
-								Element initProto = doc.createElement("prototype");
-								initProto.appendChild(doc.createTextNode(facility.name));
-								entry.appendChild(initProto);
-								Element number = doc.createElement("number");
-								number.appendChild(doc.createTextNode(facility.number));
-								entry.appendChild(number);
-								initFacList.appendChild(entry);
-							}
-							institID.appendChild(initFacList);
+                            if (institution.availFacilities.size() > 0) {
+                                Element initFacList = doc.createElement("initialfacilitylist");
+                                for (Map.Entry<String, Integer> facility: institution.availFacilities.entrySet()) {
+                                    Element entry = doc.createElement("entry");
+                                    Element initProto = doc.createElement("prototype");
+                                    initProto.appendChild(doc.createTextNode(facility.getKey()));
+                                    entry.appendChild(initProto);
+                                    Element number = doc.createElement("number");
+                                    number.appendChild(doc.createTextNode(Integer.toString(facility.getValue())));
+                                    entry.appendChild(number);
+                                    initFacList.appendChild(entry);
+                                }
+                                institID.appendChild(initFacList);
+                            }
 							regionBuilder(doc, institID, institution.name, institution.institStruct, institution.institData, institution.archetype.split(":")[2]);
 						}
 					}
@@ -99,7 +101,8 @@ public class OutPut {
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(file);
-
+                        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			transformer.transform(source, result);
 
 		} catch (ParserConfigurationException pce){
@@ -160,6 +163,7 @@ public class OutPut {
 		for(regionNode region: CycicScenarios.workingCycicScenario.regionNodes){
 			Element spec = doc.createElement("spec");
 			Element lib = doc.createElement("lib");
+			System.out.println(region.archetype);
 			String[] fullPath = region.archetype.split(":");
 			
 			if(!fullPath[0].equalsIgnoreCase("")){
@@ -279,6 +283,9 @@ public class OutPut {
 				facilityDataElement(doc, configType, (ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
 			} else {
 				// Adding the label
+				if((Boolean) facArray.get(10) == false){
+					break;
+				}
 				Element heading = doc.createElement((String) facArray.get(0));
 				heading.appendChild(doc.createTextNode((String) dataArray.get(0)));
 				configType.appendChild(heading);
@@ -309,30 +316,36 @@ public class OutPut {
 	 * input document.
 	 * @param rootElement The element that will serve as the heading for 
 	 * substructures built in this function.
-	 * @param structArray ArrayList<Object> containing the 
+	 * @param facArray ArrayList<Object> containing the 
 	 * facility input field information.
 	 * @param dataArray ArrayList<Object> containing the data associated 
 	 * with the input field information.
 	 */
 	@SuppressWarnings("unchecked")
-	public static void facilityDataElement(Document doc, Element rootElement, ArrayList<Object> structArray, ArrayList<Object> dataArray){
+	public static void facilityDataElement(Document doc, Element rootElement, ArrayList<Object> facArray, ArrayList<Object> dataArray){
 		for (int i = 0; i < dataArray.size(); i++){
 			if (dataArray.get(i) instanceof ArrayList){
-				if (structArray.size() > 2 && !(structArray.get(2) instanceof ArrayList)){ 
-					if (indentCheck((String) structArray.get(2))){
-						Element tempElement = doc.createElement((String) structArray.get(0).toString().replace(" ", ""));
+				if (facArray.size() > 2 && !(facArray.get(2) instanceof ArrayList)){ 
+					if((Boolean) facArray.get(10) == false){
+						break;
+					}
+					if (indentCheck((String) facArray.get(2))){
+						Element tempElement = doc.createElement((String) facArray.get(0).toString().replace(" ", ""));
 						rootElement.appendChild(tempElement);
 						for(int j = 0; j < dataArray.size(); j++){
-							facilityDataElement(doc, tempElement, (ArrayList<Object>) structArray.get(1), (ArrayList<Object>) dataArray.get(j));
+							facilityDataElement(doc, tempElement, (ArrayList<Object>) facArray.get(1), (ArrayList<Object>) dataArray.get(j));
 						}
 						break;
 						
 					}
 				} else {
-					facilityDataElement(doc, rootElement, (ArrayList<Object>) structArray.get(i), (ArrayList<Object>) dataArray.get(i));
+					facilityDataElement(doc, rootElement, (ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
 				}
 			} else {
-				Element name = doc.createElement((String) structArray.get(0).toString().replace(" ", ""));
+				if((Boolean) facArray.get(10) == false){
+					break;
+				}
+				Element name = doc.createElement((String) facArray.get(0).toString().replace(" ", "").replace("\"", ""));
 				name.appendChild(doc.createTextNode((String)dataArray.get(0)));
 				rootElement.appendChild(name);
 			}
@@ -346,7 +359,7 @@ public class OutPut {
 	 * @return Boolean to indicate whether a indent is required. 
 	 */
 	public static boolean indentCheck(String string){
-		if(string == "oneOrMore" || string == "zeroOrMore" || string == "input" || string == "output"){
+		if(string == "oneOrMore" || string == "zeroOrMore"||string == "oneOrMoreMap" || string == "pair" || string == "item"){
 			return true;
 		} else {
 			return false;
@@ -420,15 +433,13 @@ public class OutPut {
 				double xPosition = Double.parseDouble(element.getElementsByTagName("xPosition").item(0).getTextContent());
 				tempNode.cycicCircle.setCenterX(xPosition);
 				tempNode.cycicCircle.text.setLayoutX(xPosition-radius*0.6);
-				tempNode.cycicCircle.menu.setLayoutX(xPosition);
 				double yPosition = Double.parseDouble(element.getElementsByTagName("yPosition").item(0).getTextContent());
 				tempNode.cycicCircle.setCenterY(yPosition);
 				tempNode.cycicCircle.text.setLayoutY(yPosition-radius*0.6);
-				tempNode.cycicCircle.menu.setLayoutY(yPosition);
 			}
 			
 			NodeList marketList = doc.getElementsByTagName("marketNode");
-			VisFunctions.marketHide();
+			VisFunctions.redrawPane();
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -520,7 +531,7 @@ public class OutPut {
 				tempNode.name = element.getElementsByTagName("name").item(0).getTextContent();
 				tempNode.cycicCircle = CycicCircles.addNode((String) tempNode.name, tempNode);
 			}	
-			VisFunctions.marketHide();
+			VisFunctions.redrawPane();
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -567,24 +578,20 @@ public class OutPut {
 	
 	public static Boolean inputTest(){
 		Boolean errorTest = true;
-		String errorLog = "";
 		DataArrays scen = CycicScenarios.workingCycicScenario;
 		if(scen.FacilityNodes.size() == 0){
-			errorLog += "Warning: There are no facilities in your simulation. Please add a facility to your simulation.\n";
+			log.error(" There are no facilities in your simulation. Please add a facility to your simulation.");
 			errorTest = false;
 		}
 		if(scen.regionNodes.size() == 0){
-			errorLog += "Warning: There are no regions in your simulation. Please add a region to your simulation.\n";
+			log.warn("Warning: There are no regions in your simulation. Please add a region to your simulation.");
 		}
 		if(scen.institNodes.size() == 0){
-			errorLog += "Warning: There are no institutions in your simulation. Please add an institution to your simulation.\n";
+			log.warn("Warning: There are no institutions in your simulation. Please add an institution to your simulation.");
 		}
 		if(scen.simulationData.duration.equalsIgnoreCase("0")){
-			errorLog += "ERROR: Please add a duration to your cyclus simulation.\n";
+			log.error("Please add a duration to your cyclus simulation.");
 			errorTest = false;
-		}
-		if(errorTest == false){
-			log.error(errorLog);
 		}
 		return errorTest;
 	}
@@ -619,7 +626,6 @@ public class OutPut {
 				for(regionNode region : CycicScenarios.workingCycicScenario.regionNodes) {
 					Element regionID = doc.createElement("region");
 					rootElement.appendChild(regionID);
-
 					regionBuilder(doc, regionID, region.name, region.regionStruct, region.regionData, region.archetype.split(":")[2]);
 					// Building the institutions within regions.
 					for (instituteNode institution: CycicScenarios.workingCycicScenario.institNodes){
@@ -627,18 +633,20 @@ public class OutPut {
 							if (institution.name.equalsIgnoreCase(instit)) {
 								Element institID = doc.createElement("institution");
 								regionID.appendChild(institID);
-								Element initFacList = doc.createElement("initialfacilitylist");
-								for(facilityItem facility: institution.availFacilities) {
-									Element entry = doc.createElement("entry");
-									Element initProto = doc.createElement("prototype");
-									initProto.appendChild(doc.createTextNode(facility.name));
-									entry.appendChild(initProto);
-									Element number = doc.createElement("number");
-									number.appendChild(doc.createTextNode(facility.number));
-									entry.appendChild(number);
-									initFacList.appendChild(entry);
-								}
-								institID.appendChild(initFacList);
+                                if (institution.availFacilities.size() > 0) {
+                                    Element initFacList = doc.createElement("initialfacilitylist");
+                                    for (Map.Entry<String, Integer> facility: institution.availFacilities.entrySet()) {
+                                        Element entry = doc.createElement("entry");
+                                        Element initProto = doc.createElement("prototype");
+                                        initProto.appendChild(doc.createTextNode(facility.getKey()));
+                                        entry.appendChild(initProto);
+                                        Element number = doc.createElement("number");
+                                        number.appendChild(doc.createTextNode(Integer.toString(facility.getValue())));
+                                        entry.appendChild(number);
+                                        initFacList.appendChild(entry);
+                                    }
+                                    institID.appendChild(initFacList);
+                                }
 								regionBuilder(doc, institID, institution.name, institution.institStruct, institution.institData, institution.archetype.split(":")[2]);
 							}
 						}

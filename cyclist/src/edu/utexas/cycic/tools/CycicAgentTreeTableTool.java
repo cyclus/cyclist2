@@ -1,5 +1,6 @@
 package edu.utexas.cycic.tools;
 
+import edu.utah.sci.cyclist.ToolsLibrary;
 import edu.utah.sci.cyclist.core.event.notification.EventBus;
 import edu.utah.sci.cyclist.core.presenter.ViewPresenter;
 import edu.utah.sci.cyclist.core.tools.Tool;
@@ -11,6 +12,8 @@ import edu.utexas.cycic.presenter.CycicAgentTreeTablePresenter;
 public class CycicAgentTreeTableTool implements Tool{
 	public static final String ID 			= "edu.utexas.cycic.CycicAgentTreeTableTool";
 	public static final String TOOL_NAME 	= "TreeTable";
+    public static final String TYPE			= ToolsLibrary.SCENARIO_TOOL;
+
 	public static final AwesomeIcon ICON 	= AwesomeIcon.QUESTION_CIRCLE;
 	
 	private View _view = null;

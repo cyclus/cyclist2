@@ -10,12 +10,15 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -34,7 +37,7 @@ public class FormBuilder extends ViewBase {
 		super();
 		formNode = Cycic.workingNode;
 		TITLE = (String) Cycic.workingNode.name;
-		
+		//System.out.println(formNode.facilityStructure);
 		formBuilder(grid, formNode.facilityStructure, formNode.facilityData);
 		
 		Button button = new Button();
@@ -70,7 +73,11 @@ public class FormBuilder extends ViewBase {
 		grid.setStyle("-fx-background-color: silver;");
 		
 		VBox formGrid = new VBox();
-		formGrid.getChildren().addAll(topGrid, grid);
+		ScrollPane scroll = new ScrollPane();
+		scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		scroll.setMaxHeight(600);
+		scroll.setContent(grid);
+		formGrid.getChildren().addAll(topGrid, scroll);
 		
 		// This is a quick hack. 
 		setOnMousePressed(new EventHandler<MouseEvent>(){
@@ -107,6 +114,7 @@ public class FormBuilder extends ViewBase {
 		
 		button.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
+				facArray.set(10, true);
  				FormBuilderFunctions.formArrayBuilder(facArray, (ArrayList<Object>) dataArray);
 				grid.getChildren().clear();
 				rowNumber = 0;
@@ -125,13 +133,16 @@ public class FormBuilder extends ViewBase {
 	 * @return Button that is used to remove the structure, and redraw
 	 * the GridPane to update the form.
 	 */
-	public Button arrayListRemove(final GridPane grid, final ArrayList<Object> dataArray, final int dataArrayNumber){
+	public Button arrayListRemove(final GridPane grid, final ArrayList<Object> dataArray, final int dataArrayNumber, ArrayList<Object> facArray){
 		Button button = new Button();
 		button.setText("Remove");
-		
+		ArrayList<Object> tempData = (ArrayList<Object>) ((ArrayList<Object>) dataArray.get(dataArrayNumber)).get(0);
 		button.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e) {
 				dataArray.remove(dataArrayNumber);
+				if(dataArray.size() == 0){
+					facArray.set(10, false);
+				}
 				grid.getChildren().clear();
 				rowNumber = 0;
 				formBuilder(grid, formNode.facilityStructure, formNode.facilityData);
@@ -152,6 +163,8 @@ public class FormBuilder extends ViewBase {
 	 */
 	@SuppressWarnings("unchecked")
 	public void formBuilder(GridPane grid, ArrayList<Object> facArray, ArrayList<Object> dataArray){
+		//System.out.println(facArray);
+		//System.out.println(dataArray);
 		for (int i = 0; i < facArray.size(); i++){
 			if (facArray.get(i) instanceof ArrayList && facArray.get(0) instanceof ArrayList) {
 				formBuilder(grid, (ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
@@ -159,16 +172,32 @@ public class FormBuilder extends ViewBase {
 				if (facArray.get(2) == "oneOrMore"){
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = new Label((String) facArray.get(0));
+						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
+							name.setText((String) facArray.get(9));
+						} else {
+							name.setText((String) facArray.get(0));	
+						}
 						name.setTooltip(new Tooltip((String)facArray.get(7)));
+						String help = (String) facArray.get(8);
+						name.setOnMouseClicked(new EventHandler<MouseEvent>(){
+							public void handle(MouseEvent e){
+								if(e.getClickCount() == 2){
+									Dialog dg = new Dialog();
+									ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
+									dg.setContentText(help);
+									dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+									dg.show();
+								}
+							}
+						});
 						grid.add(name, columnNumber, rowNumber);
-						//grid.add(new Label((String) facArray.get(2)), columnNumber+1, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						rowNumber += 1;
 						// Indenting a sub structure
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								grid.add(arrayListRemove(grid, dataArray, ii), columnNumber+2, rowNumber);
+								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
 							}
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
@@ -177,14 +206,57 @@ public class FormBuilder extends ViewBase {
 						columnNumber -= 1;
 						
 					}
+				} else if (facArray.get(2) == "oneOrMoreMap"){
+					//facArray = (ArrayList<Object>) facArray.get(1);
+					//dataArray = (ArrayList<Object>) dataArray.get(0);
+					if ((int)facArray.get(6) <= userLevel && i == 0){
+						Label name = new Label((String) facArray.get(0));
+						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
+							name.setText((String) facArray.get(9));
+						} else {
+							name.setText((String) facArray.get(0));	
+						}
+						name.setTooltip(new Tooltip((String)facArray.get(7)));
+						String help = (String) facArray.get(8);
+						name.setOnMouseClicked(new EventHandler<MouseEvent>(){
+							public void handle(MouseEvent e){
+								if(e.getClickCount() == 2){
+									Dialog dg = new Dialog();
+									ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
+									dg.setContentText(help);
+									dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+									dg.show();
+								}
+							}
+						});
+						grid.add(name, columnNumber, rowNumber);
+						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
+						rowNumber += 1;
+						// Indenting a sub structure
+						columnNumber += 1;
+						for(int ii = 0; ii < dataArray.size(); ii ++){
+							if ( ii > 0 ) {
+								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
+							}
+							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
+							rowNumber += 1;
+						}
+						// resetting the indent
+						columnNumber -= 1;
+					}
 				} else if (facArray.get(2) == "zeroOrMore") {
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = new Label((String) facArray.get(0));
+						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
+							name.setText((String) facArray.get(9));
+						} else {
+							name.setText((String) facArray.get(0));	
+						}
 						grid.add(name, columnNumber, rowNumber);
 						// Indenting a sub structure
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
-							grid.add(arrayListRemove(grid, dataArray, ii), columnNumber-1, rowNumber);
+							grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
 						}
@@ -210,25 +282,37 @@ public class FormBuilder extends ViewBase {
 				} else if ((int) facArray.get(6) <= userLevel){
 					// Adding the label
 					Label name = new Label();
-					if(facArray.get(9) != null){
+					if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
 						name.setText((String) facArray.get(9));
 					} else {
 						name.setText((String) facArray.get(0));	
 					}
 					name.setTooltip(new Tooltip((String) facArray.get(7)));
+					String help = (String) facArray.get(8);
+					name.setOnMouseClicked(new EventHandler<MouseEvent>(){
+						public void handle(MouseEvent e){
+							if(e.getClickCount() == 2){
+								Dialog dg = new Dialog();
+								ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
+								dg.setContentText(help);
+								dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+								dg.show();
+							}
+						}
+					});
 					grid.add(name, columnNumber, rowNumber);
 					// Setting up the input type for the label
 					if (facArray.get(4) != null){
 						// If statement to test for a continuous range for sliders.
 						if (facArray.get(4).toString().split("[...]").length > 1){
 							Slider slider = FormBuilderFunctions.sliderBuilder(facArray.get(4).toString(), dataArray.get(0).toString());
-							TextField textField = FormBuilderFunctions.sliderTextFieldBuilder(slider, dataArray);
+							TextField textField = FormBuilderFunctions.sliderTextFieldBuilder(slider, facArray, dataArray);
 							grid.add(slider, 1+columnNumber, rowNumber);
 							grid.add(textField, 2+columnNumber, rowNumber);
 							columnEnd = 2+columnNumber+1;
 						// Slider with discrete steps
 						} else {
-							ComboBox<String> cb = FormBuilderFunctions.comboBoxBuilder(facArray.get(4).toString(), dataArray);
+							ComboBox<String> cb = FormBuilderFunctions.comboBoxBuilder(facArray.get(4).toString(), facArray, dataArray);
 							grid.add(cb, 1+columnNumber, rowNumber);
 							columnEnd = 2 + columnNumber;
 						}

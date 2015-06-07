@@ -6,6 +6,7 @@ public class GenericToolFactory<ToolImpl extends Tool> implements ToolFactory {
 
 	private Class<ToolImpl> cls;
 	private String name;
+	private String type;
 	private AwesomeIcon iconName;
 	
 	public GenericToolFactory(Class<ToolImpl> cls, String name, AwesomeIcon iconName) {
@@ -13,11 +14,17 @@ public class GenericToolFactory<ToolImpl extends Tool> implements ToolFactory {
 		this.name = name;
 		this.iconName = iconName;
 	}
+
 	@Override
 	public String getToolName() {
 		return name;
 	}
 
+	@Override
+	public String getToolType() {
+		return type;
+	}
+	
 	@Override
 	public AwesomeIcon getIcon() {
 		return iconName;

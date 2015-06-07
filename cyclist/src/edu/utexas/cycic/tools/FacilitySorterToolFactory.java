@@ -12,6 +12,11 @@ public class FacilitySorterToolFactory implements ToolFactory {
 	}
 
 	@Override
+	public String getToolType() {
+		return FacilitySorterTool.TYPE;
+	}
+	
+	@Override
 	public AwesomeIcon getIcon() {
 		return FacilitySorterTool.ICON;
 	}

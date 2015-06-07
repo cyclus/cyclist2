@@ -1,5 +1,6 @@
 package edu.utexas.cycic.tools;
 
+import edu.utah.sci.cyclist.ToolsLibrary;
 import edu.utah.sci.cyclist.core.event.notification.EventBus;
 import edu.utah.sci.cyclist.core.presenter.ViewPresenter;
 import edu.utah.sci.cyclist.core.tools.Tool;
@@ -12,6 +13,7 @@ public class RegionViewTool implements Tool {
 
 	public static final String ID 			= "edu.utexas.cycic.RegionViewTool";
     public static final String TOOL_NAME    = "Region View";
+    public static final String TYPE			= ToolsLibrary.SCENARIO_TOOL;
     public static final AwesomeIcon ICON    = AwesomeIcon.GLOBE;
 	
 	private View _view = null;

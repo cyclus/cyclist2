@@ -24,13 +24,14 @@ package edu.utah.sci.cyclist.core.presenter;
 
 import edu.utah.sci.cyclist.core.event.notification.CyclistNotification;
 import edu.utah.sci.cyclist.core.event.notification.EventBus;
+import edu.utah.sci.cyclist.core.model.Table;
 
 public abstract interface Presenter {
 	String getId();
 	EventBus getEventBus();
 	
+	void addTable(Table table);
 //	void setView(final View view);
-//	View getView();
 //	
 //	void setRemoteTables(List<SelectionModel.Entry> list);
 //	void addTable(Table table, boolean remote, boolean active, boolean remoteActive);

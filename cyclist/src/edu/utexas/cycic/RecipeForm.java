@@ -118,18 +118,20 @@ public class RecipeForm extends ViewBase{
 		});
 		recipeGrid.add(name, 0, 0);
 		recipeGrid.add(recipeName, 1, 0);
-		
+
+		String saveBasis = recipe.Basis;  // cache basis so it doesn't get rest by the clear()
 		Label basis = new Label("Basis");
 		recipeGrid.add(basis, 0, 1);
 		basisBox.getItems().clear();
 		basisBox.getItems().add("atom");
 		basisBox.getItems().add("mass");
+
 		basisBox.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				recipe.Basis = basisBox.getValue();
 			}
 		});
-		basisBox.setValue(recipe.Basis);
+		basisBox.setValue(saveBasis);
 		recipeGrid.add(basisBox, 1, 1);
 		
 		Label isotope = new Label("Isotopes");

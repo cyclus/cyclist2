@@ -1,38 +1,23 @@
 package edu.utexas.cycic;
 
-import java.io.File;
+import java.util.Optional;
 
 import edu.utah.sci.cyclist.core.controller.CyclistController;
-import edu.utah.sci.cyclist.core.event.dnd.DnD;
-import edu.utah.sci.cyclist.core.event.notification.EventBus;
-import edu.utah.sci.cyclist.core.presenter.WorkspacePresenter;
-import edu.utah.sci.cyclist.core.tools.Tool;
-import edu.utah.sci.cyclist.core.ui.MainScreen;
-import edu.utah.sci.cyclist.core.ui.View;
-import edu.utah.sci.cyclist.core.ui.components.ViewBase;
-import edu.utah.sci.cyclist.core.ui.views.Workspace;
 import edu.utexas.cycic.tools.FormBuilderTool;
-import edu.utexas.cycic.tools.FormBuilderToolFactory;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.VPos;
-import javafx.scene.control.CustomMenuItem;
-import javafx.scene.control.Label;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Window;
 
 /**
  * The class used to build a new Prototype Facility node.
@@ -45,6 +30,10 @@ public class CycicCircles{
 	protected static double mousex;
 	protected static double x;
 	protected static double y;
+	protected static int defRadius = 45;
+	protected static int mouseOverRadius = 52;
+
+	static Window window;
 	
 	/**
 	 * Function to build a prototype facility node. This node will contain
@@ -55,7 +44,7 @@ public class CycicCircles{
 	static FacilityCircle addNode(String name, final facilityNode parent) {
 
 		final FacilityCircle circle = parent.cycicCircle;
-		circle.setRadius(45);
+		circle.setRadius(defRadius);
 		circle.setCenterX(60);
 		circle.setCenterY(60);
 		circle.type = "Parent";
@@ -65,27 +54,15 @@ public class CycicCircles{
 		circle.text.setText(name);
 		circle.tooltip.setText(name);
 		circle.text.setTooltip(circle.tooltip);
-		circle.text.setWrapText(true);
-		circle.text.setLayoutX(circle.getCenterX()-circle.getRadius()*0.6);
-		circle.text.setLayoutY(circle.getCenterY()-circle.getRadius()*0.6);	
-		circle.text.setTextAlignment(TextAlignment.CENTER);
-		circle.text.setMaxWidth(circle.getRadius()*1.4);
-		circle.text.setMouseTransparent(true);
-		circle.text.setFont(new Font("ComicSans", 14));
-		circle.text.setMaxHeight(circle.getRadius()*1.2);
-		
-		
-		
+
 		// Setting the circle color //
 		circle.setStroke(Color.BLACK);
 		circle.rgbColor=VisFunctions.stringToColor(parent.facilityType);
-		circle.setFill(Color.rgb(circle.rgbColor.get(0), circle.rgbColor.get(1), circle.rgbColor.get(2), 0.9));
-		// Setting font color for visibility //
-		if(VisFunctions.colorTest(circle.rgbColor) == true){
-			circle.text.setTextFill(Color.BLACK);
-		}else{
-			circle.text.setTextFill(Color.WHITE);
-		}
+		circle.setFill(VisFunctions.pastelize(Color.rgb(circle.rgbColor.get(0), circle.rgbColor.get(1), circle.rgbColor.get(2), 0.9)));
+
+		// Place text after color to get font color right //
+		VisFunctions.placeTextOnCircle(circle, "bottom");
+		
 		for(int i = 0; i < Cycic.pane.getChildren().size(); i++){
 			if(Cycic.pane.getChildren().get(i).getId() == "cycicNode"){
 				((Shape) Cycic.pane.getChildren().get(i)).setStroke(Color.BLACK);
@@ -97,7 +74,6 @@ public class CycicCircles{
 		circle.setStroke(Color.DARKGRAY);
 		
 		// Adding the menu and it's menu items.
-		final Menu menu1 = new Menu("Options");
 		
 		MenuItem facForm = new MenuItem("Facility Form");
 		EventHandler<ActionEvent> circleAction = new EventHandler<ActionEvent>() {
@@ -105,7 +81,6 @@ public class CycicCircles{
 			public void handle(ActionEvent event) {
 				try{
 					CyclistController._presenter.addTool(new FormBuilderTool());
-					circle.menu.setVisible(false);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -113,39 +88,45 @@ public class CycicCircles{
 		};
 		facForm.setOnAction(circleAction);
 		
-
+		circle.image.setLayoutX(circle.getCenterX()-60);
+		circle.image.setLayoutY(circle.getCenterY()-60);
 		
 		MenuItem delete = new MenuItem("Delete");
 		
 		delete.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
 				deleteNode(parent);
-				circle.menu.setVisible(false);
 			}
 		});
 		
-		final Menu clonesList = new Menu("Children");
-		
-		/*CustomMenuItem cloneNode = new CustomMenuItem(new Label("Add Child"));
-		cloneNode.setHideOnClick(false);
-		cloneNode.setOnAction(new EventHandler<ActionEvent>(){
+		MenuItem changeNiche = new MenuItem("Change Niche");
+		changeNiche.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
-				Clones.addClone("", parent, parent.cycicCircle.childrenShow);
+				/** TODO CHANGE NICHE OF CIRCLE */
+				TextInputDialog dg = new TextInputDialog(parent.niche);
+				dg.setContentText("New Niche: ");
+				Optional<String> result = dg.showAndWait();
+				if (result.isPresent()){
+				    parent.niche = result.get();
+				    for(int i = 0; i < DataArrays.visualizationSkins.size(); i++){
+						if(DataArrays.visualizationSkins.get(i).name.equalsIgnoreCase(Cycic.currentSkin)){
+							circle.image.setImage(DataArrays.visualizationSkins.get(i).images.getOrDefault(parent.niche,DataArrays.visualizationSkins.get(i).images.get("facility")));
+							circle.image.setVisible(true);
+							circle.setOpacity(0);
+							circle.setRadius(DataArrays.visualizationSkins.get(i).radius);
+							VisFunctions.placeTextOnCircle(circle, DataArrays.visualizationSkins.get(i).textPlacement);
+						}
+					}
+				}
 			}
 		});
-		clonesList.getItems().add(cloneNode);*/
-		
-		circle.image.setLayoutX(circle.getCenterX()-60);
-		circle.image.setLayoutY(circle.getCenterY()-60);
-		
-		
+
 		MenuItem showImage = new MenuItem("Show Image");
 		showImage.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
 				circle.image.setVisible(true);
 				circle.image.toBack();
 				circle.setOpacity(0);	
-				circle.menu.setVisible(false);
 			}
 		});
 		
@@ -153,15 +134,10 @@ public class CycicCircles{
 		hideImage.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
 				circle.image.setVisible(false);
-				circle.setOpacity(100);
-				circle.menu.setVisible(false);			}
+				circle.setOpacity(100);	}
 		});
 		
-		menu1.getItems().addAll(facForm, clonesList, delete, showImage, hideImage);
-		circle.menu.getMenus().add(menu1);
-		circle.menu.setLayoutX(circle.getCenterX());
-		circle.menu.setLayoutY(circle.getCenterY());
-		circle.menu.setVisible(false);
+		circle.menu.getItems().addAll(facForm, changeNiche, delete, showImage, hideImage);
 		
 		// Piece of test code for changing the look of the facility circles.
 		//circle.image.setImage(new Image("reactor.png"));
@@ -190,66 +166,72 @@ public class CycicCircles{
 		
 		// To allow the facilityCircle to be moved through the pane and setting bounding regions.
 		circle.onMouseDraggedProperty().set(new EventHandler<MouseEvent>(){
-			@Override
 			public void handle(MouseEvent event){
-				circle.setCenterX(mousex+x);
-				circle.setCenterY(mousey+y);
-				
-				if(circle.getCenterX() <= Cycic.pane.getLayoutBounds().getMinX()+circle.getRadius()){
-					circle.setCenterX(Cycic.pane.getLayoutBounds().getMinX()+circle.getRadius());
-				}
-				if(circle.getCenterY() <= Cycic.pane.getLayoutBounds().getMinY()+circle.getRadius()){
-					circle.setCenterY(Cycic.pane.getLayoutBounds().getMinY()+circle.getRadius());
-				}
-				if(circle.getCenterY() >= Cycic.pane.getLayoutBounds().getMaxY()-circle.getRadius()){
-					circle.setCenterY(Cycic.pane.getLayoutBounds().getMaxY()-circle.getRadius());
-				}
-				if(circle.getCenterX() >= Cycic.pane.getLayoutBounds().getMaxX()-circle.getRadius()){
-					circle.setCenterX(Cycic.pane.getLayoutBounds().getMaxX()-circle.getRadius());
-				}
-				
-				circle.menu.setLayoutX(circle.getCenterX());
-				circle.menu.setLayoutY(circle.getCenterY());
-				
-				circle.image.setLayoutX(circle.getCenterX()-60);
-				circle.image.setLayoutY(circle.getCenterY()-50);
-				
-				circle.text.setLayoutX(circle.getCenterX()-circle.getRadius()*0.6);
-				circle.text.setLayoutY(circle.getCenterY()-circle.getRadius()*0.6);	
-				
-				for(int i = 0; i < CycicScenarios.workingCycicScenario.Links.size(); i++){
-					if(CycicScenarios.workingCycicScenario.Links.get(i).source == circle){
-						CycicScenarios.workingCycicScenario.Links.get(i).line.setStartX(circle.getCenterX());
-						CycicScenarios.workingCycicScenario.Links.get(i).line.setStartY(circle.getCenterY());
-						CycicScenarios.workingCycicScenario.Links.get(i).line.updatePosition();
+				Line line = new Line();
+				if(event.isShiftDown() == true){
+					Cycic.pane.getChildren().add(line);
+					line.setEndX(event.getX());
+					line.setEndY(event.getY());
+					line.setStartX(circle.getCenterX());
+					line.setStartY(circle.getCenterY());
+				} else {
+					circle.setCenterX(mousex+x);
+					circle.setCenterY(mousey+y);
+
+					if(circle.getCenterX() <= Cycic.pane.getLayoutBounds().getMinX()+circle.getRadius()){
+						circle.setCenterX(Cycic.pane.getLayoutBounds().getMinX()+circle.getRadius());
 					}
-					if(CycicScenarios.workingCycicScenario.Links.get(i).target == circle){
-						CycicScenarios.workingCycicScenario.Links.get(i).line.setEndX(circle.getCenterX());
-						CycicScenarios.workingCycicScenario.Links.get(i).line.setEndY(circle.getCenterY());
-						CycicScenarios.workingCycicScenario.Links.get(i).line.updatePosition();
+					if(circle.getCenterY() <= Cycic.pane.getLayoutBounds().getMinY()+circle.getRadius()){
+						circle.setCenterY(Cycic.pane.getLayoutBounds().getMinY()+circle.getRadius());
 					}
-				}
-				for(int i = 0; i < circle.childrenLinks.size(); i++){
-					circle.childrenLinks.get(i).line.setStartX(circle.getCenterX());
-					circle.childrenLinks.get(i).line.setStartY(circle.getCenterY());
-					circle.childrenList.get(i).setCenterX(mousex-circle.childrenDeltaX.get(i)+x);
-					circle.childrenList.get(i).setCenterY(mousey-circle.childrenDeltaY.get(i)+y);
-					circle.childrenLinks.get(i).line.setEndX(circle.childrenList.get(i).getCenterX());
-					circle.childrenLinks.get(i).line.setEndY(circle.childrenList.get(i).getCenterY());
-					circle.childrenList.get(i).menu.setLayoutX(circle.childrenList.get(i).getCenterX());
-					circle.childrenList.get(i).menu.setLayoutY(circle.childrenList.get(i).getCenterY());
-					circle.childrenList.get(i).text.setLayoutX(circle.childrenList.get(i).getCenterX()-circle.childrenList.get(i).getRadius()*0.6);
-					circle.childrenList.get(i).text.setLayoutY(circle.childrenList.get(i).getCenterY()-circle.childrenList.get(i).getRadius()*0.6);
-					for(int ii = 0; ii < CycicScenarios.workingCycicScenario.Links.size(); ii++){
-						if(circle.childrenList.get(i) == CycicScenarios.workingCycicScenario.Links.get(ii).source){
-							CycicScenarios.workingCycicScenario.Links.get(ii).line.setStartX(circle.childrenList.get(i).getCenterX());
-							CycicScenarios.workingCycicScenario.Links.get(ii).line.setStartY(circle.childrenList.get(i).getCenterY());
-							CycicScenarios.workingCycicScenario.Links.get(ii).line.updatePosition();
+					if(circle.getCenterY() >= Cycic.pane.getLayoutBounds().getMaxY()-circle.getRadius()){
+						circle.setCenterY(Cycic.pane.getLayoutBounds().getMaxY()-circle.getRadius());
+					}
+					if(circle.getCenterX() >= Cycic.pane.getLayoutBounds().getMaxX()-circle.getRadius()){
+						circle.setCenterX(Cycic.pane.getLayoutBounds().getMaxX()-circle.getRadius());
+					}
+
+
+					circle.image.setLayoutX(circle.getCenterX()-60);
+					circle.image.setLayoutY(circle.getCenterY()-50);
+
+					VisFunctions.placeTextOnCircle(circle, "bottom");
+
+					for(int i = 0; i < CycicScenarios.workingCycicScenario.Links.size(); i++){
+						if(CycicScenarios.workingCycicScenario.Links.get(i).source == circle){
+							CycicScenarios.workingCycicScenario.Links.get(i).line.setStartX(circle.getCenterX());
+							CycicScenarios.workingCycicScenario.Links.get(i).line.setStartY(circle.getCenterY());
+							CycicScenarios.workingCycicScenario.Links.get(i).line.updatePosition();
+						}
+						if(CycicScenarios.workingCycicScenario.Links.get(i).target == circle){
+							CycicScenarios.workingCycicScenario.Links.get(i).line.setEndX(circle.getCenterX());
+							CycicScenarios.workingCycicScenario.Links.get(i).line.setEndY(circle.getCenterY());
+							CycicScenarios.workingCycicScenario.Links.get(i).line.updatePosition();
 						}
 					}
+					for(int i = 0; i < circle.childrenLinks.size(); i++){
+						circle.childrenLinks.get(i).line.setStartX(circle.getCenterX());
+						circle.childrenLinks.get(i).line.setStartY(circle.getCenterY());
+						circle.childrenList.get(i).setCenterX(mousex-circle.childrenDeltaX.get(i)+x);
+						circle.childrenList.get(i).setCenterY(mousey-circle.childrenDeltaY.get(i)+y);
+						circle.childrenLinks.get(i).line.setEndX(circle.childrenList.get(i).getCenterX());
+						circle.childrenLinks.get(i).line.setEndY(circle.childrenList.get(i).getCenterY());
+						VisFunctions.placeTextOnCircle(circle.childrenList.get(i), "bottom");
+						for(int ii = 0; ii < CycicScenarios.workingCycicScenario.Links.size(); ii++){
+							if(circle.childrenList.get(i) == CycicScenarios.workingCycicScenario.Links.get(ii).source){
+								CycicScenarios.workingCycicScenario.Links.get(ii).line.setStartX(circle.childrenList.get(i).getCenterX());
+								CycicScenarios.workingCycicScenario.Links.get(ii).line.setStartY(circle.childrenList.get(i).getCenterY());
+								CycicScenarios.workingCycicScenario.Links.get(ii).line.updatePosition();
+							}
+						}
+					}
+					mousex = event.getX();
+					mousey = event.getY();
 				}
-				mousex = event.getX();
-				mousey = event.getY();
+				event.consume();
+				/*if(event.isConsumed()){
+					Cycic.pane.getChildren().remove(line);	
+				}*/
 			}
 		});
 		// Double click functionality to show/hide children. As well as a bloom feature to show which node is selected.
@@ -257,7 +239,8 @@ public class CycicCircles{
 			@Override
 			public void handle(MouseEvent event){
 				if(event.getButton().equals(MouseButton.SECONDARY)){
-					circle.menu.setVisible(true);
+					circle.menu.show(circle, event.getScreenX(), event.getScreenY());
+					event.consume();
 				}
 				if(event.isAltDown() && event.isControlDown()){
 					
@@ -281,25 +264,45 @@ public class CycicCircles{
 		Cycic.workingScenario.FacilityNodes.add(parent);
 		
 		// Code for allow a shift + (drag and drop) to start a new facility form for this facilityCircle.
-		circle.setOnDragDetected(new EventHandler<MouseEvent>(){
+		/*circle.setOnDragDetected(new EventHandler<MouseEvent>(){
 			@Override
 			public void handle(MouseEvent event){
 				if(event.isShiftDown() == true){
-					DnD.LocalClipboard clipboard = DnD.getInstance().createLocalClipboard();
+					System.out.print("YAY");
+					/*DnD.LocalClipboard clipboard = DnD.getInstance().createLocalClipboard();
 					clipboard.put(DnD.TOOL_FORMAT, Tool.class, new FormBuilderTool());
 					
 					Dragboard db = circle.startDragAndDrop(TransferMode.COPY);
+					//Dragboard db = circle.startDragAndDrop(TransferMode.NONE);
 					ClipboardContent content = new ClipboardContent();				
 					content.put(DnD.TOOL_FORMAT, "Facility Form");
 					db.setContent(content);
+					Line line = new Line();
+					Cycic.pane.getChildren().add(line);
+					line.setEndX(event.getX());
+					line.setEndY(event.getY());
+					line.setStartX(circle.getCenterX());
+					line.setStartY(circle.getCenterY());
 					event.consume();
+					Cycic.pane.getChildren().remove(line);
 				}
+			}
+		});*/
+		
+		circle.setOnMouseEntered(new EventHandler<MouseEvent>(){
+			public void handle(MouseEvent e){
+				circle.setRadius(mouseOverRadius);
+			}
+		});
+		
+		circle.setOnMouseExited(new EventHandler<MouseEvent>(){
+			public void handle(MouseEvent e){
+				circle.setRadius(defRadius);
 			}
 		});
 		
 		// Adding facilityCircle to the pane. 
 		Cycic.pane.getChildren().add(circle);
-		Cycic.pane.getChildren().add(circle.menu);
 		Cycic.pane.getChildren().add(circle.text);
 		Cycic.pane.getChildren().add(circle.image);
 		circle.image.toBack();
@@ -334,7 +337,7 @@ public class CycicCircles{
 				CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.get(ii).parentIndex = i;
 			}
 		}
-		VisFunctions.marketHide();
+		VisFunctions.redrawPane();
 
 	}
 }

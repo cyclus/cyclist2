@@ -55,7 +55,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import edu.utah.sci.cyclist.Cyclist;
-import edu.utah.sci.cyclist.core.controller.WorkDirectoryController;
+import edu.utah.sci.cyclist.core.controller.SessionController;
 import edu.utah.sci.cyclist.core.model.CyclistDatasource;
 import edu.utah.sci.cyclist.core.model.Table;
 import edu.utah.sci.cyclist.core.ui.components.DatasourceSelector;
@@ -84,7 +84,7 @@ public class DatatableWizard extends TilePane {
 	private CyclistDatasource     _current;
 	private ObjectProperty<Table> _selection =  new SimpleObjectProperty<>();
 	private DatasourceSelector    _selector;
-	private String               _workDir = WorkDirectoryController.CYCLIST_DIR;
+	private String               _workDir = SessionController.CYCLIST_DIR;
 	private UpdateDbDialog		 _updateDialog;
 	private ObjectProperty<Boolean> _dsIsValid  = new SimpleObjectProperty<>();
 	private TextArea _statusText;

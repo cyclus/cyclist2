@@ -12,6 +12,11 @@ public class InstitutionViewToolFactory implements ToolFactory {
 	}
 
 	@Override
+	public String getToolType() {
+		return InstitutionViewTool.TYPE;
+	}
+	
+	@Override
 	public AwesomeIcon getIcon() {
 		return InstitutionViewTool.ICON;
 	}

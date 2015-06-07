@@ -22,13 +22,13 @@
  *******************************************************************************/
 package edu.utah.sci.cyclist.core.ui;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -39,9 +39,9 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -58,8 +58,8 @@ import edu.utah.sci.cyclist.core.ui.panels.JobsPanel;
 import edu.utah.sci.cyclist.core.ui.panels.SchemaPanel;
 import edu.utah.sci.cyclist.core.ui.panels.SimulationsPanel;
 import edu.utah.sci.cyclist.core.ui.panels.TablesPanel;
+import edu.utah.sci.cyclist.core.ui.panels.TitledPanel;
 import edu.utah.sci.cyclist.core.ui.panels.ToolsPanel;
-import edu.utah.sci.cyclist.core.ui.views.Workspace;
 import edu.utah.sci.cyclist.core.ui.wizards.WorkspaceWizard;
 import edu.utah.sci.cyclist.core.util.AwesomeIcon;
 import edu.utah.sci.cyclist.core.util.GlyphRegistry;
@@ -73,14 +73,15 @@ public class MainScreen extends VBox implements Resource {
 	private SchemaPanel _fieldsPanel;
     private ToolsPanel _toolsPanel;
     private InputPanel _inputPanel;
-	private StackPane _workspacePane;
+	private TabPane _tabsPane;
 	private SimulationsPanel _simulationPanel;
 	private JobsPanel _jobsPanel;
+	private Map<String, TitledPanel> _panels = new HashMap<>();
 
 	private Menu _perspectiveMenu;
-    private Menu _viewMenu;
-    private Menu _inputMenu;
-	private Menu _runMenu;
+    private Menu _toolsMenu;
+//    private Menu _inputMenu;
+//	private Menu _runMenu;
 	
 	private ObjectProperty<EventHandler<WindowEvent>> _stageCloseProperty;
 		
@@ -109,9 +110,26 @@ public class MainScreen extends VBox implements Resource {
 		return wizard.show(getScene().getWindow());
 	}
 	
+	public TabPane getTabPane() {
+		return _tabsPane;
+	}
 	
-	public void setWorkspace(Workspace workspace) {
-		_workspacePane.getChildren().add(workspace);
+	public void showPanels(List<String> list, double[] pos) {
+		_toolsPane.getItems().clear();
+		for (String name : list) {
+			TitledPanel panel = _panels.get(name);
+			if (panel != null) 
+				_toolsPane.getItems().add(panel);
+			else
+				System.out.println("MainScreen error: unknow panel ["+name+"]");
+		}
+		
+		Platform.runLater(new Runnable() {	
+			@Override
+			public void run() {
+				_toolsPane.setDividerPositions(pos);
+			}
+		});
 	}
 	
 	public TablesPanel getDatasourcesPanel() {
@@ -138,27 +156,24 @@ public class MainScreen extends VBox implements Resource {
 		return _jobsPanel;
 	}
 	
-	public Workspace getWorkspace(){
-		for(Object obj : _workspacePane.getChildren()){
-			if (obj.getClass() == Workspace.class) {
-				return (Workspace)obj;
-			}
-		}
-		return null;
-	}
-	
 	private double TOOLS_WIDTH = 120; 
 	
 	private void build(Stage stage){
-		getStyleClass().add("main-screen");
-		double[] div = {0.1, 0.4, 0.7, 0.8, 0.95, 0.97};
-		
+		getStyleClass().add("main-screen");		
 		double [] mainDividers = {TOOLS_WIDTH/600.0};
 		
 		this.setPrefWidth(600);
 		this.setPrefHeight(400);
 		this.setPadding(new Insets(0));
 		this.setSpacing(0);
+
+		_panels.put("Builder", _inputPanel = new InputPanel());
+		_panels.put("Simulations", _simulationPanel = new SimulationsPanel());
+		_panels.put("Tables", _datasourcesPanel = new TablesPanel());
+		_panels.put("Fields", _fieldsPanel = new SchemaPanel("Fields"));
+		_panels.put("Tools", _toolsPanel = new ToolsPanel());
+		_panels.put("Jobs", _jobsPanel = new JobsPanel());
+		_panels.put("Filters", new FiltersListPanel());
 		
 		_sp = new SplitPane();
 		_sp.setOrientation(Orientation.HORIZONTAL);
@@ -169,20 +184,10 @@ public class MainScreen extends VBox implements Resource {
 		_toolsPane.setPrefWidth(USE_COMPUTED_SIZE);
 		_toolsPane.setPrefHeight(USE_COMPUTED_SIZE);
 		_toolsPane.setOrientation(Orientation.VERTICAL);
-		_toolsPane.getItems().addAll(
-				_simulationPanel = new SimulationsPanel(),
-				_datasourcesPanel = new TablesPanel(),
-				_fieldsPanel = new SchemaPanel("Fields"),
-                _toolsPanel = new ToolsPanel(),
-                _inputPanel = new InputPanel(),
-        		_jobsPanel = new JobsPanel(),
-				/*_filtersPanel = */new FiltersListPanel()
-				);
-		_toolsPane.setDividerPositions(div);
 		
 		_sp.getItems().addAll(
 				_toolsPane,
-				_workspacePane = new StackPane());
+				_tabsPane = new TabPane());
 		
 		this.getChildren().addAll(
 				createMenuBar(stage),
@@ -194,46 +199,46 @@ public class MainScreen extends VBox implements Resource {
 		SplitPane.setResizableWithParent(_toolsPane, false);
 		
 		_stageCloseProperty = stage.onCloseRequestProperty();
-		_remoteServers = FXCollections.observableArrayList();
-		_remoteServers.addListener(new ListChangeListener<MenuItem>() {
-			@Override
-			public void onChanged(ListChangeListener.Change<? extends MenuItem> change) {
-				List<MenuItem> newServers = new ArrayList<MenuItem>();
-				List<MenuItem> deletedServers = new ArrayList<MenuItem>();
-				while (change.next()) {
-					for (MenuItem item : change.getRemoved()) {
-						deletedServers.add(item);
-					}
-					for (MenuItem item : change.getAddedSubList()) {
-						item.setUserData(item.getText());
-						item.onActionProperty().set(_runMenuItem.getOnAction());
-						newServers.add(item);
-					}
-					updateRunOnMenu(newServers,deletedServers);
-				}
-			}
-		});
+//		_remoteServers = FXCollections.observableArrayList();
+//		_remoteServers.addListener(new ListChangeListener<MenuItem>() {
+//			@Override
+//			public void onChanged(ListChangeListener.Change<? extends MenuItem> change) {
+//				List<MenuItem> newServers = new ArrayList<MenuItem>();
+//				List<MenuItem> deletedServers = new ArrayList<MenuItem>();
+//				while (change.next()) {
+//					for (MenuItem item : change.getRemoved()) {
+//						deletedServers.add(item);
+//					}
+//					for (MenuItem item : change.getAddedSubList()) {
+//						item.setUserData(item.getText());
+//						item.onActionProperty().set(_runMenuItem.getOnAction());
+//						newServers.add(item);
+//					}
+//					updateRunOnMenu(newServers,deletedServers);
+//				}
+//			}
+//		});
 	}
 	
 	/*
 	 * Menus & Actions
 	 */
 	
-    public Menu getViewMenu() {
-        return _viewMenu;
+    public Menu getToolsMenu() {
+        return _toolsMenu;
     }
     
-    public Menu getInputMenu() {
-        return _inputMenu;
-    }
+//    public Menu getInputMenu() {
+//        return _inputMenu;
+//    }
     
 	public Menu getPerspectiveMenu() {
 		return _perspectiveMenu;
 	}
 	
-	public Menu getRunMenu() {
-		return _runMenu;
-	}
+//	public Menu getRunMenu() {
+//		return _runMenu;
+//	}
 	
 	private MenuItem _datasourceMenuItem;
 	private MenuItem _workspaceMenuItem;
@@ -242,12 +247,12 @@ public class MainScreen extends VBox implements Resource {
 	private MenuItem _saveAsMenuItem;
 	private MenuItem _simulationMenuItem;
 	private MenuItem _sqliteLoaderMenuItem;
-	private MenuItem _runMenuItem;
-	private MenuItem _manageMenuItem;
-	private Menu     _runOnMenu;
-	private MenuItem _runOnOtherItem;
+//	private MenuItem _runMenuItem;
+//	private MenuItem _manageMenuItem;
+//	private Menu     _runOnMenu;
+//	private MenuItem _runOnOtherItem;
 	private MenuItem _preferencesMenuItem;
-	private ObservableList<MenuItem> _remoteServers;
+//	private ObservableList<MenuItem> _remoteServers;
 	
 	public ObjectProperty<EventHandler<ActionEvent>> onAddDatasource() {
 		return _datasourceMenuItem.onActionProperty();
@@ -276,17 +281,17 @@ public class MainScreen extends VBox implements Resource {
 		return _quitMenuItem.onActionProperty();
 	}
 	
-	public ObjectProperty<EventHandler<ActionEvent>> onRun() {
-		return _runMenuItem.onActionProperty();
-	}
+//	public ObjectProperty<EventHandler<ActionEvent>> onRun() {
+//		return _runMenuItem.onActionProperty();
+//	}
 	
-	public ObjectProperty<EventHandler<ActionEvent>> onManage() {
-		return _manageMenuItem.onActionProperty();
-	}
-	
-	public ObjectProperty<EventHandler<ActionEvent>> onRunOnOther() {
-		return _runOnOtherItem.onActionProperty();
-	}
+//	public ObjectProperty<EventHandler<ActionEvent>> onManage() {
+//		return _manageMenuItem.onActionProperty();
+//	}
+//	
+//	public ObjectProperty<EventHandler<ActionEvent>> onRunOnOther() {
+//		return _runOnOtherItem.onActionProperty();
+//	}
 	
 	public ObjectProperty<Boolean> editDataSourceProperty() {
 		return _datasourcesPanel.editTableProperty();
@@ -296,9 +301,9 @@ public class MainScreen extends VBox implements Resource {
 		return _preferencesMenuItem.onActionProperty();
 	}
 	
-	public ObservableList<MenuItem> getRemoteServers(){
-		return _remoteServers; 
-	}
+//	public ObservableList<MenuItem> getRemoteServers(){
+//		return _remoteServers; 
+//	}
 
 	
 	/**
@@ -325,22 +330,29 @@ public class MainScreen extends VBox implements Resource {
 		return _stageCloseProperty;
 	}
 	
+	public double[] getToolsPositions() {
+		return _toolsPane.getDividerPositions();
+	}
+	
+	public double[] getSplitPositions() {
+		return _sp.getDividerPositions();
+	}
+	
 	public void save(IMemento memento) {
 		memento.createChild("sp-pos").putString("values", Arrays.toString(_sp.getDividerPositions()));
-		memento.createChild("tools-pos").putString("values", Arrays.toString(_toolsPane.getDividerPositions()));
 	}
 	
 	public void restore(IMemento memento, Context ctx) {
-//		final double [] pos = parseArray(memento.getChild("sp-pos").getString("values"));
-//		final double [] pos1 = parseArray(memento.getChild("tools-pos").getString("values"));
-//
-//		Platform.runLater(new Runnable() {	
-//			@Override
-//			public void run() {
-//				_sp.setDividerPositions(pos);
-//				_toolsPane.setDividerPositions(pos1);
-//			}
-//		});
+		if (memento.getChild("sp-pos") != null) {
+			final double [] pos = parseArray(memento.getChild("sp-pos").getString("values"));
+
+			Platform.runLater(new Runnable() {	
+				@Override
+				public void run() {
+					_sp.setDividerPositions(pos);
+				}
+			});
+		}
 	}
 	
 	private double[] parseArray(String str) {
@@ -357,13 +369,11 @@ public class MainScreen extends VBox implements Resource {
 		
 		Menu fileMenu = createFileMenu();
 		Menu dataMenu = createDataMenu();
-        _viewMenu = createViewMenu();
-        _inputMenu = createInputMenu();
-		_runMenu = createRunMenu();
-//		Menu panelMenu = createPanelMenu();
-//		_perspectiveMenu = createPerspectiveMenu();
+        _toolsMenu = createToolsMenu();
+//        _inputMenu = createInputMenu();
+//		_runMenu = createRunMenu();
 		
-        menubar.getMenus().addAll(fileMenu, dataMenu, _viewMenu, _inputMenu, _runMenu /*, _perspectiveMenu*/);
+        menubar.getMenus().addAll(fileMenu, dataMenu, _toolsMenu /*, _inputMenu , _runMenu*/);
 		
 		return menubar;
 	}
@@ -409,46 +419,59 @@ public class MainScreen extends VBox implements Resource {
 		return dataMenu;
 	}
 
-    private Menu createViewMenu() {
-        Menu menu = new Menu("Views");          
+    private Menu createToolsMenu() {
+        Menu menu = new Menu("Tools");          
 
-        for (final ToolFactory factory : ToolsLibrary.factories) {
+        for (final ToolFactory factory : ToolsLibrary.getFactoriesOfType(ToolsLibrary.SCENARIO_TOOL)) {
             MenuItem item = new MenuItem(factory.getToolName(), GlyphRegistry.get(factory.getIcon()));
+            item.getProperties().put("type", ToolsLibrary.SCENARIO_TOOL);
+            menu.getItems().add(item);
+        }
+        
+        for (final ToolFactory factory : ToolsLibrary.getFactoriesOfType(ToolsLibrary.VIS_TOOL)) {
+            MenuItem item = new MenuItem(factory.getToolName(), GlyphRegistry.get(factory.getIcon()));
+            item.getProperties().put("type", ToolsLibrary.VIS_TOOL);
             menu.getItems().add(item);
         }
 
         return menu;
     }
 	
-    private Menu createInputMenu() {
-        Menu menu = new Menu("Input");          
-
-        for (final ToolFactory factory : ToolsLibrary.inputFactories) {
-            MenuItem item = new MenuItem(factory.getToolName(), GlyphRegistry.get(factory.getIcon()));
-            menu.getItems().add(item);
-        }
-
-        return menu;
+    public void selectTools(String type) {
+    	for (MenuItem item : _toolsMenu.getItems()) {
+    		item.setDisable(item.getProperties().get("type") != type);
+    	}
     }
+    
+//    private Menu createInputMenu() {
+//        Menu menu = new Menu("Scenario Builder");          
+//
+//        for (final ToolFactory factory : ToolsLibrary.getFactoriesOfType(ToolsLibrary.SCENARIO_TOOL)) {
+//            MenuItem item = new MenuItem(factory.getToolName(), GlyphRegistry.get(factory.getIcon()));
+//            menu.getItems().add(item);
+//        }
+//
+//        return menu;
+//    }
 
-	private Menu createRunMenu() {
-		Menu menu= new Menu("Run");
-		_runMenuItem = new MenuItem("Submit file"/*, GlyphRegistry.get(AwesomeIcon.EXCHANGE))*/);
-		_runMenuItem.setAccelerator(KeyCombination.keyCombination("Meta+R"));
-		//Let the controller retrieve the current default server each time the menu item is selected.
-		_runMenuItem.setUserData("");
-		
-		_runOnMenu = new Menu("Run on");
-	    _runOnOtherItem = new MenuItem("other...");
-		   
-		_runOnMenu.getItems().add(_runOnOtherItem);
-		
-		_manageMenuItem = new MenuItem("Manage list");
-
-		menu.getItems().addAll(_runMenuItem,_runOnMenu,_manageMenuItem);
-	
-		return menu;
-	}
+//	private Menu createRunMenu() {
+//		Menu menu= new Menu("Run");
+//		_runMenuItem = new MenuItem("Submit file"/*, GlyphRegistry.get(AwesomeIcon.EXCHANGE))*/);
+//		_runMenuItem.setAccelerator(KeyCombination.keyCombination("Meta+R"));
+//		//Let the controller retrieve the current default server each time the menu item is selected.
+//		_runMenuItem.setUserData("");
+//		
+//		_runOnMenu = new Menu("Run on");
+//	    _runOnOtherItem = new MenuItem("other...");
+//		   
+//		_runOnMenu.getItems().add(_runOnOtherItem);
+//		
+//		_manageMenuItem = new MenuItem("Manage list");
+//
+//		menu.getItems().addAll(_runMenuItem,_runOnMenu,_manageMenuItem);
+//	
+//		return menu;
+//	}
 	
 	/*
 	 * Updates the remote servers menu after the list of remote addresses has changed.
@@ -458,43 +481,33 @@ public class MainScreen extends VBox implements Resource {
 	 * @param List<MenuItem> deletedServers - list of addresses to remove.
 	 *  
 	 */
-	private void updateRunOnMenu(List<MenuItem> newServers, List<MenuItem> deletedServers){
-		
-		List<MenuItem> deleted = new ArrayList<MenuItem>();
-		//First deleted old items
-		for(MenuItem item : deletedServers){
-			for(MenuItem menuItem :_runOnMenu.getItems()){
-				if(menuItem.getText() != null &&  menuItem.getText().equals(item.getText())){
-					deleted.add(menuItem);
-				}
-			}
-		}
-		
-		for(MenuItem menuItem : deleted){
-			_runOnMenu.getItems().remove(menuItem);
-		}
-		
-		//If only the separator and "other" where left
-		if(_runOnMenu.getItems().size()==2 && _runOnMenu.getItems().get(0) instanceof SeparatorMenuItem){
-			 _runOnMenu.getItems().remove(0);
-		}
-		
-		//If only "other" menu item exists - add a separator
-		if(_runOnMenu.getItems().size()==1 && newServers.size()>0 ){
-			_runOnMenu.getItems().add(0,new SeparatorMenuItem());
-		}
-		if(newServers.size()>0){
-			_runOnMenu.getItems().addAll(0, newServers);
-		}
-	}
-	
-	private Menu createPerspectiveMenu() {
-		Menu menu = new Menu("Perspectives");
-		
-		MenuItem cycic = new MenuItem("Design");
-		MenuItem cyclist = new MenuItem("Analysis");
-		
-		menu.getItems().addAll(cycic, cyclist);
-		return menu;
-	}
+//	private void updateRunOnMenu(List<MenuItem> newServers, List<MenuItem> deletedServers){
+//		
+//		List<MenuItem> deleted = new ArrayList<MenuItem>();
+//		//First deleted old items
+//		for(MenuItem item : deletedServers){
+//			for(MenuItem menuItem :_runOnMenu.getItems()){
+//				if(menuItem.getText() != null &&  menuItem.getText().equals(item.getText())){
+//					deleted.add(menuItem);
+//				}
+//			}
+//		}
+//		
+//		for(MenuItem menuItem : deleted){
+//			_runOnMenu.getItems().remove(menuItem);
+//		}
+//		
+//		//If only the separator and "other" where left
+//		if(_runOnMenu.getItems().size()==2 && _runOnMenu.getItems().get(0) instanceof SeparatorMenuItem){
+//			 _runOnMenu.getItems().remove(0);
+//		}
+//		
+//		//If only "other" menu item exists - add a separator
+//		if(_runOnMenu.getItems().size()==1 && newServers.size()>0 ){
+//			_runOnMenu.getItems().add(0,new SeparatorMenuItem());
+//		}
+//		if(newServers.size()>0){
+//			_runOnMenu.getItems().addAll(0, newServers);
+//		}
+//	}
 }

@@ -11,6 +11,11 @@ public class TimelineDisplayToolFactory implements ToolFactory {
 	public String getToolName() {
 		return TimelineDisplayTool.TOOL_NAME;
 	}
+	
+	@Override
+	public String getToolType() {
+		return TimelineDisplayTool.TYPE;
+	}
 
 	@Override
 	public AwesomeIcon getIcon() {

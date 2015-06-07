@@ -1,13 +1,17 @@
 package edu.utexas.cycic;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import edu.utah.sci.cyclist.core.presenter.SelectionModel;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -15,6 +19,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 /**
  * This class is built to handle all of the functions used in building the forms for CYCIC. 
@@ -79,6 +85,7 @@ public class FormBuilderFunctions {
 	static TextField textFieldBuilder(final ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
 		
 		TextField textField = new TextField();
+		textField.setMaxWidth(150);
 		textField.setText(defaultValue.get(0).toString());
 		if(facArray.get(1) != null){
 			textField.setPromptText(facArray.get(1).toString());
@@ -86,6 +93,7 @@ public class FormBuilderFunctions {
 		textField.textProperty().addListener(new ChangeListener<Object>(){         
 			public void changed(ObservableValue<?> observable, Object oldValue, Object newValue){
 				defaultValue.set(0, newValue);
+				facArray.set(10, true);
 			}
 		});
 		
@@ -150,6 +158,7 @@ public class FormBuilderFunctions {
 		textName.textProperty().addListener(new ChangeListener<String>(){         
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				node.name = newValue;
+				node.institutionShape.text.setText(newValue);
 			}
 		});
 		return textName;
@@ -181,7 +190,7 @@ public class FormBuilderFunctions {
 	 * @param defaultValue The current value of the slider passed to the function. 
 	 * @return A text field used to interact with the slider. 
 	 */
-	static TextField sliderTextFieldBuilder(final Slider slider, final ArrayList<Object> defaultValue){
+	static TextField sliderTextFieldBuilder(final Slider slider, ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
 		
 		final TextField textField = new TextField();
 		
@@ -202,6 +211,9 @@ public class FormBuilderFunctions {
 					textField.setText("IT'S OVER 9000!!!!!");
 				} else {
 					defaultValue.set(0, textField.getText());
+					if((Boolean) facArray.get(10) == false){
+						facArray.set(10, true);
+					}
 				}
 			}
 		});
@@ -210,6 +222,9 @@ public class FormBuilderFunctions {
 			public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
 				textField.setText(String.format("%.2f", new_val));
 				defaultValue.set(0, textField.getText());
+				if((Boolean) facArray.get(10) == false){
+					facArray.set(10, true);
+				}
 			}
 		});
 		return textField;
@@ -221,19 +236,20 @@ public class FormBuilderFunctions {
 	 * @param defaultValue ArrayList<Object> that contains the default or current value of the comboBox being initiated. 
 	 * @return Returns a ComboBox to be used in the creation of the form. 
 	 */
-	static ComboBox<String> comboBoxBuilder(String string, final ArrayList<Object> defaultValue){
+	static ComboBox<String> comboBoxBuilder(String string, ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
 		
 		final ComboBox<String> cb = new ComboBox<String>();
-		
 		for(String value : string.split(",")){
 			cb.getItems().add(value.trim());
 		}
 		cb.setPromptText("Select value");
 		cb.setValue(defaultValue.get(0).toString());
-		
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				defaultValue.set(0, cb.getValue());
+				if((Boolean) facArray.get(10) == false){
+					facArray.set(10, true);
+				}
 			}
 		});
 		return cb;
@@ -259,43 +275,50 @@ public class FormBuilderFunctions {
 	 * @param defaultValue The ArrayList<Object> that contains the default value of this input field for the facilityCircle.
 	 * @return ComboBox containing all of the commodities currently linked to markets, with the value shown being the current incommodity for the facNode.
 	 */
-	static ComboBox<String> comboBoxInCommod(final facilityNode facNode, final ArrayList<Object> defaultValue){
+	static ComboBox<String> comboBoxInCommod(final facilityNode facNode, ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
 		// Create and fill the comboBox
 		final ComboBox<String> cb = new ComboBox<String>();
 		cb.setMinWidth(80);
 		cb.setOnMousePressed(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
+				for(int i =0; i < facNode.cycicCircle.incommods.size(); i++){
+					if(facNode.cycicCircle.incommods.get(i) == cb.getValue()){
+						facNode.cycicCircle.incommods.remove(i);
+					}
+				}
 				cb.getItems().clear();
 
-				for (CommodityNode label: DataArrays.CommoditiesList){
+				for(CommodityNode label: DataArrays.CommoditiesList){
 					cb.getItems().add(label.name.getText());
 				}
-				//cb.getItems().add("New Commodity");
+				cb.getItems().add("New Commodity");
 				
-				if ( defaultValue.get(0) != "") {
+				if(!defaultValue.get(0).equals("")) {
 					cb.setValue((String) defaultValue.get(0));
 				}
 			}
 		});
-		if ( defaultValue.get(0) != "") {
+		if(defaultValue.get(0) != "") {
 			cb.setValue((String) defaultValue.get(0));
 		}
 		cb.setPromptText("Select a commodity");
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-
 				if (newValue == "New Commodity"){
-					// Tell Commodity Window to add a new commodity 
+					Cycic.addNewCommodity();
 				} else {
 					facNode.cycicCircle.incommods.add(newValue);
 					defaultValue.set(0, newValue);
+					if((Boolean) facArray.get(10) == false){
+						facArray.set(10, true);
+					}
 					for (int i = 0; i < facNode.cycicCircle.incommods.size(); i++) {
 						if (facNode.cycicCircle.incommods.get(i) == (String) oldValue){
 							facNode.cycicCircle.incommods.remove(i);
-							i--;
+							break;
 						}
 					}
-					VisFunctions.marketHide();
+					VisFunctions.redrawPane();
 				}
 			}
 		});
@@ -310,18 +333,23 @@ public class FormBuilderFunctions {
 	 * @param defaultValue The ArrayList<Object> that contains the default value of this input field for the facilityCircle.
 	 * @return ComboBox containing all of the commodities currently linked to markets, with the value shown being the current outcommodity for the facNode.
 	 */
-	static ComboBox<String> comboBoxOutCommod(final facilityNode facNode, final ArrayList<Object> defaultValue){
-		// Create and fill the comboBox
+	static ComboBox<String> comboBoxOutCommod(final facilityNode facNode, ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
+		///TODO Fix quick hack.
 		final ComboBox<String> cb = new ComboBox<String>();
 		cb.setMinWidth(80);
 				
 		cb.setOnMousePressed(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
+					for(int i = 0; i < facNode.cycicCircle.outcommods.size(); i++){
+						if(facNode.cycicCircle.outcommods.get(i) == cb.getValue()){
+							facNode.cycicCircle.outcommods.remove(i);
+						}
+					}
 				cb.getItems().clear();
 				for (CommodityNode label: DataArrays.CommoditiesList){
 					cb.getItems().add(label.name.getText());
 				}
-				//cb.getItems().add("New Commodity");
+				cb.getItems().add("New Commodity");
 				
 				if (defaultValue.get(0) != "") {
 					cb.setValue((String) defaultValue.get(0));
@@ -335,17 +363,20 @@ public class FormBuilderFunctions {
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				if (newValue == "New Commodity"){
-					// Tell Commodity Window to add a new commodity 
+					Cycic.addNewCommodity(); 
 				} else {
 					facNode.cycicCircle.outcommods.add(newValue);
 					defaultValue.set(0, newValue);
+					if((Boolean) facArray.get(10) == false){
+						facArray.set(10, true);
+					}
 					for (int i = 0; i < facNode.cycicCircle.outcommods.size(); i++) {
 						if (facNode.cycicCircle.outcommods.get(i) == (String) oldValue){
 							facNode.cycicCircle.outcommods.remove(i);
-							i--;
+							break;
 						}
 					}
-					VisFunctions.marketHide();
+					VisFunctions.redrawPane();
 				}
 			}
 		});
@@ -359,9 +390,9 @@ public class FormBuilderFunctions {
 	 * @param defaultValue ArrayList<Object> containing the data for a "recipe" field in the facilityCircle. 
 	 * @return ComboBox containing all of the recipes currently available in the simulation, tied to the value of this recipe field. 
 	 */
-	static ComboBox<String> recipeComboBox(facilityNode facNode, final ArrayList<Object> defaultValue){
+	static ComboBox<String> recipeComboBox(facilityNode facNode, ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
 		final ComboBox<String> cb = new ComboBox<String>();
-		
+		cb.setPromptText("Select a recipe");
 		cb.setValue((String) defaultValue.get(0));
 		
 		cb.setOnMousePressed(new EventHandler<MouseEvent>(){
@@ -376,6 +407,9 @@ public class FormBuilderFunctions {
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				defaultValue.set(0, newValue);
+				if((Boolean) facArray.get(10) == false){
+					facArray.set(10, true);
+				}
 			}
 		});
 		
@@ -388,7 +422,7 @@ public class FormBuilderFunctions {
 	 * @param defaultValue ArrayList of containing the default value of this field.
 	 * @return ComboBox containing the list of commodities in the scenario.
 	 */
-	static ComboBox<String> comboBoxCommod(final ArrayList<Object> defaultValue){
+	static ComboBox<String> comboBoxCommod(ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
 		// Create and fill the comboBox
 		final ComboBox<String> cb = new ComboBox<String>();
 		cb.setMinWidth(80);
@@ -406,12 +440,15 @@ public class FormBuilderFunctions {
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				defaultValue.set(0, newValue);
+				if((Boolean) facArray.get(10) == false){
+					facArray.set(10, true);
+				}
 			}
 		});
 		return cb;
 	}
 	
-	static ComboBox<String> comboBoxFac(final ArrayList<Object> defaultValue){
+	static ComboBox<String> comboBoxFac(ArrayList<Object> facArray, final ArrayList<Object> defaultValue){
 		final ComboBox<String> cb = new ComboBox<String>();
 		cb.setMinWidth(80);
 		cb.setPromptText("Select a Facility");
@@ -428,11 +465,63 @@ public class FormBuilderFunctions {
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				defaultValue.set(0, newValue);
+				if((Boolean) facArray.get(10) == false){
+					facArray.set(10, true);
+				}
 			}
 		});
 		return cb;
 	}
 	
+	/**
+	 * 
+	 * @param dataArray
+	 * @return
+	 */
+	static TextField fileTextField(ArrayList<Object> facArray, ArrayList<Object> dataArray){
+		TextField textField = new TextField();
+		textField.setText((String) dataArray.get(0)); 
+		textField.textProperty().addListener(new ChangeListener<String>(){
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
+				dataArray.set(0, newValue);
+				if((Boolean) facArray.get(10) == false){
+					facArray.set(10, true);
+				}
+			}
+		});
+		return textField;
+	}
+	
+	/**
+	 * 
+	 * @param textField
+	 * @return
+	 */
+	static Button fileChooserButton(TextField textField){
+		Button button = new Button("Choose File");
+		Window window = null;
+		
+		FileChooser fileChooser = new FileChooser();
+		//Set extension filter
+		/*FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+		fileChooser.getExtensionFilters().add(extFilter);
+		fileChooser.setTitle("Please save as Cyclus input file.");
+		fileChooser.setInitialFileName("*.xml");*/
+		//Show save file dialog
+		button.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+				File file = fileChooser.showOpenDialog(window);
+				textField.setText(file.getAbsolutePath());
+				textField.setText("ADFASDF");
+			}
+		});
+		
+		
+		return button;
+	}
+	
+	/**
+	/**
 	/**
 	 * 
 	 * @param grid
@@ -444,24 +533,29 @@ public class FormBuilderFunctions {
 	 * @return
 	 */
 	static GridPane cycicTypeTest(GridPane grid, facilityNode formNode, ArrayList<Object> facArray, ArrayList<Object> dataArray, int col, int row){
+		col = 1+col;
 		switch ((String) facArray.get(2).toString().toLowerCase()) {
 		case "incommodity":
-			grid.add(FormBuilderFunctions.comboBoxInCommod(formNode, dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.comboBoxInCommod(formNode, facArray, dataArray), col, row);
 			break;
 		case "outcommodity":
-			grid.add(FormBuilderFunctions.comboBoxOutCommod(formNode, dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.comboBoxOutCommod(formNode, facArray, dataArray), col, row);
 			break;
 		case "inrecipe": case "outrecipe": case "recipe":
-			grid.add(FormBuilderFunctions.recipeComboBox(formNode, dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.recipeComboBox(formNode, facArray, dataArray), col, row);
 			break;
 		case "commodity":
-			grid.add(FormBuilderFunctions.comboBoxCommod(dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.comboBoxCommod(facArray, dataArray), col, row);
 			break;
 		case "prototype":
-			grid.add(comboBoxFac(dataArray), 1+col, row);
+			grid.add(comboBoxFac(facArray, dataArray), col, row);
 			break;
+		case "filechooser":
+			TextField fileField = fileTextField(facArray, dataArray);
+			grid.add(fileField, col, row);
+			grid.add(fileChooserButton(fileField), col+1, row);
 		default:
-			grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), 1+col, row);
+			grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), col, row);
 			break;
 		}
 		return grid;

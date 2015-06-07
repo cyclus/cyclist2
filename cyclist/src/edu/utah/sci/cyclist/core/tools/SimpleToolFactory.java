@@ -6,13 +6,15 @@ public class SimpleToolFactory implements ToolFactory {
 
 	private String _id;
 	private String _name;
+	private String _type;
 	private AwesomeIcon _iconName;
 	private String _viewClass;
 	private String _presenterClass;
 	
-	public SimpleToolFactory(String pkg, String name, AwesomeIcon iconName, String viewClass, String presenterClass) {
+	public SimpleToolFactory(String pkg, String name, String type, AwesomeIcon iconName, String viewClass, String presenterClass) {
 		_id = pkg+"."+name;
 		_name = name;
+		_type = type;
 		_iconName = iconName;
 		_viewClass = pkg+"."+viewClass;
 		_presenterClass = pkg+"."+presenterClass;
@@ -23,6 +25,10 @@ public class SimpleToolFactory implements ToolFactory {
 		return _name;
 	}
 
+	@Override
+	public String getToolType() {
+		return _type;
+	}
 	@Override
 	public AwesomeIcon getIcon() {
 		return _iconName;

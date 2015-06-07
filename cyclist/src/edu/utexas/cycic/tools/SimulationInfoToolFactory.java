@@ -12,6 +12,11 @@ public class SimulationInfoToolFactory implements ToolFactory {
 	}
 
 	@Override
+	public String getToolType() {
+		return SimulationInfoTool.TYPE;
+	}
+	
+	@Override
 	public AwesomeIcon getIcon() {
 		return SimulationInfoTool.ICON;
 	}

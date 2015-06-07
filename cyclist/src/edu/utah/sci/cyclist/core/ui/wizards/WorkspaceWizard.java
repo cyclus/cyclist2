@@ -48,7 +48,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import edu.utah.sci.cyclist.Cyclist;
-import edu.utah.sci.cyclist.core.controller.WorkDirectoryController;
+import edu.utah.sci.cyclist.core.controller.SessionController;
 
 public class WorkspaceWizard extends VBox {
 	
@@ -125,7 +125,7 @@ public class WorkspaceWizard extends VBox {
 					if(dir.isDirectory()){
 						String parent= dir.getParent();
 						if(parent.isEmpty()){
-							parent = WorkDirectoryController.DEFAULT_WORKSPACE;
+							parent = SessionController.DEFAULT_WORKSPACE;
 						}
 						File parentDir = new File(parent);
 						if(parentDir != null){

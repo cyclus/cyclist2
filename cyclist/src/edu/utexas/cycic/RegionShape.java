@@ -45,18 +45,14 @@ public class RegionShape extends Rectangle {
 	Object name;
 	Label text = new Label("");
 	MenuBar menuBar = new MenuBar();
+	static regionNode regionBackTrace;
 	ArrayList<Integer> rgbColor = new ArrayList<Integer>();
-	ListView<String> facilityList = new ListView<String>();
-	ListView<String> institutionList = new ListView<String>();
-	{
-		setId("this");
-	}
 
 	static RegionShape addRegion(final String name, final regionNode region) {
 		final RegionShape rect = new RegionShape();
 		
 		RegionCorralView.workingRegion = region;
-		
+		regionBackTrace = region;
 		// Set properties of regionNode
 		region.name = name;
 		
@@ -69,23 +65,12 @@ public class RegionShape extends Rectangle {
 		
 		rect.name = name;
 		rect.text.setText(name);
-		rect.text.setLayoutX(rect.getX()+rect.getHeight()*0.2);
-		rect.text.setLayoutY(rect.getY()+rect.getHeight()*0.2);	
-		rect.text.setMaxWidth(rect.getWidth()*0.8);
-		rect.text.setMaxHeight(rect.getHeight()*0.8);
-		rect.text.setMouseTransparent(true);
-		rect.text.setFont(new Font(14));
-		rect.text.setWrapText(true);
 		
 		// Set circle color
 		rect.rgbColor=VisFunctions.stringToColor(region.type);
-		rect.setFill(Color.rgb(rect.rgbColor.get(0), rect.rgbColor.get(1), rect.rgbColor.get(2), 0.8));
-		// Setting font color for visibility //
-		if(VisFunctions.colorTest(rect.rgbColor) == true){
-			rect.text.setTextFill(Color.BLACK);
-		}else{
-			rect.text.setTextFill(Color.WHITE);
-		}
+		rect.setFill(VisFunctions.pastelize(Color.rgb(rect.rgbColor.get(0), rect.rgbColor.get(1), rect.rgbColor.get(2), 0.8)));
+
+		VisFunctions.placeTextOnRectangle(rect,"middle");
 		
 		rect.setEffect(VisFunctions.lighting);
 
@@ -143,7 +128,7 @@ public class RegionShape extends Rectangle {
 						((Shape) RegionCorralView.corralPane.getChildren().get(i)).setStrokeWidth(1);
 					}
 				}
-				
+				RegionCorralView.workingRegion = region;
 				rect.setEffect(VisFunctions.lighting);
 				rect.setStrokeWidth(5);
 				rect.setStroke(Color.DARKGRAY);
@@ -171,6 +156,36 @@ public class RegionShape extends Rectangle {
 				}
 			}
 		});
+
+		// To allow the facilityCircle to be moved through the pane and setting bounding regions.
+		rect.onMouseDraggedProperty().set(new EventHandler<MouseEvent>(){
+			@Override
+			public void handle(MouseEvent event){
+
+				rect.setX(x+event.getX());
+				rect.setY(y+event.getY());
+
+				if(rect.getX() <= RegionCorralView.corralPane.getLayoutBounds().getMinX()){
+					rect.setX(RegionCorralView.corralPane.getLayoutBounds().getMinX());
+				}
+				if(rect.getY() <= RegionCorralView.corralPane.getLayoutBounds().getMinY()){
+					rect.setY(RegionCorralView.corralPane.getLayoutBounds().getMinY());
+				}
+				if(rect.getY() >= RegionCorralView.corralPane.getLayoutBounds().getMaxY()-rect.getHeight()){
+					rect.setY(RegionCorralView.corralPane.getLayoutBounds().getMaxY()-rect.getHeight());
+				}
+				if(rect.getX() >= RegionCorralView.corralPane.getLayoutBounds().getMaxX()-rect.getWidth()){
+					rect.setX(RegionCorralView.corralPane.getLayoutBounds().getMaxX()-rect.getWidth());
+				}
+
+				VisFunctions.placeTextOnRectangle(rect,"middle");
+
+				rect.menuBar.setLayoutX(rect.getX()+rect.getHeight()*0.2);
+				rect.menuBar.setLayoutY(rect.getY()+rect.getHeight()*0.2);
+			}
+		});
+
+
 		
 		return rect;	
 	};
@@ -179,7 +194,7 @@ public class RegionShape extends Rectangle {
 		DataArrays.regionNodes.remove(region);
 		RegionCorralView.corralPane.getChildren().removeAll(circle, circle.menuBar, circle.text);
 	};
-
+    
 	{	
 
 		onMousePressedProperty().set(new EventHandler<MouseEvent>(){
@@ -192,35 +207,6 @@ public class RegionShape extends Rectangle {
 			}
 		});
 
-		// To allow the facilityCircle to be moved through the pane and setting bounding regions.
-		onMouseDraggedProperty().set(new EventHandler<MouseEvent>(){
-			@Override
-			public void handle(MouseEvent event){
-
-				setX(x+event.getX());
-				setY(y+event.getY());
-
-				if(getX() <= RegionCorralView.corralPane.getLayoutBounds().getMinX()){
-					setX(RegionCorralView.corralPane.getLayoutBounds().getMinX());
-				}
-				if(getY() <= RegionCorralView.corralPane.getLayoutBounds().getMinY()){
-					setY(RegionCorralView.corralPane.getLayoutBounds().getMinY());
-				}
-				if(getY() >= RegionCorralView.corralPane.getLayoutBounds().getMaxY()-getHeight()){
-					setY(RegionCorralView.corralPane.getLayoutBounds().getMaxY()-getHeight());
-				}
-				if(getX() >= RegionCorralView.corralPane.getLayoutBounds().getMaxX()-getWidth()){
-					setX(RegionCorralView.corralPane.getLayoutBounds().getMaxX()-getWidth());
-				}
-
-				text.setLayoutX(getX()+getHeight()*0.2);
-				text.setLayoutY(getY()+getHeight()*0.2);	
-
-				menuBar.setLayoutX(getX()+getHeight()*0.2);
-				menuBar.setLayoutY(getY()+getHeight()*0.2);
-
-			}
-		});
 
 	}
 

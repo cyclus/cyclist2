@@ -11,7 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ListChangeListener.Change;
 import edu.utah.sci.cyclist.core.model.WorkDirectory;
 
-public class WorkDirectoryController {
+public class SessionController {
 
 	public static final String CYCLIST_DIR = System.getProperty("user.home").replace("\\", "/") + "/.cyclist/";
 	private static final String CONFIG_FILE = CYCLIST_DIR+"config.xml";

@@ -58,7 +58,7 @@ public class SorterCircles{
 		// Setting the circle color //
 		circle.setStroke(Color.BLACK);
 		circle.rgbColor=VisFunctions.stringToColor((String)parent.name);
-		circle.setFill(Color.rgb(circle.rgbColor.get(0), circle.rgbColor.get(1), circle.rgbColor.get(2)));
+		circle.setFill(VisFunctions.pastelize(Color.rgb(circle.rgbColor.get(0), circle.rgbColor.get(1), circle.rgbColor.get(2))));
 		circle.setEffect(VisFunctions.lighting);
 		
 		// Setting font color for visibility //
@@ -96,11 +96,8 @@ public class SorterCircles{
 			}
 		});
 		
-		menu1.getItems().addAll(facForm, delete, showImage, hideImage);
-		circle.menu.getMenus().add(menu1);
-		circle.menu.setLayoutX(circle.getCenterX());
-		circle.menu.setLayoutY(circle.getCenterY());
-		circle.menu.setVisible(false);
+		circle.menu.getItems().addAll(facForm, delete, showImage, hideImage);
+
 		
 		// Piece of test code for changing the look of the facility circles.
 		circle.image.setLayoutX(circle.getCenterX()-60);
@@ -139,9 +136,7 @@ public class SorterCircles{
 				if(circle.getCenterX() >= Cycic.pane.getLayoutBounds().getMaxX()-circle.getRadius()){
 					circle.setCenterX(Cycic.pane.getLayoutBounds().getMaxX()-circle.getRadius());
 				}*/
-				
-				circle.menu.setLayoutX(circle.getCenterX());
-				circle.menu.setLayoutY(circle.getCenterY());
+
 				
 				circle.image.setLayoutX(circle.getCenterX()-60);
 				circle.image.setLayoutY(circle.getCenterY()-50);

@@ -1,0 +1,713 @@
+{
+ "annotations": {
+  ":agents:KFacility": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader"
+   ], 
+   "doc": "A facility designed for integration tests that both provides and consumes commodities. It changes its request and offer amounts based on a power law with respect to time.", 
+   "entity": "facility", 
+   "name": "cyclus::KFacility", 
+   "parents": ["cyclus::Facility"], 
+   "vars": {
+    "current_capacity": {
+     "default": 0, 
+     "doc": "number of output commodity units that can be supplied at the current time step (infinite capacity can be represented by a very large number", 
+     "index": 5, 
+     "tooltip": "current output capacity", 
+     "type": "double"
+    }, 
+    "in_capacity": {
+     "doc": "number of commodity units that can be taken at each time step (infinite capacity can be represented by a very large number", 
+     "index": 3, 
+     "tooltip": "input commodity capacity", 
+     "type": "double"
+    }, 
+    "in_commod": {
+     "doc": "commodity that the k-facility consumes", 
+     "index": 0, 
+     "schematype": "token", 
+     "tooltip": "input commodity", 
+     "type": "std::string", 
+     "uitype": "incommodity"
+    }, 
+    "inventory": {
+     "capacity": "max_inv_size", 
+     "index": 7, 
+     "type": "cyclus::toolkit::ResourceBuff"
+    }, 
+    "k_factor_in": {
+     "doc": "conversion factor that governs the behavior of the k-facility's input commodity capacity", 
+     "index": 8, 
+     "tooltip": "input k-factor", 
+     "type": "double"
+    }, 
+    "k_factor_out": {
+     "doc": "conversion factor that governs the behavior of the k-facility's output commodity capacity", 
+     "index": 9, 
+     "tooltip": "output k-factor", 
+     "type": "double"
+    }, 
+    "max_inv_size": {
+     "default": 1.000000000000000e+299, 
+     "doc": "total maximum inventory size of the k-facility", 
+     "index": 6, 
+     "tooltip": "k-facility maximum inventory size", 
+     "type": "double"
+    }, 
+    "out_capacity": {
+     "doc": "number of commodity units that can be supplied at each time step (infinite capacity can be represented by a very large number", 
+     "index": 4, 
+     "tooltip": "output commodity capacity", 
+     "type": "double"
+    }, 
+    "out_commod": {
+     "doc": "commodity that the k-facility supplies", 
+     "index": 1, 
+     "schematype": "token", 
+     "tooltip": "output commodity", 
+     "type": "std::string", 
+     "uitype": "outcommodity"
+    }, 
+    "recipe_name": {
+     "doc": "recipe name for the k-facility's in-commodity", 
+     "index": 2, 
+     "schematype": "token", 
+     "shape": [50], 
+     "tooltip": "in-commodity recipe name", 
+     "type": "std::string", 
+     "uitype": "recipe"
+    }
+   }
+  }, 
+  ":agents:NullInst": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Ider", 
+    "cyclus::Institution", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener"
+   ], 
+   "doc": "An instition that owns facilities in the simulation but exhibits null behavior. No parameters are given when using the null institution.", 
+   "entity": "institution", 
+   "name": "cyclus::NullInst", 
+   "parents": ["cyclus::Institution"], 
+   "vars": {}
+  }, 
+  ":agents:NullRegion": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Ider", 
+    "cyclus::Region", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener"
+   ], 
+   "doc": "A region that owns the simulation's institutions but exhibits null behavior. No parameters are given when using the null region.", 
+   "entity": "region", 
+   "name": "cyclus::NullRegion", 
+   "parents": ["cyclus::Region"], 
+   "vars": {}
+  }, 
+  ":agents:Predator": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader"
+   ], 
+   "doc": "A facility that represents predators in the Lotka-Volterra integration tests", 
+   "entity": "facility", 
+   "name": "cyclus::Predator", 
+   "parents": ["cyclus::Facility"], 
+   "vars": {
+    "age": {
+     "default": 0, 
+     "doc": "age of predator at beginning of simulation", 
+     "index": 7, 
+     "tooltip": "predator age", 
+     "type": "int"
+    }, 
+    "birth_and_death": {
+     "default": 0, 
+     "doc": "whether or not simultaneous birth and and death are allowed (i.e., can a facility give birth and die in the same time step?)", 
+     "index": 11, 
+     "tooltip": "simultaneous birth and death?", 
+     "type": "bool"
+    }, 
+    "commod": {
+     "doc": "commodity that the predator supplies", 
+     "index": 0, 
+     "schematype": "token", 
+     "tooltip": "predator commodity", 
+     "type": "std::string", 
+     "uitype": "outcommodity"
+    }, 
+    "consumed": {
+     "default": 0, 
+     "doc": "how many units of prey consumed per time step", 
+     "index": 12, 
+     "tooltip": "prey consumed", 
+     "type": "double"
+    }, 
+    "dead": {
+     "default": 0, 
+     "doc": "flag for whether predator is currently dead", 
+     "index": 9, 
+     "tooltip": "dead?", 
+     "type": "bool"
+    }, 
+    "full": {
+     "default": 1, 
+     "doc": "how many units of prey a predator consumes until it is satisfied", 
+     "index": 2, 
+     "tooltip": "feast size", 
+     "type": "double"
+    }, 
+    "hunt_cap": {
+     "default": 1, 
+     "doc": "how many units of prey a predator can catch during a hunt", 
+     "index": 3, 
+     "tooltip": "hunting yield", 
+     "type": "double"
+    }, 
+    "hunt_factor": {
+     "default": 0, 
+     "doc": "whether or not to base hunting success on relative predator/prey populations", 
+     "index": 10, 
+     "tooltip": "hunting success factor", 
+     "type": "bool"
+    }, 
+    "hunt_freq": {
+     "default": 1, 
+     "doc": "how often a predator needs to hunt", 
+     "index": 4, 
+     "tooltip": "hunting frequency", 
+     "type": "int"
+    }, 
+    "lifespan": {
+     "default": 1, 
+     "doc": "how long a predator lives", 
+     "index": 8, 
+     "tooltip": "predator lifespan", 
+     "type": "int"
+    }, 
+    "nchildren": {
+     "default": 1, 
+     "doc": "number of predator children born at each birthing instance", 
+     "index": 6, 
+     "tooltip": "number of children", 
+     "type": "double"
+    }, 
+    "prey": {
+     "doc": "prey that the predator hunts", 
+     "index": 1, 
+     "schematype": "token", 
+     "tooltip": "predator's prey", 
+     "type": "std::string", 
+     "uitype": "incommodity"
+    }, 
+    "success": {
+     "default": 1, 
+     "doc": "fraction of hunting success on a scale from 0 to 1", 
+     "index": 5, 
+     "tooltip": "hunting success fraction", 
+     "type": "double"
+    }
+   }
+  }, 
+  ":agents:Prey": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader"
+   ], 
+   "doc": "A facility that represents prey in the Lotka-Volterra integration tests", 
+   "entity": "facility", 
+   "name": "cyclus::Prey", 
+   "parents": ["cyclus::Facility"], 
+   "vars": {
+    "age": {
+     "default": 0, 
+     "doc": "age of prey at start of simulation", 
+     "index": 3, 
+     "tooltip": "prey age", 
+     "type": "int"
+    }, 
+    "birth_and_death": {
+     "default": 1, 
+     "doc": "whether or not simultaneous birth and and death are allowed (i.e., can a facility give birth and die in the same time step?)", 
+     "index": 5, 
+     "tooltip": "simultaneous birth and death?", 
+     "type": "bool"
+    }, 
+    "birth_freq": {
+     "default": 1, 
+     "doc": "number of time steps between birth of children", 
+     "index": 1, 
+     "tooltip": "birth frequency", 
+     "type": "int"
+    }, 
+    "commod": {
+     "index": 0, 
+     "schematype": "token", 
+     "type": "std::string", 
+     "uitype": "outcommodity"
+    }, 
+    "dead": {
+     "default": 0, 
+     "doc": "flag for whether prey is currently dead", 
+     "index": 4, 
+     "tooltip": "dead?", 
+     "type": "bool"
+    }, 
+    "nchildren": {
+     "default": 1, 
+     "doc": "number of children born at each birthing instance", 
+     "index": 2, 
+     "tooltip": "number of children", 
+     "type": "int"
+    }
+   }
+  }, 
+  ":agents:Sink": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader"
+   ], 
+   "doc": "A minimum implementation sink facility that accepts specified amounts of commodities from other agents", 
+   "entity": "facility", 
+   "name": "cyclus::Sink", 
+   "parents": ["cyclus::Facility"], 
+   "vars": {
+    "capacity": {
+     "doc": "capacity the sink facility can accept at each time step", 
+     "index": 1, 
+     "tooltip": "sink capacity", 
+     "type": "double"
+    }, 
+    "in_commods": {
+     "doc": "commodities that the sink facility accepts", 
+     "index": 0, 
+     "schematype": "token", 
+     "tooltip": "input commodities for the sink", 
+     "type": ["std::vector", "std::string"], 
+     "uitype": "incommodity"
+    }, 
+    "inventory": {
+     "capacity": "max_inv_size", 
+     "index": 3, 
+     "type": "cyclus::toolkit::ResourceBuff"
+    }, 
+    "max_inv_size": {
+     "default": 1.000000000000000e+299, 
+     "doc": "total maximum inventory size of sink facility", 
+     "index": 2, 
+     "tooltip": "sink maximum inventory size", 
+     "type": "double"
+    }
+   }
+  }, 
+  ":agents:Source": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader"
+   ], 
+   "doc": "A minimum implementation source facility that provides a commodity with a given capacity", 
+   "entity": "facility", 
+   "name": "cyclus::Source", 
+   "parents": ["cyclus::Facility"], 
+   "vars": {
+    "capacity": {
+     "doc": "amount of commodity that can be supplied at each time step", 
+     "index": 2, 
+     "tooltip": "source capacity", 
+     "type": "double"
+    }, 
+    "commod": {
+     "doc": "commodity that the source facility supplies", 
+     "index": 0, 
+     "schematype": "token", 
+     "tooltip": "source commodity", 
+     "type": "std::string", 
+     "uitype": "outcommodity"
+    }, 
+    "recipe_name": {
+     "doc": "recipe name for source facility's commodity", 
+     "index": 1, 
+     "schematype": "token", 
+     "tooltip": "commodity recipe name", 
+     "type": "std::string", 
+     "uitype": "recipe"
+    }
+   }
+  }, 
+  ":cycaless:BatchReactor": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader", 
+    "cyclus::toolkit::AgentManaged", 
+    "cyclus::toolkit::CommodityProducer"
+   ], 
+   "doc": "A reactor facility that has three storage areas that hold batches of materials: reserves, core, and storage. It can manage multiple input-output commodity pairs.", 
+   "entity": "facility", 
+   "name": "cycaless::BatchReactor", 
+   "niche": "reactor", 
+   "parents": ["cyclus::Facility", "cyclus::toolkit::CommodityProducer"], 
+   "vars": {
+    "crctx_": {
+     "alias": "fuel", 
+     "doc": "in-out commodity and fuel recipe mappings", 
+     "index": 0, 
+     "type": ["std::vector", "CommodityRecipeContext"], 
+     "uitype": ["oneormore", "incommodity", "recipe", "outcommodity", "recipe"]
+    }, 
+    "fuel": "crctx_"
+   }
+  }, 
+  ":cycaless:DeployInst": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Ider", 
+    "cyclus::Institution", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener"
+   ], 
+   "doc": "An institution that owns, operates, and deploys facilities manually defined in the input file.", 
+   "entity": "institution", 
+   "name": "cycamore::DeployInst", 
+   "parents": ["cyclus::Institution"], 
+   "vars": {
+    "build_sched_": {
+     "alias": "buildorder", 
+     "doc": "list of times to build specific facilities", 
+     "index": 0, 
+     "type": ["std::map", "int", ["std::vector", "std::string"]], 
+     "uitype": ["oneormore", "prototype", "null", "null"]
+    }, 
+    "buildorder": "build_sched_"
+   }
+  }, 
+  ":cycamore:BatchReactor": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader", 
+    "cyclus::toolkit::AgentManaged", 
+    "cyclus::toolkit::CommodityProducer"
+   ], 
+   "doc": "A reactor facility that has three storage areas that hold batches of materials: reserves, core, and storage. It can manage multiple input-output commodity pairs.", 
+   "entity": "facility", 
+   "name": "cycamore::BatchReactor", 
+   "parents": ["cyclus::Facility", "cyclus::toolkit::CommodityProducer"], 
+   "vars": {}
+  }, 
+  ":cycamore:DeployInst": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Ider", 
+    "cyclus::Institution", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener"
+   ], 
+   "doc": "An institution that owns, operates, and deploys facilities manually defined in the input file.", 
+   "entity": "institution", 
+   "name": "cycamore::DeployInst", 
+   "parents": ["cyclus::Institution"], 
+   "vars": {}
+  }, 
+  ":cycamore:EnrichmentFacility": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader"
+   ], 
+   "doc": "An enrichment facility that intakes a commodity (usually natural uranium) and supplies a user-specified enriched product based on SWU capacity", 
+   "entity": "facility", 
+   "name": "cycamore::EnrichmentFacility", 
+   "niche": "enrichment", 
+   "parents": ["cyclus::Facility"], 
+   "vars": {
+    "current_swu_capacity": {
+     "derived_init": "current_swu_capacity = swu_capacity;", 
+     "index": 7, 
+     "type": "double"
+    }, 
+    "feed_assay": {
+     "derived_init": "cyclus::Material::Ptr feed = cyclus::Material::CreateUntracked(0, context()->GetRecipe(in_recipe)); feed_assay = cyclus::toolkit::UraniumAssay(feed);", 
+     "doc": "feed assay for the enrichment process", 
+     "index": 8, 
+     "tooltip": "feed assay", 
+     "type": "double"
+    }, 
+    "in_commod": {
+     "doc": "commodity that the enrichment facility accepts", 
+     "index": 0, 
+     "tooltip": "input commodity", 
+     "type": "std::string", 
+     "uitype": "incommodity"
+    }, 
+    "in_recipe": {
+     "doc": "recipe for enrichment facility's input commodity", 
+     "index": 2, 
+     "tooltip": "input commodity recipe", 
+     "type": "std::string", 
+     "uitype": "recipe"
+    }, 
+    "initial_reserves": {
+     "default": 0, 
+     "doc": "amount of natural uranium stored at the enrichment facility at the beginning of the simulation", 
+     "index": 6, 
+     "tooltip": "initial uranium reserves", 
+     "type": "double"
+    }, 
+    "inventory": {
+     "capacity": "max_inv_size", 
+     "index": 9, 
+     "type": "cyclus::toolkit::ResourceBuff"
+    }, 
+    "max_inv_size": {
+     "default": 1.000000000000000e+299, 
+     "doc": "maximum inventory capacity of natural uranium in the enrichment facility", 
+     "index": 5, 
+     "tooltip": "maximum inventory size", 
+     "type": "double"
+    }, 
+    "out_commod": {
+     "doc": "commodity that the enrichment facility supplies", 
+     "index": 1, 
+     "tooltip": "output commodity", 
+     "type": "std::string", 
+     "uitype": "outcommodity"
+    }, 
+    "swu_capacity": {
+     "default": 1.000000000000000e+299, 
+     "doc": "separative work unit (SWU) capcity of enrichment facility", 
+     "index": 4, 
+     "tooltip": "SWU capacity", 
+     "type": "double"
+    }, 
+    "tails_assay": {
+     "default": 0.030, 
+     "doc": "tails assay from the enrichment process", 
+     "index": 3, 
+     "tooltip": "tails assay", 
+     "type": "double"
+    }
+   }
+  }, 
+  ":cycamore:GrowthRegion": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Ider", 
+    "cyclus::Region", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener"
+   ], 
+   "doc": "A region that governs a scenario in which there is growth in demand for a commodity. ", 
+   "entity": "region", 
+   "name": "cycamore::GrowthRegion", 
+   "parents": ["cyclus::Region"], 
+   "vars": {
+    "commodity_name": {
+     "doc": "name of the commodity experiencing a growth in demand", 
+     "index": 0, 
+     "tooltip": "commodity in demand", 
+     "type": "std::string", 
+     "uitype": "commodity"
+    }, 
+    "demand_params": {
+     "doc": "parameters that define the behavior of the demand type function", 
+     "index": 2, 
+     "tooltip": "demand parameters", 
+     "type": ["std::vector", "std::string"]
+    }, 
+    "demand_times": {
+     "doc": "vector describing the length of times regarding the piecewise demand type", 
+     "index": 3, 
+     "tooltip": "demand times", 
+     "type": ["std::vector", "int"]
+    }, 
+    "demand_types": {
+     "doc": "mathematical description of demand growth (i.e., linear, exponential, piecewise)", 
+     "index": 1, 
+     "tooltip": "demand type", 
+     "type": ["std::vector", "std::string"]
+    }
+   }
+  }, 
+  ":cycamore:ManagerInst": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Ider", 
+    "cyclus::Institution", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::toolkit::AgentManaged", 
+    "cyclus::toolkit::Builder", 
+    "cyclus::toolkit::CommodityProducerManager"
+   ], 
+   "doc": "An institution that owns and operates a manually entered list of facilities in the input file", 
+   "entity": "institution", 
+   "name": "cycamore::ManagerInst", 
+   "parents": [
+    "cyclus::Institution", 
+    "cyclus::toolkit::Builder", 
+    "cyclus::toolkit::CommodityProducerManager"
+   ], 
+   "vars": {
+    "prototypes": {
+     "doc": "a facility to be managed by the institution", 
+     "index": 0, 
+     "tooltip": "facility prototypes", 
+     "type": ["std::vector", "std::string"], 
+     "uitype": "prototype"
+    }
+   }
+  }, 
+  ":cycamore:Sink": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader"
+   ], 
+   "doc": "A sink facility that accepts specified amounts of commodities from other agents", 
+   "entity": "facility", 
+   "name": "cycamore::Sink", 
+   "parents": ["cyclus::Facility"], 
+   "vars": {
+    "capacity": {
+     "default": 1.000000000000000e+299, 
+     "doc": "capacity the sink facility can accept at each time step", 
+     "index": 1, 
+     "tooltip": "sink capacity", 
+     "type": "double"
+    }, 
+    "in_commods": {
+     "doc": "commodities that the sink facility accepts", 
+     "index": 0, 
+     "tooltip": "input commodities", 
+     "type": ["std::vector", "std::string"], 
+     "uitype": ["oneormore", "incommodity"]
+    }, 
+    "inventory": {
+     "capacity": "max_inv_size", 
+     "index": 3, 
+     "type": "cyclus::toolkit::ResourceBuff"
+    }, 
+    "max_inv_size": {
+     "default": 1.000000000000000e+299, 
+     "doc": "total maximum inventory size of sink facility", 
+     "index": 2, 
+     "tooltip": "sink maximum inventory size", 
+     "type": "double"
+    }
+   }
+  }, 
+  ":cycamore:Source": {
+   "all_parents": [
+    "cyclus::Agent", 
+    "cyclus::Facility", 
+    "cyclus::Ider", 
+    "cyclus::StateWrangler", 
+    "cyclus::TimeListener", 
+    "cyclus::Trader", 
+    "cyclus::toolkit::AgentManaged", 
+    "cyclus::toolkit::CommodityProducer"
+   ], 
+   "doc": "A source facility that provides a commodity with a given capacity", 
+   "entity": "facility", 
+   "name": "cycamore::Source", 
+   "parents": ["cyclus::Facility", "cyclus::toolkit::CommodityProducer"], 
+   "vars": {
+    "capacity": {
+     "default": 1.000000000000000e+299, 
+     "doc": "amount of commodity that can be supplied at each time step", 
+     "index": 2, 
+     "tooltip": "source capacity", 
+     "type": "double"
+    }, 
+    "current_capacity": {"derived_init": "current_capacity = capacity;", "index": 3, "type": "double"}, 
+    "out_commod": {
+     "doc": "output commodity that the source facility supplies", 
+     "index": 0, 
+     "tooltip": "source output commodity", 
+     "type": "std::string", 
+     "uitype": "outcommodity"
+    }, 
+    "recipe_name": {
+     "doc": "recipe name for source facility's commodity", 
+     "index": 1, 
+     "tooltip": "commodity recipe name", 
+     "type": "std::string", 
+     "uitype": "recipe"
+    }
+   }
+  }
+ }, 
+ "schema": {
+  ":agents:KFacility": "<interleave>\n<element name=\"in_commod\">\n    <data type=\"token\" />\n</element>\n<element name=\"out_commod\">\n    <data type=\"token\" />\n</element>\n<element name=\"recipe_name\">\n    <data type=\"token\" />\n</element>\n<element name=\"in_capacity\">\n    <data type=\"double\" />\n</element>\n<element name=\"out_capacity\">\n    <data type=\"double\" />\n</element>\n<optional>\n    <element name=\"current_capacity\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"max_inv_size\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<element name=\"k_factor_in\">\n    <data type=\"double\" />\n</element>\n<element name=\"k_factor_out\">\n    <data type=\"double\" />\n</element>\n</interleave>\n", 
+  ":agents:NullInst": "<text/>", 
+  ":agents:NullRegion": "<text/>", 
+  ":agents:Predator": "<interleave>\n<element name=\"commod\">\n    <data type=\"token\" />\n</element>\n<element name=\"prey\">\n    <data type=\"token\" />\n</element>\n<optional>\n    <element name=\"full\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"hunt_cap\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"hunt_freq\">\n        <data type=\"int\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"success\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"nchildren\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"age\">\n        <data type=\"int\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"lifespan\">\n        <data type=\"int\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"dead\">\n        <data type=\"boolean\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"hunt_factor\">\n        <data type=\"boolean\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"birth_and_death\">\n        <data type=\"boolean\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"consumed\">\n        <data type=\"double\" />\n    </element>\n</optional>\n</interleave>\n", 
+  ":agents:Prey": "<interleave>\n<element name=\"commod\">\n    <data type=\"token\" />\n</element>\n<optional>\n    <element name=\"birth_freq\">\n        <data type=\"int\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"nchildren\">\n        <data type=\"int\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"age\">\n        <data type=\"int\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"dead\">\n        <data type=\"boolean\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"birth_and_death\">\n        <data type=\"boolean\" />\n    </element>\n</optional>\n</interleave>\n", 
+  ":agents:Sink": "<interleave>\n<element name=\"in_commods\">\n    <oneOrMore>\n        <element name=\"val\">\n            <data type=\"token\" />\n        </element>\n    </oneOrMore>\n</element>\n<element name=\"capacity\">\n    <data type=\"double\" />\n</element>\n<optional>\n    <element name=\"max_inv_size\">\n        <data type=\"double\" />\n    </element>\n</optional>\n</interleave>\n", 
+  ":agents:Source": "<interleave>\n<element name=\"commod\">\n    <data type=\"token\" />\n</element>\n<element name=\"recipe_name\">\n    <data type=\"token\" />\n</element>\n<element name=\"capacity\">\n    <data type=\"double\" />\n</element>\n</interleave>\n", 
+  ":cycaless:BatchReactor": "  <!-- cyclus::Material In/Out  -->           \n  <element name=\"fuel\">                     \n  <oneOrMore>                                 \n    <element name=\"incommodity\"><text/></element>\n    <element name=\"inrecipe\"><text/></element>\n    <element name=\"outcommodity\"><text/></element>\n    <element name=\"outrecipe\"><text/></element>\n  </oneOrMore>                                \n  </element>                                  \n  <!-- Facility Parameters -->                \n  <interleave>                                \n  <element name=\"processtime\">              \n    <data type=\"nonNegativeInteger\"/>       \n  </element>                                  \n  <element name=\"nbatches\">                 \n    <data type=\"nonNegativeInteger\"/>       \n  </element>                                  \n  <element name =\"batchsize\">               \n    <data type=\"double\"/>                   \n  </element>                                  \n  <optional>                                  \n    <element name =\"refueltime\">            \n      <data type=\"nonNegativeInteger\"/>     \n    </element>                                \n  </optional>                                 \n  <optional>                                  \n    <element name =\"orderlookahead\">        \n      <data type=\"nonNegativeInteger\"/>     \n    </element>                                \n  </optional>                                 \n  <optional>                                  \n    <element name =\"norder\">                \n      <data type=\"nonNegativeInteger\"/>     \n    </element>                                \n  </optional>                                 \n  <optional>                                  \n    <element name =\"nreload\">               \n      <data type=\"nonNegativeInteger\"/>     \n    </element>                                \n  </optional>                                 \n  <optional>                                  \n    <element name =\"initial_condition\">     \n      <optional>                              \n        <element name =\"reserves\">          \n         <element name =\"nbatches\">         \n          <data type=\"nonNegativeInteger\"/> \n         </element>                           \n         <element name =\"commodity\">        \n          <data type=\"string\"/>             \n         </element>                           \n         <element name =\"recipe\">           \n          <data type=\"string\"/>             \n         </element>                           \n        </element>                            \n      </optional>                             \n      <optional>                              \n        <element name =\"core\">              \n        <element name =\"nbatches\">          \n          <data type=\"nonNegativeInteger\"/> \n        </element>                            \n        <element name =\"commodity\">         \n          <data type=\"string\"/>             \n        </element>                            \n        <element name =\"recipe\">            \n          <data type=\"string\"/>             \n        </element>                            \n        </element>                            \n      </optional>                             \n      <optional>                              \n        <element name =\"storage\">           \n        <element name =\"nbatches\">          \n          <data type=\"nonNegativeInteger\"/> \n        </element>                            \n        <element name =\"commodity\">         \n          <data type=\"string\"/>             \n        </element>                            \n        <element name =\"recipe\">            \n          <data type=\"string\"/>             \n        </element>                            \n        </element>                            \n      </optional>                             \n    </element>                                \n  </optional>                                 \n                                              \n  <!-- Recipe Changes  -->                    \n  <optional>                                  \n  <element name=\"recipe_change\">            \n  <oneOrMore>                                 \n   <element name=\"incommodity\">             \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"new_recipe\">              \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"time\">                    \n     <data type=\"nonNegativeInteger\"/>      \n   </element>                                 \n  </oneOrMore>                                \n  </element>                                  \n  </optional>                                 \n  </interleave>                               \n                                              \n  <!-- Power Production  -->                  \n  <element name=\"commodity_production\">     \n   <element name=\"commodity\">               \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"capacity\">                \n     <data type=\"double\"/>                  \n   </element>                                 \n   <element name=\"cost\">                    \n     <data type=\"double\"/>                  \n   </element>                                 \n  </element>                                  \n                                              \n  <!-- Trade Preferences  -->                 \n  <optional>                                  \n  <element name=\"commod_pref\">              \n  <oneOrMore>                                 \n   <element name=\"incommodity\">             \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"preference\">              \n     <data type=\"double\"/>                  \n   </element>                                 \n  </oneOrMore>                                \n  </element>                                  \n  </optional>                                 \n                                              \n  <!-- Trade Preference Changes  -->          \n  <optional>                                  \n  <element name=\"pref_change\">              \n  <oneOrMore>                                 \n   <element name=\"incommodity\">             \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"new_pref\">                \n     <data type=\"double\"/>                  \n   </element>                                 \n   <element name=\"time\">                    \n     <data type=\"nonNegativeInteger\"/>      \n   </element>                                 \n  </oneOrMore>                                \n  </element>                                  \n  </optional>                                 \n", 
+  ":cycaless:DeployInst": "<element name=\"buildorder\">            \n<oneOrMore>                               \n  <element name=\"prototype\">           \n    <data type=\"string\"/>              \n  </element>                             \n  <element name=\"number\">              \n    <data type=\"nonNegativeInteger\"/>  \n  </element>                             \n  <element name=\"date\">                \n    <data type=\"nonNegativeInteger\"/>  \n  </element>                             \n</oneOrMore>                              \n</element>                               \n", 
+  ":cycamore:BatchReactor": "  <!-- cyclus::Material In/Out  -->           \n  <oneOrMore>                                 \n  <element name=\"fuel\">                     \n    <element name=\"incommodity\"><text/></element>\n    <element name=\"inrecipe\"><text/></element>\n    <element name=\"outcommodity\"><text/></element>\n    <element name=\"outrecipe\"><text/></element>\n  </element>                                  \n  </oneOrMore>                                \n  <!-- Facility Parameters -->                \n  <interleave>                                \n  <element name=\"processtime\">              \n    <data type=\"nonNegativeInteger\"/>       \n  </element>                                  \n  <element name=\"nbatches\">                 \n    <data type=\"nonNegativeInteger\"/>       \n  </element>                                  \n  <element name =\"batchsize\">               \n    <data type=\"double\"/>                   \n  </element>                                  \n  <optional>                                  \n    <element name =\"refueltime\">            \n      <data type=\"nonNegativeInteger\"/>     \n    </element>                                \n  </optional>                                 \n  <optional>                                  \n    <element name =\"orderlookahead\">        \n      <data type=\"nonNegativeInteger\"/>     \n    </element>                                \n  </optional>                                 \n  <optional>                                  \n    <element name =\"norder\">                \n      <data type=\"nonNegativeInteger\"/>     \n    </element>                                \n  </optional>                                 \n  <optional>                                  \n    <element name =\"nreload\">               \n      <data type=\"nonNegativeInteger\"/>     \n    </element>                                \n  </optional>                                 \n  <optional>                                  \n    <element name =\"initial_condition\">     \n      <optional>                              \n        <element name =\"reserves\">          \n         <element name =\"nbatches\">         \n          <data type=\"nonNegativeInteger\"/> \n         </element>                           \n         <element name =\"commodity\">        \n          <data type=\"string\"/>             \n         </element>                           \n         <element name =\"recipe\">           \n          <data type=\"string\"/>             \n         </element>                           \n        </element>                            \n      </optional>                             \n      <optional>                              \n        <element name =\"core\">              \n        <element name =\"nbatches\">          \n          <data type=\"nonNegativeInteger\"/> \n        </element>                            \n        <element name =\"commodity\">         \n          <data type=\"string\"/>             \n        </element>                            \n        <element name =\"recipe\">            \n          <data type=\"string\"/>             \n        </element>                            \n        </element>                            \n      </optional>                             \n      <optional>                              \n        <element name =\"storage\">           \n        <element name =\"nbatches\">          \n          <data type=\"nonNegativeInteger\"/> \n        </element>                            \n        <element name =\"commodity\">         \n          <data type=\"string\"/>             \n        </element>                            \n        <element name =\"recipe\">            \n          <data type=\"string\"/>             \n        </element>                            \n        </element>                            \n      </optional>                             \n    </element>                                \n  </optional>                                 \n                                              \n  <!-- Recipe Changes  -->                    \n  <optional>                                  \n  <oneOrMore>                                 \n  <element name=\"recipe_change\">            \n   <element name=\"incommodity\">             \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"new_recipe\">              \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"time\">                    \n     <data type=\"nonNegativeInteger\"/>      \n   </element>                                 \n  </element>                                  \n  </oneOrMore>                                \n  </optional>                                 \n  </interleave>                               \n                                              \n  <!-- Power Production  -->                  \n  <element name=\"commodity_production\">     \n   <element name=\"commodity\">               \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"capacity\">                \n     <data type=\"double\"/>                  \n   </element>                                 \n   <element name=\"cost\">                    \n     <data type=\"double\"/>                  \n   </element>                                 \n  </element>                                  \n                                              \n  <!-- Trade Preferences  -->                 \n  <optional>                                  \n  <oneOrMore>                                 \n  <element name=\"commod_pref\">              \n   <element name=\"incommodity\">             \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"preference\">              \n     <data type=\"double\"/>                  \n   </element>                                 \n  </element>                                  \n  </oneOrMore>                                \n  </optional>                                 \n                                              \n  <!-- Trade Preference Changes  -->          \n  <optional>                                  \n  <oneOrMore>                                 \n  <element name=\"pref_change\">              \n   <element name=\"incommodity\">             \n     <data type=\"string\"/>                  \n   </element>                                 \n   <element name=\"new_pref\">                \n     <data type=\"double\"/>                  \n   </element>                                 \n   <element name=\"time\">                    \n     <data type=\"nonNegativeInteger\"/>      \n   </element>                                 \n  </element>                                  \n  </oneOrMore>                                \n  </optional>                                 \n", 
+  ":cycamore:DeployInst": "<oneOrMore>                               \n<element name=\"buildorder\">            \n  <element name=\"prototype\">           \n    <data type=\"string\"/>              \n  </element>                             \n  <element name=\"number\">              \n    <data type=\"nonNegativeInteger\"/>  \n  </element>                             \n  <element name=\"date\">                \n    <data type=\"nonNegativeInteger\"/>  \n  </element>                             \n</element>                               \n</oneOrMore>                              \n", 
+  ":cycamore:EnrichmentFacility": "<interleave>\n<element name=\"in_commod\">\n    <data type=\"string\" />\n</element>\n<element name=\"out_commod\">\n    <data type=\"string\" />\n</element>\n<element name=\"in_recipe\">\n    <data type=\"string\" />\n</element>\n<optional>\n    <element name=\"tails_assay\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"swu_capacity\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"max_inv_size\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"initial_reserves\">\n        <data type=\"double\" />\n    </element>\n</optional>\n</interleave>\n", 
+  ":cycamore:GrowthRegion": "<interleave>\n<element name=\"commodity_name\">\n    <data type=\"string\" />\n</element>\n<element name=\"demand_types\">\n    <oneOrMore>\n        <element name=\"val\">\n            <data type=\"string\" />\n        </element>\n    </oneOrMore>\n</element>\n<element name=\"demand_params\">\n    <oneOrMore>\n        <element name=\"val\">\n            <data type=\"string\" />\n        </element>\n    </oneOrMore>\n</element>\n<element name=\"demand_times\">\n    <oneOrMore>\n        <element name=\"val\">\n            <data type=\"int\" />\n        </element>\n    </oneOrMore>\n</element>\n</interleave>\n", 
+  ":cycamore:ManagerInst": "<interleave>\n<element name=\"prototypes\">\n    <oneOrMore>\n        <element name=\"val\">\n            <data type=\"string\" />\n        </element>\n    </oneOrMore>\n</element>\n</interleave>\n", 
+  ":cycamore:Sink": "<interleave>\n<element name=\"in_commods\">\n    <oneOrMore>\n        <element name=\"val\">\n            <data type=\"string\" />\n        </element>\n    </oneOrMore>\n</element>\n<optional>\n    <element name=\"capacity\">\n        <data type=\"double\" />\n    </element>\n</optional>\n<optional>\n    <element name=\"max_inv_size\">\n        <data type=\"double\" />\n    </element>\n</optional>\n</interleave>\n", 
+  ":cycamore:Source": "<interleave>\n<element name=\"out_commod\">\n    <data type=\"string\" />\n</element>\n<element name=\"recipe_name\">\n    <data type=\"string\" />\n</element>\n<optional>\n    <element name=\"capacity\">\n        <data type=\"double\" />\n    </element>\n</optional>\n</interleave>\n"
+ }, 
+ "specs": [
+  ":agents:KFacility", 
+  ":agents:NullInst", 
+  ":agents:NullRegion", 
+  ":agents:Predator", 
+  ":agents:Prey", 
+  ":agents:Sink", 
+  ":agents:Source", 
+  ":cycaless:BatchReactor", 
+  ":cycaless:DeployInst", 
+  ":cycamore:BatchReactor", 
+  ":cycamore:DeployInst", 
+  ":cycamore:EnrichmentFacility", 
+  ":cycamore:GrowthRegion", 
+  ":cycamore:ManagerInst", 
+  ":cycamore:Sink", 
+  ":cycamore:Source"
+ ]
+}

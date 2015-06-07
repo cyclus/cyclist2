@@ -49,7 +49,7 @@ import javafx.concurrent.Task;
 import org.apache.log4j.Logger;
 
 import edu.utah.sci.cyclist.core.controller.IMemento;
-import edu.utah.sci.cyclist.core.controller.WorkDirectoryController;
+import edu.utah.sci.cyclist.core.controller.SessionController;
 import edu.utah.sci.cyclist.core.controller.XMLMemento;
 import edu.utah.sci.cyclist.core.util.DataFactory;
 import edu.utah.sci.cyclist.core.util.QueryBuilder;
@@ -539,7 +539,7 @@ public class Table implements Resource {
 	 * */
 	private void writeFieldValuesToFile(String fieldName, String fieldType, String role ,CyclistDatasource ds, List<Object> values){
 		if(_saveDir == ""){
-			_saveDir = WorkDirectoryController.DEFAULT_WORKSPACE;
+			_saveDir = SessionController.DEFAULT_WORKSPACE;
 		}
 		File defaultDir = new File(_saveDir);
 		if(!defaultDir.exists()){
@@ -703,7 +703,7 @@ public class Table implements Resource {
 		
 		List<Object> values = new ArrayList<>();
 		if(_saveDir == ""){
-			_saveDir = WorkDirectoryController.DEFAULT_WORKSPACE;
+			_saveDir = SessionController.DEFAULT_WORKSPACE;
 		}
 		
 		// If the save file does not exist - return an empty list.

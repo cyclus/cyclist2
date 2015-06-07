@@ -57,12 +57,13 @@ import edu.utah.sci.cyclist.core.ui.components.ViewBase;
 import edu.utah.sci.cyclist.core.ui.components.WorkspacePanelArea;
 import edu.utah.sci.cyclist.core.ui.panels.TitledPanel;
 
-public class Workspace extends CyclistViewBase implements CyclistView {
+public class VisWorkspace extends CyclistViewBase implements CyclistView {
 	public static final String WORKSPACE_ID = "workspace";
 	
-	static final Logger log = LogManager.getLogger(Workspace.class.getName());
+	static final Logger log = LogManager.getLogger(VisWorkspace.class.getName());
 	
 	private Pane _pane;
+	private Console _console;
 	
 	private WorkspacePanelArea _filtersPane;
 	ScrollBar _wb;
@@ -82,6 +83,10 @@ public class Workspace extends CyclistViewBase implements CyclistView {
 	
 	public void setOnShowTable(Closure.V4<Tool, Table, Double, Double> action) {
 		_onShowTable = action;
+	}
+	
+	public Console getConsole() {
+		return _console;
 	}
 	
 	// -- Properties
@@ -105,11 +110,11 @@ public class Workspace extends CyclistViewBase implements CyclistView {
 	 * Constructor
 	 */
 	
-	public Workspace() {
+	public VisWorkspace() {
 		this(false);
 	}
 	
-	public Workspace(boolean toplevel) {
+	public VisWorkspace(boolean toplevel) {
 		super(toplevel);
 		build(toplevel);
 		enableDragging(!toplevel);
@@ -124,16 +129,16 @@ public class Workspace extends CyclistViewBase implements CyclistView {
 		_pane = ipane.getPane();
 		_pane.getStyleClass().add("workspace-pane");
 		
-		Console console = new Console();
+		_console = new Console();
 		
 		// arrange console bellow the infinite workspace
 		SplitPane sp1 = new SplitPane();
 		sp1.setOrientation(Orientation.VERTICAL);
 		sp1.setDividerPosition(0, 0.9);
-		sp1.getItems().addAll(ipane, console);
+		sp1.getItems().addAll(ipane, _console);
 
 		SplitPane.setResizableWithParent(ipane, true);
-		SplitPane.setResizableWithParent(console, false);
+		SplitPane.setResizableWithParent(_console, false);
 
 		// arrange filters to the right
 		_filtersPane = new WorkspacePanelArea();
@@ -363,9 +368,9 @@ public class Workspace extends CyclistViewBase implements CyclistView {
 	private ViewPos _viewPos = new ViewPos();
 }
 
-class ViewPos {
-	public double x;
-	public double y;
-	public double width;
-	public double height;
-}
+//class ViewPos {
+//	public double x;
+//	public double y;
+//	public double width;
+//	public double height;
+//}

@@ -13,6 +13,7 @@ public class RegionRectangle extends Rectangle {
 	Label text = new Label();
 	ArrayList<String> regionModel = new ArrayList<String>();
 	ArrayList<String> containedInstitutions = new ArrayList<String>();
+	public String archetype;
 	{
 		setId((String)name);
 	}

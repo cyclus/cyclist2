@@ -12,6 +12,11 @@ public class RegionViewToolFactory implements ToolFactory {
 	}
 
 	@Override
+	public String getToolType() {
+		return RegionViewTool.TYPE;
+	}
+	
+	@Override
 	public AwesomeIcon getIcon() {
 		return RegionViewTool.ICON;
 	}

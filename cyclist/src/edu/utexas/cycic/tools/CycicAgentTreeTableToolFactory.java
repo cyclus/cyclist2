@@ -11,6 +11,11 @@ public class CycicAgentTreeTableToolFactory implements ToolFactory {
 	}
 
 	@Override
+	public String getToolType() {
+		return CycicAgentTreeTableTool.TYPE;
+	}
+	
+	@Override
 	public AwesomeIcon getIcon() {
 		return CycicAgentTreeTableTool.ICON;
 	}
