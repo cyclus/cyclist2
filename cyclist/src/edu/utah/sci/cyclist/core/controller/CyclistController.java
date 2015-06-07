@@ -225,7 +225,10 @@ public class CyclistController {
 		});
 		
 		restore();
-		
+
+                if (_currentPerspective == null)
+                  _currentPerspective = _perspectives[0];
+                  
 		selectPerspective(_currentPerspective.id);   
 		if (_currentPerspective.id == 0)
 			perspectiveChanged(_currentPerspective.id);  
