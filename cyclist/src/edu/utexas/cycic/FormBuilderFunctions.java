@@ -162,8 +162,8 @@ public class FormBuilderFunctions {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				node.name = (String) newValue;
 
-				regionNode.regionCircle.name.equals(newValue);
-				regionNode.regionCircle.text.setText(newValue);
+				regionNode.regionShape.name.equals(newValue);
+				regionNode.regionShape.text.setText(newValue);
 			}
 		});
 		return textField;

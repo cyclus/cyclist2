@@ -45,7 +45,7 @@
 		</copy>
 		<copy todir="deploy/externalLibs">
 					<fileset dir="${basedir}\cyclist\lib">
-						<filename name="javax.json-1.0.4.jar"/>	
+						<filename name="json-simple-1.1.1.jar"/>	
 					</fileset>
 				</copy>
 		<copy todir="deploy/externalLibs">
@@ -126,6 +126,7 @@
 				<include name="httpcore-4.3.2.jar"/>
 				<include name="fluent-hc-4.3.5.jar"/>
 				<include name="httpclient-4.3.5.jar"/>
+				<include name="json-simple-1.1.1.jar"/>
 			</fileset>
 		</copy>
 	

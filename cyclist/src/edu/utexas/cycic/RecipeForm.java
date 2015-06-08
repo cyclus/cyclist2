@@ -261,11 +261,11 @@ public class RecipeForm extends ViewBase{
 					}
 				}
 				
-				public void replaceSelection(String text) {
+				/*public void replaceSelection(String text) {
 					if (!text.matches("[a-z]")){
 						super.replaceSelection(text);
 					}
-				}
+				}*/
 			};
 			if (basisBox.getValue() == "mass"){
 				isoWeightFrac.textProperty().addListener(new ChangeListener<String>(){

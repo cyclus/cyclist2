@@ -361,17 +361,21 @@ public class VisFunctions {
 	static void redrawPane(){
 		Cycic.pane.getChildren().remove(0, Cycic.pane.getChildren().size());
 		for(int i = 0; i < CycicScenarios.workingCycicScenario.FacilityNodes.size(); i++){
-			Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle);
-			Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.text);
-			Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.image);
-			for(int ii = 0; ii < CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.size(); ii++){
-				Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.get(ii));
-				Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.get(ii).text);
-				Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.get(ii).image);
-			}
-			for(int n = 0; n < CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenLinks.size(); n++){
-				Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenLinks.get(n).line);
-				CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenLinks.get(n).line.toBack();
+			FacilityCircle circle = CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle;
+			Cycic.pane.getChildren().add(circle);
+			Cycic.pane.getChildren().add(circle.text);
+			VisFunctions.placeTextOnCircle(circle, "middle");
+			Cycic.pane.getChildren().add(circle.image);
+			if(!Cycic.currentSkin.equalsIgnoreCase("Default Skin")){
+				for(int j = 0; j < DataArrays.visualizationSkins.size(); j++){
+					skinSet skin = DataArrays.visualizationSkins.get(j);
+					if(skin.name.equalsIgnoreCase(Cycic.currentSkin)){
+						circle.image.setImage(skin.images.getOrDefault(DataArrays.FacilityNodes.get(i).niche, skin.images.get("facility")));
+						circle.image.setVisible(true);
+						circle.setOpacity(0);
+						VisFunctions.placeTextOnCircle(circle, skin.textPlacement);
+					}
+				}
 			}
 		}
 		CycicScenarios.workingCycicScenario.Links.clear();
@@ -379,12 +383,28 @@ public class VisFunctions {
 			for (int i = 0; i < outFac.cycicCircle.outcommods.size(); i++) {
 				for (facilityNode inFac: CycicScenarios.workingCycicScenario.FacilityNodes) {
 					for (int j = 0; j < inFac.cycicCircle.incommods.size(); j++) {
-						if (outFac.cycicCircle.outcommods.get(i) == inFac.cycicCircle.incommods.get(j)){
+						if (outFac.cycicCircle.outcommods.get(i).toString().equalsIgnoreCase(inFac.cycicCircle.incommods.get(j).toString())){
 							linkFacToFac(outFac.cycicCircle, inFac.cycicCircle, inFac.cycicCircle.incommods.get(j));
 						}
 					}
 				}
 			}
+		}
+	}
+	
+	static void redrawRegionPane(){
+		RegionCorralView.corralPane.getChildren().remove(0, RegionCorralView.corralPane.getChildren().size());
+		for(regionNode region: CycicScenarios.workingCycicScenario.regionNodes){
+			RegionCorralView.corralPane.getChildren().add(region.regionShape);
+			RegionCorralView.corralPane.getChildren().add(region.regionShape.text);
+		}
+	}
+	
+	static void redrawInstitPane(){
+		InstitutionCorralView.institutionPane.getChildren().remove(0, InstitutionCorralView.institutionPane.getChildren().size());
+		for(instituteNode inst: CycicScenarios.workingCycicScenario.institNodes){
+			InstitutionCorralView.institutionPane.getChildren().add(inst.institutionShape);
+			InstitutionCorralView.institutionPane.getChildren().add(inst.institutionShape.text);
 		}
 	}
 }

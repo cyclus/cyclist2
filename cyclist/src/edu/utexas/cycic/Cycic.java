@@ -30,6 +30,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
@@ -101,6 +102,12 @@ public class Cycic extends ViewBase{
     private static Object monitor = new Object();
     static String currentSkin = "Default Skin";
     static String currentServer = "";
+    static TextField duration = VisFunctions.numberField();
+	static ComboBox<String> startMonth = new ComboBox<String>();
+	static TextField startYear = VisFunctions.numberField();
+	static TextArea description = new TextArea();
+	static ComboBox<String> decay = new ComboBox<String>();
+	static TextField simHandle = new TextField();
 	
     
 	/**
@@ -631,7 +638,6 @@ public class Cycic extends ViewBase{
 		simDets.setTooltip(new Tooltip("The top level details of the simulation."));
 		simDets.setFont(new Font("Times", 16));
 		simInfo.add(simDets, 0, 0, 2, 1);
-		TextField duration = VisFunctions.numberField();
 		duration.setMaxWidth(150);
 		duration.setPromptText("Length of Simulation");
 		duration.setText(Cycic.workingScenario.simulationData.duration);
@@ -644,8 +650,6 @@ public class Cycic extends ViewBase{
 		simInfo.add(new Label("Duration (Months)"), 0, 1, 2, 1);
 		simInfo.add(duration, 2, 1);
 		
-
-		final ComboBox<String> startMonth = new ComboBox<String>();
 		for(int i = 0; i < 12; i++ ){
 			startMonth.getItems().add(monthList.get(i));
 		}
@@ -659,7 +663,7 @@ public class Cycic extends ViewBase{
 		startMonth.setPromptText("Select Month");
 		simInfo.add(new Label("Start Month"), 0, 2, 2, 1);
 		simInfo.add(startMonth, 2, 2);
-		TextField startYear = VisFunctions.numberField();
+		
 		startYear.setText(Cycic.workingScenario.simulationData.startYear);
 		Cycic.workingScenario.simulationData.startYear = "0";
 		startYear.textProperty().addListener(new ChangeListener<String>(){
@@ -672,7 +676,6 @@ public class Cycic extends ViewBase{
 		simInfo.add(new Label("Start Year"), 0, 3, 2, 1);
 		simInfo.add(startYear, 2, 3);
 				
-		ComboBox<String> decay = new ComboBox<String>();
 		decay.getItems().addAll("manual", "never");
 		decay.setValue("Never");
 		Cycic.workingScenario.simulationData.decay = "never";
@@ -684,7 +687,6 @@ public class Cycic extends ViewBase{
 		simInfo.add(new Label("Decay"), 0, 4);
 		simInfo.add(decay, 2, 4);
 		
-		TextField simHandle = new TextField();
 		simHandle.setPromptText("Optional Simulation Name");
 		simHandle.textProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
@@ -694,16 +696,15 @@ public class Cycic extends ViewBase{
 		simInfo.add(new Label("Simulation Handle"), 0, 5, 2, 1);
 		simInfo.add(simHandle, 2, 5);
 		
-		TextArea notes = new TextArea();
-		notes.setMaxSize(250, 50);
-		notes.setWrapText(true);
-		notes.textProperty().addListener(new ChangeListener<String>(){
+		description.setMaxSize(250, 50);
+		description.setWrapText(true);
+		description.textProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				Cycic.workingScenario.simulationData.notes = newValue;
 			}
 		});
-		simInfo.add(new Label("Notes"), 0, 6, 2, 1);
-		simInfo.add(notes, 2, 6);
+		simInfo.add(new Label("Description"), 0, 6, 2, 1);
+		simInfo.add(description, 2, 6);
 		
 	
 		// Prints the Cyclus input associated with this simulator. 
@@ -725,6 +726,22 @@ public class Cycic extends ViewBase{
 			}
 		});
 		simInfo.add(output, 0, 7, 2, 1);
+		
+		Button load = new Button("Load Scenario");
+		load.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+				FileChooser fileChooser = new FileChooser();
+				//Set extension filter
+				FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+				fileChooser.getExtensionFilters().add(extFilter);
+				fileChooser.setTitle("Select input file to load.");
+				fileChooser.setInitialFileName("*.xml");
+				//Show save file dialog
+				File file = fileChooser.showOpenDialog(window);
+				OutPut.loadFile(file);   
+			}
+		});
+		simInfo.add(load, 2, 7);
 		
         Button runCyclus = new Button("Execute");
         simInfo.add(runCyclus, 0, 8, 1, 1);    

@@ -269,7 +269,7 @@ public class CycicCircles{
 			}
 		});
 		
-		Cycic.workingScenario.FacilityNodes.add(parent);
+		CycicScenarios.workingCycicScenario.FacilityNodes.add(parent);
 		
 		// Code for allow a shift + (drag and drop) to start a new facility form for this facilityCircle.
 		/*circle.setOnDragDetected(new EventHandler<MouseEvent>(){

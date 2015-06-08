@@ -37,7 +37,7 @@ public class FormBuilder extends ViewBase {
 		super();
 		formNode = Cycic.workingNode;
 		TITLE = (String) Cycic.workingNode.name;
-		//System.out.println(formNode.facilityStructure);
+		System.out.println(formNode.facilityStructure);
 		formBuilder(grid, formNode.facilityStructure, formNode.facilityData);
 		
 		Button button = new Button();
@@ -233,7 +233,7 @@ public class FormBuilder extends ViewBase {
 			if (facArray.get(i) instanceof ArrayList && facArray.get(0) instanceof ArrayList) {
 				formBuilder(grid, (ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
 			} else if (i == 0){
-				if (facArray.get(2) == "oneOrMore"){
+				if (facArray.get(2).toString().equalsIgnoreCase("oneOrMore")){
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = new Label((String) facArray.get(0));
 						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
@@ -259,7 +259,7 @@ public class FormBuilder extends ViewBase {
 						columnNumber -= 1;
 						
 					}
-				} else if (facArray.get(2) == "oneOrMoreMap"){
+				} else if (facArray.get(2).toString().equalsIgnoreCase("oneOrMoreMap")){
 					//facArray = (ArrayList<Object>) facArray.get(1);
 					//dataArray = (ArrayList<Object>) dataArray.get(0);
 					if ((int)facArray.get(6) <= userLevel && i == 0){
@@ -286,7 +286,7 @@ public class FormBuilder extends ViewBase {
 						// resetting the indent
 						columnNumber -= 1;
 					}
-				} else if (facArray.get(2) == "zeroOrMore") {
+				} else if (facArray.get(2).toString().equalsIgnoreCase("zeroOrMore")) {
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = new Label((String) facArray.get(0));
 						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){

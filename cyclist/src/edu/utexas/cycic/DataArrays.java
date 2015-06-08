@@ -347,7 +347,7 @@ class regionNode{
 	ArrayList<Object> regionStruct = new ArrayList<Object>();
 	ArrayList<Object> regionData  = new ArrayList<Object>();
 	ArrayList<String> institutions = new ArrayList<String>();
-	static RegionShape regionCircle = new RegionShape();
+	static RegionShape regionShape = new RegionShape();
 }
 
 /**
@@ -388,7 +388,6 @@ class simInfo{
 class facilityNode{
 	Object name;
 	String facilityType = "";
-	String entity; 
 	Integer facTypeIndex = 0;
 	String facLifetime  = "";
 	ArrayList<Object> facilityData = new ArrayList<Object>();
