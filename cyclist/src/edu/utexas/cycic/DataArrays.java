@@ -2,14 +2,21 @@ package edu.utexas.cycic;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.json.JsonString;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +27,7 @@ import org.apache.log4j.Logger;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.shape.Line;
-
+import edu.utah.sci.cyclist.Cyclist;
 import edu.utah.sci.cyclist.core.Resources1;
 
 
@@ -156,7 +163,8 @@ public class DataArrays{
 
 
     private static void defaultJsonReader(String path) throws IOException{
-        BufferedReader reader = new BufferedReader( new FileReader (path + "/default-metadata.json"));
+    	InputStream in = Cyclist.class.getResourceAsStream("assets/default-metadata.json");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String         line = null;
         StringBuilder  stringBuilder = new StringBuilder();
         String         ls = System.getProperty("line.separator");
@@ -166,7 +174,6 @@ public class DataArrays{
             stringBuilder.append( ls );
         }
         reader.close();
-        
         retrieveSchema(stringBuilder.toString());
     }
 
