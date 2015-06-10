@@ -326,7 +326,7 @@ public class FormBuilderFunctions {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				if(newValue == null || newValue.equalsIgnoreCase("")){
 					for (int i = 0; i < facNode.cycicCircle.incommods.size(); i++) {
-						if (facNode.cycicCircle.incommods.get(i) == (String) oldValue){
+						if (facNode.cycicCircle.incommods.get(i).equals((String) oldValue)){
 							facNode.cycicCircle.incommods.remove(i);
 							break;
 						}
@@ -340,7 +340,7 @@ public class FormBuilderFunctions {
 						facArray.set(10, true);
 					}
 					for (int i = 0; i < facNode.cycicCircle.incommods.size(); i++) {
-						if (facNode.cycicCircle.incommods.get(i) == (String) oldValue){
+						if (facNode.cycicCircle.incommods.get(i).equals((String) oldValue)){
 							String string = facNode.cycicCircle.incommods.remove(i);
 							break;
 						}
@@ -393,7 +393,7 @@ public class FormBuilderFunctions {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				if(newValue == null || newValue.equalsIgnoreCase("")){
 					for (int i = 0; i < facNode.cycicCircle.outcommods.size(); i++) {
-						if (facNode.cycicCircle.outcommods.get(i) == (String) oldValue){
+						if (facNode.cycicCircle.outcommods.get(i).equals((String) oldValue)){
 							facNode.cycicCircle.outcommods.remove(i);
 							break;
 						}
@@ -407,7 +407,7 @@ public class FormBuilderFunctions {
 						facArray.set(10, true);
 					}
 					for (int i = 0; i < facNode.cycicCircle.outcommods.size(); i++) {
-						if (facNode.cycicCircle.outcommods.get(i) == (String) oldValue){
+						if (facNode.cycicCircle.outcommods.get(i).equals((String) oldValue)){
 							facNode.cycicCircle.outcommods.remove(i);
 							break;
 						}
