@@ -35,7 +35,7 @@
 		</copy>
 		<copy todir="deploy/externalLibs">
 			<fileset dir="${basedir}\cyclist\lib">
-				<filename name="sqlite-jdbc-3.8.5-pre1.jar"/>	
+				<filename name="sqlite-jdbc-3.8.10.1.jar"/>	
 			</fileset>
 		</copy>
 		<copy todir="deploy/externalLibs">
@@ -45,14 +45,19 @@
 		</copy>
 		<copy todir="deploy/externalLibs">
 					<fileset dir="${basedir}\cyclist\lib">
-						<filename name="javax.json-1.0.4.jar"/>	
+						<filename name="json-simple-1.1.1.jar"/>	
 					</fileset>
 				</copy>
 		<copy todir="deploy/externalLibs">
 			<fileset dir="${basedir}\cyclist\lib">
-				<filename name="controlsfx-8.0.6.jar"/>	
+				<filename name="controlsfx-8.20.8.jar"/>	
 			</fileset>
 		</copy>
+                <copy todir="deploy/externalLibs">
+                        <fileset dir="${basedir}\cyclist\lib">
+                                <filename name="openjfx-dialogs-1.0.2.jar"/>
+                        </fileset>
+                </copy>
 		<copy todir="deploy/externalLibs">
 			<fileset dir="${basedir}\cyclist\lib">
 				<filename name="log4j-1.2.16.jar"/>	
@@ -110,7 +115,7 @@
 		<copy todir="deploy/build/libs">
 			<fileset dir="deploy/externalLibs">
 				<include name="commons-logging.jar"/>
-				<include name="controlsfx-8.0.6.jar"/>
+				<include name="controlsfx-8.20.8.jar"/>
 				<include name="log4j-1.2.16.jar"/>
 				<include name="mysql-connector-java-5.1.18-bin.jar"/>
 				<include name="commons-collections-3.2.1.jar"/>
@@ -121,6 +126,7 @@
 				<include name="httpcore-4.3.2.jar"/>
 				<include name="fluent-hc-4.3.5.jar"/>
 				<include name="httpclient-4.3.5.jar"/>
+				<include name="json-simple-1.1.1.jar"/>
 			</fileset>
 		</copy>
 	
@@ -155,7 +161,20 @@
 		<mkdir dir="deploy/dist" />
 		<mkdir dir="deploy/dist/libs" />
 		<mkdir dir="deploy/dist/externalApps" />
-		
+		<mkdir dir="deploy/dist/skinImages" />
+
+		<copy todir="deploy/dist">
+			<fileset dir="${basedir}\cyclist\">
+				<filename name="default-metadata.json"/>	
+			</fileset>
+		</copy>
+
+		<copy todir="deploy/dist/skinImages">
+			<fileset dir="${basedir}\cyclist\skinImages">
+				<filename name="*"/>
+			</fileset>
+		</copy>
+
 		<copy todir="deploy/dist/libs">
 			<fileset dir="deploy/externalLibs">
 				<include name="*" />

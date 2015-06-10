@@ -17,19 +17,19 @@
     "current_capacity": {
      "alias": "current_capacity", 
      "default": 0, 
-     "doc": "number of output commodity units that can be supplied at the current time step (infinite capacity can be represented by a very large number )", 
+     "doc": "number of output commodity units that can be supplied at the current time step (infinite capacity can be represented by a very large number", 
      "index": 5, 
      "tooltip": "current output capacity", 
      "type": "double", 
-     "uilabel": "Current Capacity"
+     "uilabel": "current_capacity"
     }, 
     "in_capacity": {
      "alias": "in_capacity", 
-     "doc": "number of commodity units that can be taken at each timestep (infinite capacity can be represented by a very large number)", 
+     "doc": "number of commodity units that can be taken at each time step (infinite capacity can be represented by a very large number", 
      "index": 3, 
      "tooltip": "input commodity capacity", 
      "type": "double", 
-     "uilabel": "Incoming Throughput"
+     "uilabel": "in_capacity"
     }, 
     "in_commod": {
      "alias": "in_commod", 
@@ -38,7 +38,7 @@
      "schematype": "token", 
      "tooltip": "input commodity", 
      "type": "std::string", 
-     "uilabel": "Input Commodity", 
+     "uilabel": "in_commod", 
      "uitype": "incommodity"
     }, 
     "inventory": {
@@ -55,7 +55,7 @@
      "index": 8, 
      "tooltip": "input k-factor", 
      "type": "double", 
-     "uilabel": "Input K-Factor"
+     "uilabel": "k_factor_in"
     }, 
     "k_factor_out": {
      "alias": "k_factor_out", 
@@ -63,7 +63,7 @@
      "index": 9, 
      "tooltip": "output k-factor", 
      "type": "double", 
-     "uilabel": "Output K-Factor"
+     "uilabel": "k_factor_out"
     }, 
     "max_inv_size": {
      "alias": "max_inv_size", 
@@ -72,35 +72,35 @@
      "index": 6, 
      "tooltip": "k-facility maximum inventory size", 
      "type": "double", 
-     "uilabel": "Maximum Inventory"
+     "uilabel": "max_inv_size"
     }, 
     "out_capacity": {
      "alias": "out_capacity", 
-     "doc": "number of commodity units that can be supplied at each timestep (infinite capacity can be represented by a very large number)", 
+     "doc": "number of commodity units that can be supplied at each time step (infinite capacity can be represented by a very large number", 
      "index": 4, 
      "tooltip": "output commodity capacity", 
      "type": "double", 
-     "uilabel": "Outgoing Throughput"
+     "uilabel": "out_capacity"
     }, 
     "out_commod": {
      "alias": "out_commod", 
      "doc": "commodity that the k-facility supplies", 
-     "index": 2, 
+     "index": 1, 
      "schematype": "token", 
      "tooltip": "output commodity", 
      "type": "std::string", 
-     "uilabel": "Output Commodity", 
+     "uilabel": "out_commod", 
      "uitype": "outcommodity"
     }, 
     "recipe_name": {
      "alias": "recipe_name", 
      "doc": "recipe name for the k-facility's in-commodity", 
-     "index": 1, 
+     "index": 2, 
      "schematype": "token", 
      "shape": [50], 
      "tooltip": "in-commodity recipe name", 
      "type": "std::string", 
-     "uilabel": "Input Recipe", 
+     "uilabel": "recipe_name", 
      "uitype": "recipe"
     }
    }
@@ -151,19 +151,19 @@
      "alias": "age", 
      "default": 0, 
      "doc": "age of predator at beginning of simulation", 
-     "index": 8, 
+     "index": 7, 
      "tooltip": "predator age", 
      "type": "int", 
-     "uilabel": "Predator Age"
+     "uilabel": "age"
     }, 
     "birth_and_death": {
      "alias": "birth_and_death", 
      "default": 0, 
-     "doc": "whether or not simultaneous birth and death are allowed (i.e., can a facility give birth and die in the same time step?)", 
-     "index": 12, 
+     "doc": "whether or not simultaneous birth and and death are allowed (i.e., can a facility give birth and die in the same time step?)", 
+     "index": 11, 
      "tooltip": "simultaneous birth and death?", 
      "type": "bool", 
-     "uilabel": "Simultaneous Birth and Death?"
+     "uilabel": "birth_and_death"
     }, 
     "commod": {
      "alias": "commod", 
@@ -172,26 +172,26 @@
      "schematype": "token", 
      "tooltip": "predator commodity", 
      "type": "std::string", 
-     "uilabel": "Predator Commodity", 
+     "uilabel": "commod", 
      "uitype": "outcommodity"
     }, 
     "consumed": {
      "alias": "consumed", 
      "default": 0, 
      "doc": "how many units of prey consumed per time step", 
-     "index": 6, 
+     "index": 12, 
      "tooltip": "prey consumed", 
      "type": "double", 
-     "uilabel": "Prey Consumed"
+     "uilabel": "consumed"
     }, 
     "dead": {
      "alias": "dead", 
      "default": 0, 
      "doc": "flag for whether predator is currently dead", 
-     "index": 10, 
+     "index": 9, 
      "tooltip": "dead?", 
      "type": "bool", 
-     "uilabel": "Predator Dead?"
+     "uilabel": "dead"
     }, 
     "full": {
      "alias": "full", 
@@ -200,52 +200,52 @@
      "index": 2, 
      "tooltip": "feast size", 
      "type": "double", 
-     "uilabel": "Feast Size"
+     "uilabel": "full"
     }, 
     "hunt_cap": {
      "alias": "hunt_cap", 
      "default": 1, 
      "doc": "how many units of prey a predator can catch during a hunt", 
-     "index": 4, 
+     "index": 3, 
      "tooltip": "hunting yield", 
      "type": "double", 
-     "uilabel": "Hunting Yield"
+     "uilabel": "hunt_cap"
     }, 
     "hunt_factor": {
      "alias": "hunt_factor", 
      "default": 0, 
      "doc": "whether or not to base hunting success on relative predator/prey populations", 
-     "index": 7, 
+     "index": 10, 
      "tooltip": "hunting success factor", 
      "type": "bool", 
-     "uilabel": "Hunting Success Factor"
+     "uilabel": "hunt_factor"
     }, 
     "hunt_freq": {
      "alias": "hunt_freq", 
      "default": 1, 
      "doc": "how often a predator needs to hunt", 
-     "index": 3, 
+     "index": 4, 
      "tooltip": "hunting frequency", 
      "type": "int", 
-     "uilabel": "Hunting Frequency"
+     "uilabel": "hunt_freq"
     }, 
     "lifespan": {
      "alias": "lifespan", 
      "default": 1, 
      "doc": "how long a predator lives", 
-     "index": 9, 
+     "index": 8, 
      "tooltip": "predator lifespan", 
      "type": "int", 
-     "uilabel": "Predator Lifespan"
+     "uilabel": "lifespan"
     }, 
     "nchildren": {
      "alias": "nchildren", 
      "default": 1, 
      "doc": "number of predator children born at each birthing instance", 
-     "index": 11, 
+     "index": 6, 
      "tooltip": "number of children", 
      "type": "double", 
-     "uilabel": "Number Predator Children"
+     "uilabel": "nchildren"
     }, 
     "prey": {
      "alias": "prey", 
@@ -254,7 +254,7 @@
      "schematype": "token", 
      "tooltip": "predator's prey", 
      "type": "std::string", 
-     "uilabel": "Prey Commodity", 
+     "uilabel": "prey", 
      "uitype": "incommodity"
     }, 
     "success": {
@@ -264,7 +264,7 @@
      "index": 5, 
      "tooltip": "hunting success fraction", 
      "type": "double", 
-     "uilabel": "Hunting Success Fraction"
+     "uilabel": "success"
     }
    }
   }, 
@@ -286,28 +286,28 @@
      "alias": "age", 
      "default": 0, 
      "doc": "age of prey at start of simulation", 
-     "index": 1, 
+     "index": 3, 
      "tooltip": "prey age", 
      "type": "int", 
-     "uilabel": "Prey Age"
+     "uilabel": "age"
     }, 
     "birth_and_death": {
      "alias": "birth_and_death", 
      "default": 1, 
-     "doc": "whether or not simultaneous birth and death are allowed (i.e., can a facility give birth and die in the same time step?)", 
+     "doc": "whether or not simultaneous birth and and death are allowed (i.e., can a facility give birth and die in the same time step?)", 
      "index": 5, 
      "tooltip": "simultaneous birth and death?", 
      "type": "bool", 
-     "uilabel": "Simultaneous Birth and Death?"
+     "uilabel": "birth_and_death"
     }, 
     "birth_freq": {
      "alias": "birth_freq", 
      "default": 1, 
      "doc": "number of time steps between birth of children", 
-     "index": 4, 
+     "index": 1, 
      "tooltip": "birth frequency", 
      "type": "int", 
-     "uilabel": "Birth Frequency"
+     "uilabel": "birth_freq"
     }, 
     "commod": {
      "alias": "commod", 
@@ -315,26 +315,26 @@
      "schematype": "token", 
      "tooltip": "commod", 
      "type": "std::string", 
-     "uilabel": "Prey Commodity", 
+     "uilabel": "commod", 
      "uitype": "outcommodity"
     }, 
     "dead": {
      "alias": "dead", 
      "default": 0, 
      "doc": "flag for whether prey is currently dead", 
-     "index": 2, 
+     "index": 4, 
      "tooltip": "dead?", 
      "type": "bool", 
-     "uilabel": "Dead?"
+     "uilabel": "dead"
     }, 
     "nchildren": {
      "alias": "nchildren", 
      "default": 1, 
      "doc": "number of children born at each birthing instance", 
-     "index": 3, 
+     "index": 2, 
      "tooltip": "number of children", 
      "type": "int", 
-     "uilabel": "Number of Children"
+     "uilabel": "nchildren"
     }
    }
   }, 
@@ -355,18 +355,18 @@
     "capacity": {
      "alias": "capacity", 
      "doc": "capacity the sink facility can accept at each time step", 
-     "index": 3, 
+     "index": 2, 
      "tooltip": "sink capacity", 
      "type": "double", 
-     "uilabel": "Maximum Throughput"
+     "uilabel": "capacity"
     }, 
     "in_commods": {
      "alias": ["in_commods", "val"], 
-     "doc": "commodities that the sink facility accepts ", 
-     "index": 0, 
+     "doc": "commodities that the sink facility accepts", 
+     "index": 1, 
      "tooltip": ["input commodities for the sink", ""], 
      "type": ["std::vector", "std::string"], 
-     "uilabel": ["List of Input Commodities", ""], 
+     "uilabel": ["in_commods", ""], 
      "uitype": ["oneormore", "incommodity"]
     }, 
     "inventory": {
@@ -381,19 +381,19 @@
      "alias": "max_inv_size", 
      "default": 1.000000000000000e+299, 
      "doc": "total maximum inventory size of sink facility", 
-     "index": 2, 
+     "index": 3, 
      "tooltip": "sink maximum inventory size", 
      "type": "double", 
-     "uilabel": "Maximum Inventory"
+     "uilabel": "max_inv_size"
     }, 
     "recipe_name": {
      "alias": "recipe_name", 
      "default": "", 
      "doc": "Name of recipe to request.If empty, sink requests material no particular composition.", 
-     "index": 1, 
+     "index": 0, 
      "tooltip": "input/request recipe name", 
      "type": "std::string", 
-     "uilabel": "Input Recipe", 
+     "uilabel": "recipe_name", 
      "uitype": "recipe"
     }
    }
@@ -418,7 +418,7 @@
      "index": 2, 
      "tooltip": "source capacity", 
      "type": "double", 
-     "uilabel": "Maximum Throughput"
+     "uilabel": "capacity"
     }, 
     "commod": {
      "alias": "commod", 
@@ -427,7 +427,7 @@
      "schematype": "token", 
      "tooltip": "source commodity", 
      "type": "std::string", 
-     "uilabel": "Commodity", 
+     "uilabel": "commod", 
      "uitype": "outcommodity"
     }, 
     "recipe_name": {
@@ -438,7 +438,7 @@
      "schematype": "token", 
      "tooltip": "commodity recipe name", 
      "type": "std::string", 
-     "uilabel": "Recipe", 
+     "uilabel": "recipe_name", 
      "uitype": "recipe"
     }
    }
@@ -519,7 +519,7 @@
     "feed_recipe": {
      "alias": "feed_recipe", 
      "doc": "recipe for enrichment facility feed commodity", 
-     "index": 1, 
+     "index": 2, 
      "tooltip": "feed recipe", 
      "type": "std::string", 
      "uilabel": "Feed Recipe", 
@@ -529,7 +529,7 @@
      "alias": "initial_feed", 
      "default": 0, 
      "doc": "amount of natural uranium stored at the enrichment facility at the beginning of the simulation (kg)", 
-     "index": 5, 
+     "index": 8, 
      "tooltip": "initial uranium reserves (kg)", 
      "type": "double", 
      "uilabel": "Initial Feed Inventory"
@@ -562,8 +562,8 @@
      "alias": "order_prefs", 
      "default": 1, 
      "doc": "turn on preference ordering for input material so that EF chooses higher U235 content first", 
-     "index": 8, 
-     "tooltip": "Rank Material Requests by U235 Content", 
+     "index": 9, 
+     "tooltip": "order material requests by U235 content", 
      "type": "bool", 
      "uilabel": "Prefer feed with higher U235 content", 
      "userlevel": 10
@@ -571,7 +571,7 @@
     "product_commod": {
      "alias": "product_commod", 
      "doc": "product commodity that the enrichment facility generates", 
-     "index": 2, 
+     "index": 1, 
      "tooltip": "product commodity", 
      "type": "std::string", 
      "uilabel": "Product Commodity", 
@@ -580,8 +580,8 @@
     "swu_capacity": {
      "alias": "swu_capacity", 
      "default": 1.000000000000000e+299, 
-     "doc": "separative work unit (SWU) capacity of enrichment facility (kgSWU/timestep) ", 
-     "index": 9, 
+     "doc": "separative work unit (SWU) capacity of enrichment facility (kgSWU/month) ", 
+     "index": 5, 
      "tooltip": "SWU capacity (kgSWU/month)", 
      "type": "double", 
      "uilabel": "SWU Capacity"
@@ -589,7 +589,7 @@
     "tails": {"index": 11, "type": ["cyclus::toolkit::ResBuf", "cyclus::Material"]}, 
     "tails_assay": {
      "alias": "tails_assay", 
-     "default": 0.0030, 
+     "default": 0.030, 
      "doc": "tails assay from the enrichment process", 
      "index": 4, 
      "tooltip": "tails assay", 
@@ -631,7 +631,7 @@
      "alias": ["fill_commod_prefs", "val"], 
      "default": [], 
      "doc": "Filler stream commodity request preferences for each of the given filler commodities (same order). If unspecified, default is to use 1.0 for all preferences.", 
-     "index": 1, 
+     "index": 2, 
      "tooltip": ["fill_commod_prefs", ""], 
      "type": ["std::vector", "double"], 
      "uilabel": ["Filler Stream Preferences", ""]
@@ -648,7 +648,7 @@
     "fill_recipe": {
      "alias": "fill_recipe", 
      "doc": "Name of recipe to be used in filler material stream requests.", 
-     "index": 2, 
+     "index": 1, 
      "tooltip": "fill_recipe", 
      "type": "std::string", 
      "uilabel": "Filler Stream Recipe", 
@@ -693,7 +693,7 @@
      "index": 7, 
      "tooltip": "fiss_recipe", 
      "type": "std::string", 
-     "uilabel": "Fissile Stream Recipe", 
+     "uilabel": "Fissile Stream Recipes", 
      "uitype": "recipe"
     }, 
     "fiss_size": {
@@ -708,7 +708,7 @@
     "outcommod": {
      "alias": "outcommod", 
      "doc": "Commodity on which to offer/supply mixed fuel material.", 
-     "index": 15, 
+     "index": 16, 
      "tooltip": "outcommod", 
      "type": "std::string", 
      "uilabel": "Output Commodity", 
@@ -718,7 +718,7 @@
      "alias": "spectrum", 
      "categorical": ["fission_spectrum_ave", "thermal"], 
      "doc": "The type of cross-sections to use for composition property calculation. Use 'fission_spectrum_ave' for fast reactor compositions or 'thermal' for thermal reactors.", 
-     "index": 17, 
+     "index": 15, 
      "tooltip": "spectrum", 
      "type": "std::string", 
      "uilabel": "Spectrum type"
@@ -726,7 +726,7 @@
     "throughput": {
      "alias": "throughput", 
      "doc": "Maximum number of kg of fuel material that can be supplied per time step.", 
-     "index": 16, 
+     "index": 17, 
      "tooltip": "throughput", 
      "type": "double", 
      "uilabel": "Maximum Throughput", 
@@ -751,7 +751,7 @@
      "alias": "topup_pref", 
      "default": 0, 
      "doc": "Top-up material stream request preference.", 
-     "index": 11, 
+     "index": 12, 
      "tooltip": "topup_pref", 
      "type": "double", 
      "uilabel": "Top-up Stream Preference"
@@ -760,7 +760,7 @@
      "alias": "topup_recipe", 
      "default": "", 
      "doc": "Name of recipe to be used in top-up material stream requests. This MUST be set if 'topup_size > 0'.", 
-     "index": 12, 
+     "index": 11, 
      "tooltip": "topup_recipe", 
      "type": "std::string", 
      "uilabel": "Top-up Stream Recipe", 
@@ -869,22 +869,23 @@
     "assem_size": {
      "alias": "assem_size", 
      "doc": "Mass (kg) of a single assembly.", 
-     "index": 9, 
+     "index": 3, 
      "tooltip": "assem_size", 
      "type": "double", 
-     "uilabel": "Assembly Mass", 
+     "uilabel": "assem_size", 
+     "uilabels": "Assembly Mass", 
      "units": "kg"
     }, 
     "core": {
      "capacity": "n_assem_core * assem_size", 
-     "index": 23, 
+     "index": 16, 
      "type": ["cyclus::toolkit::ResBuf", "cyclus::Material"]
     }, 
     "cycle_step": {
      "alias": "cycle_step", 
      "default": 0, 
      "doc": "Number of time steps since the start of the last cycle. Only set this if you know what you are doing", 
-     "index": 16, 
+     "index": 9, 
      "tooltip": "cycle_step", 
      "type": "int", 
      "uilabel": "Time Since Start of Last Cycle", 
@@ -893,7 +894,7 @@
     "cycle_time": {
      "alias": "cycle_time", 
      "doc": "The duration of a full operational cycle (excluding refueling time) in time steps.", 
-     "index": 14, 
+     "index": 7, 
      "tooltip": "cycle_time", 
      "type": "int", 
      "uilabel": "Cycle Length", 
@@ -902,7 +903,7 @@
     "discharged": {
      "alias": "discharged", 
      "default": 0, 
-     "doc": "This should NEVER be set manually", 
+     "doc": "This should NEVER be set manually.", 
      "index": 25, 
      "internal": true, 
      "tooltip": "discharged", 
@@ -911,13 +912,13 @@
     }, 
     "fresh": {
      "capacity": "n_assem_fresh * assem_size", 
-     "index": 22, 
+     "index": 15, 
      "type": ["cyclus::toolkit::ResBuf", "cyclus::Material"]
     }, 
     "fuel_incommods": {
      "alias": ["fuel_incommods", "val"], 
      "doc": "Ordered list of input commodities on which to requesting fuel.", 
-     "index": 0, 
+     "index": 10, 
      "tooltip": ["fuel_incommods", ""], 
      "type": ["std::vector", "std::string"], 
      "uilabel": ["Fresh Fuel Commodity List", ""], 
@@ -926,7 +927,7 @@
     "fuel_inrecipes": {
      "alias": ["fuel_inrecipes", "val"], 
      "doc": "Fresh fuel recipes to request for each of the given fuel input commodities (same order).", 
-     "index": 1, 
+     "index": 11, 
      "tooltip": ["fuel_inrecipes", ""], 
      "type": ["std::vector", "std::string"], 
      "uilabel": ["Fresh Fuel Recipe List", ""], 
@@ -934,8 +935,8 @@
     }, 
     "fuel_outcommods": {
      "alias": ["fuel_outcommods", "val"], 
-     "doc": "Output commodities on which to offer spent fuel originally received as each particular input commodity (same order).", 
-     "index": 3, 
+     "doc": "Output commodities on which to offer spent fuel originally received as each particular  input commodity (same order).", 
+     "index": 13, 
      "tooltip": ["fuel_outcommods", ""], 
      "type": ["std::vector", "std::string"], 
      "uilabel": ["Spent Fuel Commodity List", ""], 
@@ -944,7 +945,7 @@
     "fuel_outrecipes": {
      "alias": ["fuel_outrecipes", "val"], 
      "doc": "Spent fuel recipes corresponding to the given fuel input commodities (same order). Fuel received via a particular input commodity is transmuted to the recipe specified here after being burned during a cycle.", 
-     "index": 4, 
+     "index": 12, 
      "tooltip": ["fuel_outrecipes", ""], 
      "type": ["std::vector", "std::string"], 
      "uilabel": ["Spent Fuel Recipe List", ""], 
@@ -954,15 +955,15 @@
      "alias": ["fuel_prefs", "val"], 
      "default": [], 
      "doc": "The preference for each type of fresh fuel requested corresponding to each input commodity (same order).  If no preferences are specified, zero is used for all fuel requests (default).", 
-     "index": 2, 
+     "index": 14, 
      "tooltip": ["fuel_prefs", ""], 
      "type": ["std::vector", "double"], 
      "uilabel": ["Fresh Fuel Preference List", ""]
     }, 
     "n_assem_batch": {
      "alias": "n_assem_batch", 
-     "doc": "Number of assemblies that constitute a single batch.  This is the number of assemblies discharged from the core fully burned each cycle.Batch size is equivalent to ``n_assem_batch / n_assem_core``.", 
-     "index": 10, 
+     "doc": "Number of assemblies that constitute a single batch.This is the number of assemblies discharged from the core fully burned each cycle.Batch size is equivalent to ``n_assem_batch / n_assem_core``.", 
+     "index": 2, 
      "tooltip": "n_assem_batch", 
      "type": "int", 
      "uilabel": "Number of Assemblies per Batch"
@@ -970,7 +971,7 @@
     "n_assem_core": {
      "alias": "n_assem_core", 
      "doc": "Number of assemblies that constitute a full core.", 
-     "index": 11, 
+     "index": 4, 
      "tooltip": "n_assem_core", 
      "type": "int", 
      "uilabel": "Number of Assemblies in Core"
@@ -979,7 +980,7 @@
      "alias": "n_assem_fresh", 
      "default": 0, 
      "doc": "Number of fresh fuel assemblies to keep on-hand if possible.", 
-     "index": 12, 
+     "index": 6, 
      "tooltip": "n_assem_fresh", 
      "type": "int", 
      "uilabel": "Minimum Fresh Fuel Inventory", 
@@ -989,7 +990,7 @@
      "alias": "n_assem_spent", 
      "default": 1000000000, 
      "doc": "Number of spent fuel assemblies that can be stored on-site before reactor operation stalls.", 
-     "index": 13, 
+     "index": 5, 
      "tooltip": "n_assem_spent", 
      "type": "int", 
      "uilabel": "Maximum Spent Fuel Inventory", 
@@ -999,7 +1000,7 @@
      "alias": "power_cap", 
      "default": 0, 
      "doc": "Amount of electrical power the facility produces when operating normally.", 
-     "index": 17, 
+     "index": 0, 
      "tooltip": "power_cap", 
      "type": "double", 
      "uilabel": "Nominal Reactor Power", 
@@ -1009,7 +1010,7 @@
      "alias": "power_name", 
      "default": "power", 
      "doc": "The name of the 'power' commodity used in conjunction with a deployment curve.", 
-     "index": 18, 
+     "index": 1, 
      "tooltip": "power_name", 
      "type": "std::string", 
      "uilabel": "Power Commodity Name"
@@ -1017,8 +1018,8 @@
     "pref_change_commods": {
      "alias": ["pref_change_commods", "val"], 
      "default": [], 
-     "doc": "The input commodity for a particular fuel preference change.  Same order as and direct correspondence to the specified preference change times.", 
-     "index": 20, 
+     "doc": "The input commodity for a particular fuel preference change. Same order as and direct correspondence to the specified preference change times.", 
+     "index": 19, 
      "tooltip": ["pref_change_commods", ""], 
      "type": ["std::vector", "std::string"], 
      "uilabel": ["Commodity for Changed Fresh Fuel Preference", ""], 
@@ -1028,7 +1029,7 @@
      "alias": ["pref_change_times", "val"], 
      "default": [], 
      "doc": "A time step on which to change the request preference for a particular fresh fuel type.", 
-     "index": 19, 
+     "index": 18, 
      "tooltip": ["pref_change_times", ""], 
      "type": ["std::vector", "int"], 
      "uilabel": ["Time to Change Fresh Fuel Preference", ""]
@@ -1037,7 +1038,7 @@
      "alias": ["pref_change_values", "val"], 
      "default": [], 
      "doc": "The new/changed request preference for a particular fresh fuel. Same order as and direct correspondence to the specified preference change times.", 
-     "index": 21, 
+     "index": 20, 
      "tooltip": ["pref_change_values", ""], 
      "type": ["std::vector", "double"], 
      "uilabel": ["Changed Fresh Fuel Preference", ""]
@@ -1046,7 +1047,7 @@
      "alias": ["recipe_change_commods", "val"], 
      "default": [], 
      "doc": "The input commodity indicating fresh fuel for which recipes will be changed. Same order as and direct correspondence to the specified recipe change times.", 
-     "index": 6, 
+     "index": 22, 
      "tooltip": ["recipe_change_commods", ""], 
      "type": ["std::vector", "std::string"], 
      "uilabel": ["Commodity for Changed Fresh/Spent Fuel Recipe", ""], 
@@ -1056,7 +1057,7 @@
      "alias": ["recipe_change_in", "val"], 
      "default": [], 
      "doc": "The new input recipe to use for this recipe change. Same order as and direct correspondence to the specified recipe change times.", 
-     "index": 7, 
+     "index": 23, 
      "tooltip": ["recipe_change_in", ""], 
      "type": ["std::vector", "std::string"], 
      "uilabel": ["New Recipe for Fresh Fuel", ""], 
@@ -1066,7 +1067,7 @@
      "alias": ["recipe_change_out", "val"], 
      "default": [], 
      "doc": "The new output recipe to use for this recipe change. Same order as and direct correspondence to the specified recipe change times.", 
-     "index": 8, 
+     "index": 24, 
      "tooltip": ["recipe_change_out", ""], 
      "type": ["std::vector", "std::string"], 
      "uilabel": ["New Recipe for Spent Fuel", ""], 
@@ -1076,15 +1077,15 @@
      "alias": ["recipe_change_times", "val"], 
      "default": [], 
      "doc": "A time step on which to change the input-output recipe pair for a requested fresh fuel.", 
-     "index": 5, 
+     "index": 21, 
      "tooltip": ["recipe_change_times", ""], 
      "type": ["std::vector", "int"], 
      "uilabel": ["Time to Change Fresh/Spent Fuel Recipe", ""]
     }, 
     "refuel_time": {
      "alias": "refuel_time", 
-     "doc": "The duration of a full refueling period - the minimum time between the end of a cycle and the start of the next cycle.", 
-     "index": 15, 
+     "doc": "The duration of a full refueling period - the minimum time between a cycle end and the start of the next cycle.", 
+     "index": 8, 
      "tooltip": "refuel_time", 
      "type": "int", 
      "uilabel": "Refueling Outage Duration", 
@@ -1093,7 +1094,7 @@
     "res_indexes": {
      "alias": [["res_indexes", "item"], "key", "val"], 
      "default": {}, 
-     "doc": "This should NEVER be set manually", 
+     "doc": "This should NEVER be set manually.", 
      "index": 26, 
      "internal": true, 
      "tooltip": [["res_indexes", ""], "", ""], 
@@ -1102,7 +1103,7 @@
     }, 
     "spent": {
      "capacity": "n_assem_spent * assem_size", 
-     "index": 24, 
+     "index": 17, 
      "type": ["cyclus::toolkit::ResBuf", "cyclus::Material"]
     }
    }
@@ -1124,14 +1125,14 @@
    "vars": {
     "feed": {
      "capacity": "feedbuf_size", 
-     "index": 4, 
+     "index": 5, 
      "type": ["cyclus::toolkit::ResBuf", "cyclus::Material"]
     }, 
     "feed_commod_prefs": {
      "alias": ["feed_commod_prefs", "val"], 
      "default": [], 
      "doc": "Feed commodity request preferences for each of the given feed commodities (same order). If unspecified, default is to use zero for all preferences.", 
-     "index": 1, 
+     "index": 2, 
      "tooltip": ["feed_commod_prefs", ""], 
      "type": ["std::vector", "double"], 
      "uilabel": ["Feed Commodity Preference List", ""]
@@ -1139,7 +1140,7 @@
     "feed_commods": {
      "alias": ["feed_commods", "val"], 
      "doc": "Ordered list of commodities on which to request feed material to separate. Order only matters for matching up with feed commodity preferences if specified.", 
-     "index": 0, 
+     "index": 1, 
      "tooltip": ["feed_commods", ""], 
      "type": ["std::vector", "std::string"], 
      "uilabel": ["Feed Commodity List", ""], 
@@ -1149,7 +1150,7 @@
      "alias": "feed_recipe", 
      "default": "", 
      "doc": "Name for recipe to be used in feed requests. Empty string results in use of a dummy recipe.", 
-     "index": 2, 
+     "index": 3, 
      "tooltip": "feed_recipe", 
      "type": "std::string", 
      "uilabel": "Feed Commodity Recipe List", 
@@ -1158,7 +1159,7 @@
     "feedbuf_size": {
      "alias": "feedbuf_size", 
      "doc": "Maximum amount of feed material to keep on hand.", 
-     "index": 3, 
+     "index": 4, 
      "tooltip": "feedbuf_size", 
      "type": "double", 
      "uilabel": "Maximum Feed Inventory", 
@@ -1173,7 +1174,7 @@
      "alias": "leftover_commod", 
      "default": "default-waste-stream", 
      "doc": "Commodity on which to trade the leftover separated material stream. This MUST NOT be the same as any commodity used to define the other separations streams.", 
-     "index": 6, 
+     "index": 7, 
      "tooltip": "leftover_commod", 
      "type": "std::string", 
      "uilabel": "Leftover Commodity", 
@@ -1183,7 +1184,7 @@
      "alias": "leftoverbuf_size", 
      "default": 1.000000000000000e+299, 
      "doc": "Maximum amount of leftover separated material (not included in any other stream) that can be stored. If full, the facility halts operation until space becomes available.", 
-     "index": 7, 
+     "index": 6, 
      "tooltip": "leftoverbuf_size", 
      "type": "double", 
      "uilabel": "Maximum Leftover Inventory", 
@@ -1196,7 +1197,7 @@
       "commod", 
       ["info", "buf_size", [["efficiencies", "item"], "comp", "eff"]]
      ], 
-     "doc": "Output streams for separations. Each stream must have a unique name identifying the commodity on  which its material is traded, a max buffer capacity in kg (neg values indicate infinite size), and a set of component efficiencies. 'comp' is a component to be separated into the stream (e.g. U, Pu, etc.) and 'eff' is the mass fraction of the component that is separated from the feed into this output stream. If any stream buffer is full, the facility halts operation until space becomes available. The sum total of all component efficiencies across streams must be less than or equal to 1 (e.g. sum of U efficiencies for all streams must be <= 1).", 
+     "doc": "Output streams for separations. Each stream must have a unique name identifying the commodity on which its material is traded, a max buffer capacity in kg (neg values indicate infinite size), and a set of component efficiencies. 'comp' is a component to be separated into the stream (e.g. U, Pu, etc.) and 'eff' is the mass fraction of the component that is separated from the feed into this output stream. If any stream buffer is full, the facility halts operation until space becomes available. The sum total of all component efficiencies across streams must be less than or equal to 1 (e.g. sum of U efficiencies for all streams must be <= 1).", 
      "index": 9, 
      "tooltip": [["streams_", ""], "", ["", "", [["", ""], "", ""]]], 
      "type": [
@@ -1214,7 +1215,7 @@
     "throughput": {
      "alias": "throughput", 
      "doc": "Maximum quantity of feed material that can be processed per time step.", 
-     "index": 5, 
+     "index": 0, 
      "tooltip": "throughput", 
      "type": "double", 
      "uilabel": "Maximum Separations Throughput", 
@@ -1240,7 +1241,7 @@
      "alias": "capacity", 
      "default": 1.000000000000000e+299, 
      "doc": "capacity the sink facility can accept at each time step", 
-     "index": 3, 
+     "index": 1, 
      "tooltip": "sink capacity", 
      "type": "double", 
      "uilabel": "Maximum Throughput"
@@ -1263,7 +1264,7 @@
      "alias": "max_inv_size", 
      "default": 1.000000000000000e+299, 
      "doc": "total maximum inventory size of sink facility", 
-     "index": 2, 
+     "index": 3, 
      "tooltip": "sink maximum inventory size", 
      "type": "double", 
      "uilabel": "Maximum Inventory"
@@ -1272,7 +1273,7 @@
      "alias": "recipe_name", 
      "default": "", 
      "doc": "name of recipe to use for material requests, where the default (empty string) is to accept everything", 
-     "index": 1, 
+     "index": 2, 
      "tooltip": "requested composition", 
      "type": "std::string", 
      "uilabel": "Input Recipe", 
@@ -1299,8 +1300,8 @@
     "inventory_size": {
      "alias": "inventory_size", 
      "default": 1.000000000000000e+299, 
-     "doc": "Total amount of material this source has remaining. Every trade decreases this value by the supplied material quantity.  When it reaches zero, the source cannot provide any  more material.", 
-     "index": 2, 
+     "doc": "Total amount of material this source has remaining. Every trade decreases this value by the supplied material quantity'. When it reaches zero, the source cannot provide any more material.", 
+     "index": 3, 
      "tooltip": "inventory_size", 
      "type": "double", 
      "uilabel": "Initial Inventory", 
@@ -1329,7 +1330,7 @@
      "alias": "throughput", 
      "default": 1.000000000000000e+299, 
      "doc": "amount of commodity that can be supplied at each time step", 
-     "index": 3, 
+     "index": 2, 
      "tooltip": "per time step throughput", 
      "type": "double", 
      "uilabel": "Maximum Throughput", 
@@ -1339,22 +1340,22 @@
   }
  }, 
  "schema": {
-  ":agents:KFacility": "<interleave>\n    <element name=\"in_commod\">\n        <data type=\"token\"/>\n    </element>\n    <element name=\"recipe_name\">\n        <data type=\"token\"/>\n    </element>\n    <element name=\"out_commod\">\n        <data type=\"token\"/>\n    </element>\n    <element name=\"in_capacity\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"out_capacity\">\n        <data type=\"double\"/>\n    </element>\n    <optional>\n        <element name=\"current_capacity\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"max_inv_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <element name=\"k_factor_in\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"k_factor_out\">\n        <data type=\"double\"/>\n    </element>\n</interleave>\n", 
+  ":agents:KFacility": "<interleave>\n    <element name=\"in_commod\">\n        <data type=\"token\"/>\n    </element>\n    <element name=\"out_commod\">\n        <data type=\"token\"/>\n    </element>\n    <element name=\"recipe_name\">\n        <data type=\"token\"/>\n    </element>\n    <element name=\"in_capacity\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"out_capacity\">\n        <data type=\"double\"/>\n    </element>\n    <optional>\n        <element name=\"current_capacity\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"max_inv_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <element name=\"k_factor_in\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"k_factor_out\">\n        <data type=\"double\"/>\n    </element>\n</interleave>\n", 
   ":agents:NullInst": "<text/>", 
   ":agents:NullRegion": "<text/>", 
-  ":agents:Predator": "<interleave>\n    <element name=\"commod\">\n        <data type=\"token\"/>\n    </element>\n    <element name=\"prey\">\n        <data type=\"token\"/>\n    </element>\n    <optional>\n        <element name=\"full\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"hunt_freq\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"hunt_cap\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"success\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"consumed\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"hunt_factor\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"age\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"lifespan\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"dead\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"nchildren\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"birth_and_death\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n</interleave>\n", 
-  ":agents:Prey": "<interleave>\n    <element name=\"commod\">\n        <data type=\"token\"/>\n    </element>\n    <optional>\n        <element name=\"age\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"dead\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"nchildren\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"birth_freq\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"birth_and_death\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n</interleave>\n", 
-  ":agents:Sink": "<interleave>\n    <element name=\"in_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"recipe_name\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"max_inv_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <element name=\"capacity\">\n        <data type=\"double\"/>\n    </element>\n</interleave>\n", 
+  ":agents:Predator": "<interleave>\n    <element name=\"commod\">\n        <data type=\"token\"/>\n    </element>\n    <element name=\"prey\">\n        <data type=\"token\"/>\n    </element>\n    <optional>\n        <element name=\"full\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"hunt_cap\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"hunt_freq\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"success\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"nchildren\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"age\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"lifespan\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"dead\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"hunt_factor\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"birth_and_death\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"consumed\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n</interleave>\n", 
+  ":agents:Prey": "<interleave>\n    <element name=\"commod\">\n        <data type=\"token\"/>\n    </element>\n    <optional>\n        <element name=\"birth_freq\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"nchildren\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"age\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"dead\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"birth_and_death\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n</interleave>\n", 
+  ":agents:Sink": "<interleave>\n    <optional>\n        <element name=\"recipe_name\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <element name=\"in_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <element name=\"capacity\">\n        <data type=\"double\"/>\n    </element>\n    <optional>\n        <element name=\"max_inv_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n</interleave>\n", 
   ":agents:Source": "<interleave>\n    <element name=\"commod\">\n        <data type=\"token\"/>\n    </element>\n    <optional>\n        <element name=\"recipe_name\">\n            <data type=\"token\"/>\n        </element>\n    </optional>\n    <element name=\"capacity\">\n        <data type=\"double\"/>\n    </element>\n</interleave>\n", 
   ":cycamore:DeployInst": "<interleave>\n    <element name=\"prototypes\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <element name=\"build_times\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"int\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <element name=\"n_build\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"int\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"lifetimes\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"int\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n</interleave>\n", 
-  ":cycamore:Enrichment": "<interleave>\n    <element name=\"feed_commod\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"feed_recipe\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"product_commod\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"tails_commod\">\n        <data type=\"string\"/>\n    </element>\n    <optional>\n        <element name=\"tails_assay\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"initial_feed\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"max_feed_inventory\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"max_enrich\">\n            <data type=\"double\">\n                <param name=\"minInclusive\">0</param>\n                <param name=\"maxInclusive\">1</param>\n            </data>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"order_prefs\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"swu_capacity\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n</interleave>\n", 
-  ":cycamore:FuelFab": "<interleave>\n    <element name=\"fill_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"fill_commod_prefs\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <element name=\"fill_recipe\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"fill_size\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"fiss_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"fiss_commod_prefs\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"fiss_recipe\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <element name=\"fiss_size\">\n        <data type=\"double\"/>\n    </element>\n    <optional>\n        <element name=\"topup_commod\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"topup_pref\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"topup_recipe\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"topup_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <element name=\"outcommod\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"throughput\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"spectrum\">\n        <data type=\"string\"/>\n    </element>\n</interleave>\n", 
+  ":cycamore:Enrichment": "<interleave>\n    <element name=\"feed_commod\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"product_commod\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"feed_recipe\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"tails_commod\">\n        <data type=\"string\"/>\n    </element>\n    <optional>\n        <element name=\"tails_assay\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"swu_capacity\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"max_feed_inventory\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"max_enrich\">\n            <data type=\"double\">\n                <param name=\"minInclusive\">0</param>\n                <param name=\"maxInclusive\">1</param>\n            </data>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"initial_feed\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"order_prefs\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n</interleave>\n", 
+  ":cycamore:FuelFab": "<interleave>\n    <element name=\"fill_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <element name=\"fill_recipe\">\n        <data type=\"string\"/>\n    </element>\n    <optional>\n        <element name=\"fill_commod_prefs\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <element name=\"fill_size\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"fiss_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"fiss_commod_prefs\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"fiss_recipe\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <element name=\"fiss_size\">\n        <data type=\"double\"/>\n    </element>\n    <optional>\n        <element name=\"topup_commod\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"topup_recipe\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"topup_pref\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"topup_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <element name=\"spectrum\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"outcommod\">\n        <data type=\"string\"/>\n    </element>\n    <element name=\"throughput\">\n        <data type=\"double\"/>\n    </element>\n</interleave>\n", 
   ":cycamore:GrowthRegion": "<interleave>\n    <element name=\"growth\">\n        <oneOrMore>\n            <element name=\"item\">\n                <interleave>\n                    <element name=\"commod\">\n                        <data type=\"string\"/>\n                    </element>\n                    <element name=\"piecewise_function\">\n                        <oneOrMore>\n                            <element name=\"piece\">\n                                <interleave>\n                                    <element name=\"start\">\n                                        <data type=\"int\"/>\n                                    </element>\n                                    <element name=\"function\">\n                                        <interleave>\n                                            <element name=\"type\">\n                                                <data type=\"string\"/>\n                                            </element>\n                                            <element name=\"params\">\n                                                <data type=\"string\"/>\n                                            </element>\n                                        </interleave>\n                                    </element>\n                                </interleave>\n                            </element>\n                        </oneOrMore>\n                    </element>\n                </interleave>\n            </element>\n        </oneOrMore>\n    </element>\n</interleave>\n", 
   ":cycamore:ManagerInst": "<interleave>\n    <element name=\"prototypes\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n</interleave>\n", 
-  ":cycamore:Reactor": "<interleave>\n    <element name=\"fuel_incommods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <element name=\"fuel_inrecipes\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"fuel_prefs\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <element name=\"fuel_outcommods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <element name=\"fuel_outrecipes\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"recipe_change_times\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"int\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"recipe_change_commods\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"string\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"recipe_change_in\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"string\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"recipe_change_out\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"string\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <element name=\"assem_size\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"n_assem_batch\">\n        <data type=\"int\"/>\n    </element>\n    <element name=\"n_assem_core\">\n        <data type=\"int\"/>\n    </element>\n    <optional>\n        <element name=\"n_assem_fresh\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"n_assem_spent\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <element name=\"cycle_time\">\n        <data type=\"int\"/>\n    </element>\n    <element name=\"refuel_time\">\n        <data type=\"int\"/>\n    </element>\n    <optional>\n        <element name=\"cycle_step\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"power_cap\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"power_name\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"pref_change_times\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"int\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"pref_change_commods\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"string\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"pref_change_values\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"discharged\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"res_indexes\">\n            <oneOrMore>\n                <element name=\"item\">\n                    <interleave>\n                        <element name=\"key\">\n                            <data type=\"int\"/>\n                        </element>\n                        <element name=\"val\">\n                            <data type=\"int\"/>\n                        </element>\n                    </interleave>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n</interleave>\n", 
-  ":cycamore:Separations": "<interleave>\n    <element name=\"feed_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"feed_commod_prefs\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"feed_recipe\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <element name=\"feedbuf_size\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"throughput\">\n        <data type=\"double\"/>\n    </element>\n    <optional>\n        <element name=\"leftover_commod\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"leftoverbuf_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <element name=\"streams\">\n        <oneOrMore>\n            <element name=\"item\">\n                <interleave>\n                    <element name=\"commod\">\n                        <data type=\"string\"/>\n                    </element>\n                    <element name=\"info\">\n                        <interleave>\n                            <element name=\"buf_size\">\n                                <data type=\"double\"/>\n                            </element>\n                            <element name=\"efficiencies\">\n                                <oneOrMore>\n                                    <element name=\"item\">\n                                        <interleave>\n                                            <element name=\"comp\">\n                                                <data type=\"string\"/>\n                                            </element>\n                                            <element name=\"eff\">\n                                                <data type=\"double\"/>\n                                            </element>\n                                        </interleave>\n                                    </element>\n                                </oneOrMore>\n                            </element>\n                        </interleave>\n                    </element>\n                </interleave>\n            </element>\n        </oneOrMore>\n    </element>\n</interleave>\n", 
-  ":cycamore:Sink": "<interleave>\n    <element name=\"in_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"recipe_name\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"max_inv_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"capacity\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n</interleave>\n", 
-  ":cycamore:Source": "<interleave>\n    <element name=\"outcommod\">\n        <data type=\"string\"/>\n    </element>\n    <optional>\n        <element name=\"outrecipe\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"inventory_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"throughput\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n</interleave>\n"
+  ":cycamore:Reactor": "<interleave>\n    <optional>\n        <element name=\"power_cap\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"power_name\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <element name=\"n_assem_batch\">\n        <data type=\"int\"/>\n    </element>\n    <element name=\"assem_size\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"n_assem_core\">\n        <data type=\"int\"/>\n    </element>\n    <optional>\n        <element name=\"n_assem_spent\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"n_assem_fresh\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <element name=\"cycle_time\">\n        <data type=\"int\"/>\n    </element>\n    <element name=\"refuel_time\">\n        <data type=\"int\"/>\n    </element>\n    <optional>\n        <element name=\"cycle_step\">\n            <data type=\"int\"/>\n        </element>\n    </optional>\n    <element name=\"fuel_incommods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <element name=\"fuel_inrecipes\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <element name=\"fuel_outrecipes\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <element name=\"fuel_outcommods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"fuel_prefs\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"pref_change_times\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"int\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"pref_change_commods\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"string\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"pref_change_values\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"recipe_change_times\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"int\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"recipe_change_commods\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"string\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"recipe_change_in\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"string\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"recipe_change_out\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"string\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"discharged\">\n            <data type=\"boolean\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"res_indexes\">\n            <oneOrMore>\n                <element name=\"item\">\n                    <interleave>\n                        <element name=\"key\">\n                            <data type=\"int\"/>\n                        </element>\n                        <element name=\"val\">\n                            <data type=\"int\"/>\n                        </element>\n                    </interleave>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n</interleave>\n", 
+  ":cycamore:Separations": "<interleave>\n    <element name=\"throughput\">\n        <data type=\"double\"/>\n    </element>\n    <element name=\"feed_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"feed_commod_prefs\">\n            <oneOrMore>\n                <element name=\"val\">\n                    <data type=\"double\"/>\n                </element>\n            </oneOrMore>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"feed_recipe\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <element name=\"feedbuf_size\">\n        <data type=\"double\"/>\n    </element>\n    <optional>\n        <element name=\"leftoverbuf_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"leftover_commod\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <element name=\"streams\">\n        <oneOrMore>\n            <element name=\"item\">\n                <interleave>\n                    <element name=\"commod\">\n                        <data type=\"string\"/>\n                    </element>\n                    <element name=\"info\">\n                        <interleave>\n                            <element name=\"buf_size\">\n                                <data type=\"double\"/>\n                            </element>\n                            <element name=\"efficiencies\">\n                                <oneOrMore>\n                                    <element name=\"item\">\n                                        <interleave>\n                                            <element name=\"comp\">\n                                                <data type=\"string\"/>\n                                            </element>\n                                            <element name=\"eff\">\n                                                <data type=\"double\"/>\n                                            </element>\n                                        </interleave>\n                                    </element>\n                                </oneOrMore>\n                            </element>\n                        </interleave>\n                    </element>\n                </interleave>\n            </element>\n        </oneOrMore>\n    </element>\n</interleave>\n", 
+  ":cycamore:Sink": "<interleave>\n    <element name=\"in_commods\">\n        <oneOrMore>\n            <element name=\"val\">\n                <data type=\"string\"/>\n            </element>\n        </oneOrMore>\n    </element>\n    <optional>\n        <element name=\"capacity\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"recipe_name\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"max_inv_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n</interleave>\n", 
+  ":cycamore:Source": "<interleave>\n    <element name=\"outcommod\">\n        <data type=\"string\"/>\n    </element>\n    <optional>\n        <element name=\"outrecipe\">\n            <data type=\"string\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"throughput\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n    <optional>\n        <element name=\"inventory_size\">\n            <data type=\"double\"/>\n        </element>\n    </optional>\n</interleave>\n"
  }, 
  "specs": [
   ":agents:KFacility", 
