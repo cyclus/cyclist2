@@ -464,7 +464,7 @@ public class Cycic extends ViewBase{
 		scroll.setMinHeight(120);
 		scroll.setContent(nodesPane);
 		
-//		opSwitch.getToggles().clear();
+//		dopSwitch.getToggles().clear();
 //        opSwitch.getToggles().addAll(localToggle, remoteToggle);
 //        try {
 //            Process readproc = Runtime.getRuntime().exec("cyclus -V");

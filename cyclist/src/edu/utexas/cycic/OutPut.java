@@ -280,7 +280,7 @@ public class OutPut {
 			isotope.appendChild(isoID);
 			
 			Element isoComp = doc.createElement("comp");
-			if (recipe.Basis == "mass"){
+			if (recipe.Basis.equalsIgnoreCase("mass")){
 				isoComp.appendChild(doc.createTextNode(String.format("%f2", iso.mass)));
 			} else {
 				isoComp.appendChild(doc.createTextNode(String.format("%f2", iso.atom)));
