@@ -871,32 +871,31 @@ public class Cycic extends ViewBase{
 
 
     public void addArcheToBar(String archeType){
-        
-		for(int i = 0; i < DataArrays.simFacilities.size(); i++){
-			if(DataArrays.simFacilities.get(i).facilityName.equalsIgnoreCase(archeType)){
-				if(DataArrays.simFacilities.get(i).loaded == true){
-					return;
-				}
-				facilityStructure test = DataArrays.simFacilities.get(i);
-				try {
-					test.loaded = true;
-					FacilityCircle circle = new FacilityCircle();
-					int pos = 0;
-					for(int k = 0; k < DataArrays.simFacilities.size(); k++){
-						if(DataArrays.simFacilities.get(k).loaded == true){
-							pos+=1;
-						}
-					}
-					buildDnDCircle(circle, pos-1, test.facilityName);
-					nodesPane.getChildren().addAll(circle, circle.text);
-				} catch (Exception eq) {
-					
-				}
-			}
-		}
-
+    	nodesPane.getChildren().clear();
+    	int pos = 0;
+    	for(int i = 0; i < DataArrays.simFacilities.size(); i++){
+    		facilityStructure test = DataArrays.simFacilities.get(i);
+    		if(test.facilityName.equalsIgnoreCase(archeType)){
+    			if(test.loaded == true){
+    				pos = placeDnDCircle(pos, test);
+    				continue;
+    			}
+    			test.loaded = true;
+    			pos = placeDnDCircle(pos, test);
+    		} else if(test.loaded == true){
+    			pos = placeDnDCircle(pos, test);
+    		}
+    	} 
     }
 
+    public int placeDnDCircle(int pos, facilityStructure test){
+		FacilityCircle circle = new FacilityCircle();
+		pos += 1;
+		buildDnDCircle(circle, pos-1, test.facilityName);
+		nodesPane.getChildren().addAll(circle, circle.text);
+		return pos;
+    }
+    
 	public void createArchetypeBar(GridPane grid){
 		ComboBox<String> archetypes = new ComboBox<String>();
 		for(int i = 0; i < DataArrays.simFacilities.size(); i++){
@@ -912,7 +911,9 @@ public class Cycic extends ViewBase{
 		});
 		archetypes.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
-				addArcheToBar(archetypes.getValue());
+				if(archetypes.getValue() != null){
+					addArcheToBar(archetypes.getValue());
+				}	
 			}
 		});
 
