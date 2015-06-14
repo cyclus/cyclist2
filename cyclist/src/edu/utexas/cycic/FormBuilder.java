@@ -86,7 +86,6 @@ public class FormBuilder extends ViewBase {
 		scroll.setContent(grid);
 		formGrid.getChildren().addAll(topGrid, scroll);
 		
-		// This is a quick hack. 
 		setOnMousePressed(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
 				Cycic.workingNode = formNode;

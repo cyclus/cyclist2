@@ -36,6 +36,13 @@ public class RegionView extends ViewBase{
 		super();
 		TITLE = (String) RegionCorralView.workingRegion.name;
 		workingRegion = RegionCorralView.workingRegion;
+		
+		setOnMousePressed(new EventHandler<MouseEvent>(){
+			public void handle(MouseEvent e){
+				RegionCorralView.workingRegion = workingRegion;
+			}
+		});
+		
 		//Institution list view for the region.
 		final ListView<String> institList = new ListView<String>();
 		institList.setOrientation(Orientation.VERTICAL);
@@ -121,7 +128,7 @@ public class RegionView extends ViewBase{
 		
 		setTitle(TITLE);
 		setContent(regionBox);
-		formBuilder(RegionCorralView.workingRegion.regionStruct, RegionCorralView.workingRegion.regionData);
+		formBuilder(workingRegion.regionStruct, workingRegion.regionData);
 		
 	}
 	

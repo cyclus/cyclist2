@@ -44,6 +44,12 @@ public class InstitutionView extends ViewBase {
 		super();
 		TITLE = (String) InstitutionCorralView.workingInstitution.name;
 		workingInstitution = InstitutionCorralView.workingInstitution;
+		
+		setOnMousePressed(new EventHandler<MouseEvent>(){
+			public void handle(MouseEvent e){
+				InstitutionCorralView.workingInstitution = workingInstitution;
+			}
+		});
 
 		//Initial facility list view for the institution.
 
@@ -176,7 +182,7 @@ public class InstitutionView extends ViewBase {
 			if (facArray.get(i) instanceof ArrayList && facArray.get(0) instanceof ArrayList) {
 				formBuilder((ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
 			} else if (i == 0){
-				if (facArray.get(2) == "oneOrMore"){
+				if (facArray.get(2).toString().equalsIgnoreCase("oneOrMore")){
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = new Label((String) facArray.get(0));
 						grid.add(name, columnNumber, rowNumber);
@@ -194,7 +200,7 @@ public class InstitutionView extends ViewBase {
 						// resetting the indent
 						columnNumber -= 1;
 					}
-				} else if (facArray.get(2) == "oneOrMoreMap"){
+				} else if (facArray.get(2).toString().equalsIgnoreCase("oneOrMoreMap")){
 					//facArray = (ArrayList<Object>) facArray.get(1);
 					//dataArray = (ArrayList<Object>) dataArray.get(0);
 					if ((int)facArray.get(6) <= userLevel && i == 0){
@@ -221,7 +227,7 @@ public class InstitutionView extends ViewBase {
 						// resetting the indent
 						columnNumber -= 1;
 					}
-				} else if (facArray.get(2) == "zeroOrMore") {
+				} else if (facArray.get(2).toString().equalsIgnoreCase("zeroOrMore")) {
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = new Label((String) facArray.get(0));
 						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
@@ -244,53 +250,67 @@ public class InstitutionView extends ViewBase {
 						// resetting the indent
 						columnNumber -= 1;
 						rowNumber += 1;
+					} 
+				}else if (facArray.get(1) instanceof ArrayList) {
+					if ((int)facArray.get(6) <= userLevel){
+						Label name = new Label((String) facArray.get(0));
+						name.setTooltip(new Tooltip ((String)facArray.get(7)));
+						grid.add(name, columnNumber, rowNumber);
+						rowNumber += 1;
+						// Indenting a sub structure
+						columnNumber += 1;
+						for(int ii = 0; ii < dataArray.size(); ii ++){
+							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));						
+						}
+						// resetting the indent
+						columnNumber -= 1;
 					}
 				} else {
-					// Adding the label
-					Label name = new Label((String) facArray.get(0));
-					name.setTooltip(new Tooltip((String) facArray.get(7)));
-					grid.add(name, columnNumber, rowNumber);
-					// Setting up the input type for the label
-					if (facArray.get(4) != null){
-						// If statement to test for a continuous range for sliders.
-						if (facArray.get(4).toString().split("[...]").length > 1){
-							Slider slider = FormBuilderFunctions.sliderBuilder(facArray.get(4).toString(), dataArray.get(0).toString());
-							TextField textField = FormBuilderFunctions.sliderTextFieldBuilder(slider, facArray, dataArray);
-							grid.add(slider, 1+columnNumber, rowNumber);
-							grid.add(textField, 2+columnNumber, rowNumber);
-							columnEnd = 2+columnNumber+1;
-							// Slider with discrete steps
+						// Adding the label
+						Label name = new Label((String) facArray.get(0));
+						name.setTooltip(new Tooltip((String) facArray.get(7)));
+						grid.add(name, columnNumber, rowNumber);
+						// Setting up the input type for the label
+						if (facArray.get(4) != null){
+							// If statement to test for a continuous range for sliders.
+							if (facArray.get(4).toString().split("[...]").length > 1){
+								Slider slider = FormBuilderFunctions.sliderBuilder(facArray.get(4).toString(), dataArray.get(0).toString());
+								TextField textField = FormBuilderFunctions.sliderTextFieldBuilder(slider, facArray, dataArray);
+								grid.add(slider, 1+columnNumber, rowNumber);
+								grid.add(textField, 2+columnNumber, rowNumber);
+								columnEnd = 2+columnNumber+1;
+								// Slider with discrete steps
+							} else {
+								ComboBox<String> cb = FormBuilderFunctions.comboBoxBuilder(facArray.get(4).toString(), facArray, dataArray);
+								grid.add(cb, 1+columnNumber, rowNumber);
+								columnEnd = 2 + columnNumber;
+							}
 						} else {
-							ComboBox<String> cb = FormBuilderFunctions.comboBoxBuilder(facArray.get(4).toString(), facArray, dataArray);
-							grid.add(cb, 1+columnNumber, rowNumber);
-							columnEnd = 2 + columnNumber;
+							switch ((String) facArray.get(2).toString().toLowerCase()) {
+							case "prototype":
+								grid.add(FormBuilderFunctions.comboBoxFac(facArray, dataArray), 1+columnNumber, rowNumber);
+								break;
+							case "commodity":
+								grid.add(FormBuilderFunctions.comboBoxCommod(facArray, dataArray), 1+columnNumber, rowNumber);
+							default:
+								grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), 1+columnNumber, rowNumber);
+								columnEnd = 2 + columnNumber;
+								break;
+							}
 						}
-					} else {
-						switch ((String) facArray.get(2).toString().toLowerCase()) {
-						case "prototype":
-							grid.add(FormBuilderFunctions.comboBoxFac(facArray, dataArray), 1+columnNumber, rowNumber);
-							break;
-						case "commodity":
-							grid.add(FormBuilderFunctions.comboBoxCommod(facArray, dataArray), 1+columnNumber, rowNumber);
-						default:
-							grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), 1+columnNumber, rowNumber);
-							columnEnd = 2 + columnNumber;
-							break;
-						}
+						grid.add(FormBuilderFunctions.unitsBuilder((String)facArray.get(3)), columnEnd, rowNumber);
+						columnEnd = 0;
+						rowNumber += 1;
 					}
-					grid.add(FormBuilderFunctions.unitsBuilder((String)facArray.get(3)), columnEnd, rowNumber);
-					columnEnd = 0;
-					rowNumber += 1;
 				}
 			}
 		}
-	}
 
 
 
-	/**
-	 * Function to add an orMore button to the form. This button allows the user to add additional fields to zeroOrMore or oneOrMore form inputs.
-	 * @param grid This is the grid of the current view. 
+		/**
+		 * Function to add an orMore button to the form. This button allows the user to add additional fields to zeroOrMore or oneOrMore form inputs.
+		 * @param grid This is the grid of the current view. 
 	 * @param facArray The ArrayList<Object> used to make a copy of the one or more field. 
 	 * @param dataArray The ArrayList<Object> the new orMore field will be added to.
 	 * @return Button that will add the orMore field to the dataArray and reload the form.
