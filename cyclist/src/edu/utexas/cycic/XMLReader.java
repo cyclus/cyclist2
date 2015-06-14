@@ -30,17 +30,6 @@ import edu.utah.sci.cyclist.Cyclist;
 public class XMLReader {
 	/**
 	 * 
-	 */
-	static skinSet SC2 = new skinSet(){
-		{
-			name = "SC2";
-			images.put("reactor", new Image(new File("skinImages/reactor.png").toURI().toString()));
-			images.put("facility", new Image(new File("skinImages/sourceFacSC2.jpg").toURI().toString()));
-		}
-	};
-	
-	/**
-	 * 
 	 * @param path
 	 * @return
 	 */
@@ -50,14 +39,14 @@ public class XMLReader {
 				name = "DSARR";
 				radius = 45;
 				textPlacement = "bottom";
-				images.put("abr", new Image(Cyclist.class.getResource("assets/skinImages/fuelcycle_abr.png").toExternalForm()));
-				images.put("facility", new Image(Cyclist.class.getResource("assets/skinImages/fuelcycle_enr.png").toExternalForm()));
-				images.put("fuel fabrication", new Image(Cyclist.class.getResource("assets/skinImages/fuelcycle_fab.png").toExternalForm()));
-				images.put("repository", new Image(Cyclist.class.getResource("assets/skinImages/fuelcycle_geo.png").toExternalForm()));
-				images.put("mine", new Image(Cyclist.class.getResource("assets/skinImages/fuelcycle_mine.png").toExternalForm()));
-				images.put("reactor", new Image(Cyclist.class.getResource("assets/skinImages/fuelcycle_rxtr.png").toExternalForm()));
-				images.put("reprocessing", new Image(Cyclist.class.getResource("assets/skinImages/fuelcycle_sep.png").toExternalForm()));
-				images.put("separations", new Image(Cyclist.class.getResource("assets/skinImages/fuelcycle_sep.png").toExternalForm()));
+				images.put("abr", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_abr.png").toExternalForm()));
+				images.put("facility", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_enr.png").toExternalForm()));
+				images.put("fuel fabrication", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_fab.png").toExternalForm()));
+				images.put("repository", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_geo.png").toExternalForm()));
+				images.put("mine", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_mine.png").toExternalForm()));
+				images.put("reactor", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_rxtr.png").toExternalForm()));
+				images.put("reprocessing", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_sep.png").toExternalForm()));
+				images.put("separations", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_sep.png").toExternalForm()));
 			}
 		};
 		return skin;

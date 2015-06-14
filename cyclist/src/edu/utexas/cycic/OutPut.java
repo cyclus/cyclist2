@@ -498,16 +498,14 @@ public class OutPut {
 			
 			String description = (String) json.get("description");
 			CycicScenarios.workingCycicScenario.simulationData.description = description;
-			Cycic.description.setText(description);	
 			
 			String decay = (String) json.get("decay");
 			CycicScenarios.workingCycicScenario.simulationData.description = decay;
-			Cycic.decay.setValue(decay);	
 
 			String simHandle = (String) json.get("simHandle");
 			CycicScenarios.workingCycicScenario.simulationData.description = simHandle;
-			Cycic.simHandle.setText(simHandle);	
-
+			
+			Cycic.details();
 			VisFunctions.redrawPane();
 			VisFunctions.redrawInstitPane();
 			VisFunctions.redrawRegionPane();
@@ -648,17 +646,14 @@ public class OutPut {
 		// Duration
 		String duration = doc.getElementsByTagName("duration").item(0).getTextContent();
 		Cycic.workingScenario.simulationData.duration = duration;
-		Cycic.duration.setText(duration);
 		
 		// Start Month
 		String startMonth = doc.getElementsByTagName("startmonth").item(0).getTextContent();
 		Cycic.workingScenario.simulationData.startMonth = startMonth;
-		Cycic.startMonth.setValue(Cycic.monthList.get(Integer.parseInt(Cycic.workingScenario.simulationData.startMonth)-1));
 		
 		// Start Year
 		String startYear = doc.getElementsByTagName("startyear").item(0).getTextContent();
 		Cycic.workingScenario.simulationData.startYear = startYear;
-		Cycic.startYear.setText(startYear);
 		
 	}
 

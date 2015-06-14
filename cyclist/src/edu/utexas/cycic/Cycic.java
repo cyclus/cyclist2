@@ -103,12 +103,6 @@ public class Cycic extends ViewBase{
     private static Object monitor = new Object();
     static String currentSkin = "Default Skin";
     static String currentServer = "";
-    static TextField duration = VisFunctions.numberField();
-	static ComboBox<String> startMonth = new ComboBox<String>();
-	static TextField startYear = VisFunctions.numberField();
-	static TextArea description = new TextArea();
-	static ComboBox<String> decay = new ComboBox<String>();
-	static TextField simHandle = new TextField();
 	
     
 	/**
@@ -266,7 +260,7 @@ public class Cycic extends ViewBase{
 
 		setCloseable(false);
 		enableDragging(false);
-        DataArrays.cycicInitLoader();
+        DataArrays.cycicInitLoader("facility");
 
         final ContextMenu paneMenu = new ContextMenu();
         MenuItem linkColor = new MenuItem("Change Link Color...");
@@ -604,7 +598,7 @@ public class Cycic extends ViewBase{
 		buildCommodPane();
 	}
 	
-	HashMap<String, String> months = new HashMap<String, String>();
+	static HashMap<String, String> months = new HashMap<String, String>();
 	static ArrayList<String> monthList = new ArrayList<String>();
 	/**
 	 * Quick hack to convert months into their integer values.
@@ -641,11 +635,43 @@ public class Cycic extends ViewBase{
 	/**
 	 * 
 	 */
-	public void details(){
+	public static void details(){
+	    TextField duration = VisFunctions.numberField();
+		ComboBox<String> startMonth = new ComboBox<String>();
+		TextField startYear = VisFunctions.numberField();
+		TextArea description = new TextArea();
+		ComboBox<String> decay = new ComboBox<String>();
+		TextField simHandle = new TextField();
+		
+		
 		Label simDets = new Label("Simulation Details");
 		simDets.setTooltip(new Tooltip("The top level details of the simulation."));
 		simDets.setFont(new Font("Times", 16));
 		simInfo.add(simDets, 0, 0, 2, 1);
+		
+		Button clear = new Button("Clear Scenario");
+		clear.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+			      Dialog<ButtonType> dg = new Dialog();
+			      dg.setTitle("Scenario Clear");
+			      dg.setHeaderText("Warning: You will lose all unsaved work");
+			      dg.setContentText("Are you sure you want to clear the scenario?");
+			      dg.getDialogPane().getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+			      Optional<ButtonType> result = dg.showAndWait();
+			      if(result.get() == ButtonType.YES){
+			    	  clearScenario();	
+			    	  Cycic.details();
+			    	  VisFunctions.redrawPane();
+			    	  VisFunctions.redrawInstitPane();
+			    	  VisFunctions.redrawRegionPane();
+			    	  buildCommodPane();
+			    	  
+			    	  
+			      }
+			}
+		});
+		simInfo.add(clear, 4, 0);
+		
 		duration.setMaxWidth(150);
 		duration.setPromptText("Length of Simulation");
 		duration.setText(Cycic.workingScenario.simulationData.duration);
@@ -903,7 +929,7 @@ public class Cycic extends ViewBase{
                         String metadata = new String();
                         while ((line = metaBuf.readLine()) != null) {metadata += line;}
                         metaBuf.close();
-                        DataArrays.retrieveSchema(metadata);
+                        DataArrays.retrieveSchema(metadata, "facility");
                     } catch (IOException ex) {
                         log.error(ex.getMessage());
 //                        ex.printStackTrace();
@@ -922,7 +948,7 @@ public class Cycic extends ViewBase{
 		                        public void changed(ObservableValue<? extends Status> observable,
 		                            Status oldValue, Status newValue) {
 		                            if (newValue == Status.READY) {
-		                                DataArrays.retrieveSchema(_remoteDashA.getStdout());
+		                                DataArrays.retrieveSchema(_remoteDashA.getStdout(), "facility");
 		                            }
 		                        }
 	                    });
@@ -978,6 +1004,27 @@ public class Cycic extends ViewBase{
 				break;
 			}
 		}
+	}
+	
+	public static void clearScenario(){
+		CycicScenarios.workingCycicScenario.Recipes.clear();
+		CycicScenarios.workingCycicScenario.institNodes.clear();
+		CycicScenarios.workingCycicScenario.regionNodes.clear();
+		CycicScenarios.workingCycicScenario.FacilityNodes.clear();
+		CycicScenarios.workingCycicScenario.CommoditiesList.clear();
+		CycicScenarios.workingCycicScenario.Links.clear();
+		CycicScenarios.workingCycicScenario.RecipesList.clear();
+		CycicScenarios.workingCycicScenario.FacilityTypes.clear();
+		clearSimDetails();
+	}
+	
+	public static void clearSimDetails(){
+		CycicScenarios.workingCycicScenario.simulationData.decay = "never";
+		CycicScenarios.workingCycicScenario.simulationData.description = "";
+		CycicScenarios.workingCycicScenario.simulationData.duration = null;
+		CycicScenarios.workingCycicScenario.simulationData.simHandle = null;
+		CycicScenarios.workingCycicScenario.simulationData.startMonth = "January";
+		CycicScenarios.workingCycicScenario.simulationData.startYear = null;
 	}
 	
 }

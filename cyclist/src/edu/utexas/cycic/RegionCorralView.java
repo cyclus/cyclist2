@@ -84,7 +84,7 @@ public class RegionCorralView extends ViewBase {
 	public RegionCorralView() {
 		super(); 
 		
-		DataArrays.cycicInitLoader();
+		DataArrays.cycicInitLoader("region");
 
 		// Create content for RegionCorralView header 
 		final Label regionLabel = new Label("Region Name:");

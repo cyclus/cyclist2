@@ -90,7 +90,7 @@ public class InstitutionCorralView extends ViewBase{
 	public InstitutionCorralView(){
 		super();
 
-		DataArrays.cycicInitLoader();
+		DataArrays.cycicInitLoader("institution");
 
 		TextField institName = new TextField();
 		
