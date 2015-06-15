@@ -280,11 +280,7 @@ public class OutPut {
 			isotope.appendChild(isoID);
 			
 			Element isoComp = doc.createElement("comp");
-			if (recipe.Basis.equalsIgnoreCase("mass")){
-				isoComp.appendChild(doc.createTextNode(String.format("%f2", iso.mass)));
-			} else {
-				isoComp.appendChild(doc.createTextNode(String.format("%f2", iso.atom)));
-			}
+			isoComp.appendChild(doc.createTextNode(String.format("%f2", iso.value)));
 			isotope.appendChild(isoComp);
 		}
 	}
@@ -669,11 +665,7 @@ public class OutPut {
 				Node comp = tempRecipe.getChildNodes().item(j);
 				isotopeData composition = new isotopeData();
 				composition.Name = comp.getChildNodes().item(1).getTextContent();
-				if(recipe.Basis.equalsIgnoreCase("mass")){
-					composition.mass = Double.parseDouble(comp.getChildNodes().item(3).getTextContent());
-				} else {
-					composition.atom = Double.parseDouble(comp.getChildNodes().item(3).getTextContent());
-				}
+				composition.value = Double.parseDouble(comp.getChildNodes().item(3).getTextContent());
 				recipe.Composition.add(composition);
 			}
 			Cycic.workingScenario.Recipes.add(recipe);

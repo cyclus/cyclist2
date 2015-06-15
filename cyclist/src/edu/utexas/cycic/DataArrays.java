@@ -339,7 +339,7 @@ class Nrecipe {
 class isotopeData {
 	String Name = new String();
 	double atom;
-	double mass;
+	double value;
 	
 	
 }

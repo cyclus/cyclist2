@@ -1,5 +1,7 @@
 package edu.utexas.cycic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import edu.utah.sci.cyclist.core.controller.CyclistController;
@@ -8,6 +10,7 @@ import edu.utexas.cycic.FormBuilder;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
@@ -111,7 +114,14 @@ public class CycicCircles{
 		changeNiche.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
 				/** TODO CHANGE NICHE OF CIRCLE */
-				TextInputDialog dg = new TextInputDialog(parent.niche);
+				Object[] skinList = null;
+				for(int i = 0; i < CycicScenarios.workingCycicScenario.visualizationSkins.size(); i++){
+					if(CycicScenarios.workingCycicScenario.visualizationSkins.get(i).name.equals(Cycic.currentSkin)){
+						skinSet skin = CycicScenarios.workingCycicScenario.visualizationSkins.get(i);
+						skinList = skin.images.keySet().toArray();
+					}
+				}
+				ChoiceDialog dg = new ChoiceDialog(circle.niche, skinList);
 				dg.setResizable(true);
 				dg.setContentText("New Niche: ");
 				Optional<String> result = dg.showAndWait();

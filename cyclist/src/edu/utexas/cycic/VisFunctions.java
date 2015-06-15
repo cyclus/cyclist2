@@ -343,6 +343,7 @@ public class VisFunctions {
 		link.target = target;
 		Line line = link.line;
 		link.line.text.setText(commod);
+		link.line.text.setFont(new Font("ComicSans", 14));
 		line.setStartX(source.getCenterX());
 		line.setStartY(source.getCenterY());
 		line.setEndX(target.getCenterX());

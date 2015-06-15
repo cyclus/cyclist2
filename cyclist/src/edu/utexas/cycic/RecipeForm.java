@@ -40,8 +40,6 @@ public class RecipeForm extends ViewBase{
 	
 	private GridPane topRecipeGrid = new GridPane();
 	private GridPane recipeGrid = new GridPane();
-	private ComboBox<String> recipiesList = new ComboBox<String>();
-	private ComboBox<String> basisBox = new ComboBox<String>();
 	private int rowNumber;
 	
 	/**
@@ -49,56 +47,44 @@ public class RecipeForm extends ViewBase{
 	 * or adding a new recipe.
 	 */
 	public void init(){
+		ComboBox<String> recipiesList = new ComboBox<String>();
 		Label isoSelect = new Label("Select Recipe");
 		topRecipeGrid.add(isoSelect, 0, 0);
-		recipiesList.getItems().clear();
-		
-		recipiesList.setOnMouseClicked(new EventHandler<MouseEvent>(){
+		recipiesList.setOnMousePressed(new EventHandler<MouseEvent>(){
 			@Override
 			public void handle(MouseEvent e){
 				recipiesList.getItems().clear();
 				for(int i = 0; i < CycicScenarios.workingCycicScenario.Recipes.size(); i++){
 					recipiesList.getItems().add(CycicScenarios.workingCycicScenario.Recipes.get(i).Name);
 				}
-				recipiesList.getItems().add("Add New Recipe");
 			}
 		});
 		recipiesList.setPromptText("Select a Recipe");
-		
-		recipiesList.valueProperty().addListener(new ChangeListener<String>(){ 
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-				if (newValue == null) {
-					// Do nothing
-				} else if (newValue == "Add New Recipe") {
-					rowNumber = 3;
-					Nrecipe recipe = new Nrecipe();
-					CycicScenarios.workingCycicScenario.Recipes.add(recipe);
-					recipeGenInfo(recipe);
-				} else {
-					for(Nrecipe recipe: CycicScenarios.workingCycicScenario.Recipes) {
-						if (recipe.Name == newValue) {
-							loadRecipe(recipe);
+		recipiesList.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+				if(recipiesList.getValue() != null){
+					if(!recipiesList.getValue().equals("")){
+						for(Nrecipe recipe: CycicScenarios.workingCycicScenario.Recipes) {
+							if (recipe.Name.equals(recipiesList.getValue())) {
+								loadRecipe(recipe);
+							}
 						}
 					}
 				}
-			}
+			}	
 		});
 		topRecipeGrid.add(recipiesList, 1, 0);
 		
-		Button removeRecipeButt = new Button();
-		removeRecipeButt.setText("Remove Recipe");
-		removeRecipeButt.setOnAction(new EventHandler<ActionEvent>(){
-			public void handle(ActionEvent event){
-				recipeGrid.getChildren().clear();
-				if (recipiesList.getValue() == "Add New Recipe"){
-					// Do nothing
-				} else {
-					CycicScenarios.workingCycicScenario.Recipes.remove(recipiesList.getItems().indexOf(recipiesList.getValue()));
-				}
+		Button addRecipe = new Button("Add Recipe");
+		addRecipe.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+				rowNumber = 3;
+				Nrecipe recipe = new Nrecipe();
+				CycicScenarios.workingCycicScenario.Recipes.add(recipe);
+				recipeGenInfo(recipe);				
 			}
 		});
-		topRecipeGrid.add(removeRecipeButt, 2, 0);
+		topRecipeGrid.add(addRecipe, 2, 0);
 	}
 	
 	/**
@@ -118,20 +104,36 @@ public class RecipeForm extends ViewBase{
 		});
 		recipeGrid.add(name, 0, 0);
 		recipeGrid.add(recipeName, 1, 0);
-
+		Button removeRecipeButt = new Button();
+		removeRecipeButt.setText("Remove Recipe");
+		removeRecipeButt.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent event){
+				for(Nrecipe recipe: CycicScenarios.workingCycicScenario.Recipes){
+					if(recipe.Name.equals(recipeName.getText())){
+						CycicScenarios.workingCycicScenario.Recipes.remove(recipe);
+						break;
+					}
+				}
+				recipeGrid.getChildren().clear();
+			}
+		});
+		recipeGrid.add(removeRecipeButt, 2, 0);
+		ComboBox<String> basisBox = new ComboBox<String>();
 		String saveBasis = recipe.Basis;  // cache basis so it doesn't get rest by the clear()
 		Label basis = new Label("Basis");
 		recipeGrid.add(basis, 0, 1);
 		basisBox.getItems().clear();
 		basisBox.getItems().add("atom");
 		basisBox.getItems().add("mass");
-
+		basisBox.setPromptText("Select Basis");
+		basisBox.setValue(saveBasis);
 		basisBox.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-				recipe.Basis = basisBox.getValue();
+				if(newValue != null){
+					recipe.Basis = basisBox.getValue();	
+				}
 			}
 		});
-		basisBox.setValue(saveBasis);
 		recipeGrid.add(basisBox, 1, 1);
 		
 		Label isotope = new Label("Isotopes");
@@ -180,27 +182,13 @@ public class RecipeForm extends ViewBase{
 					super.replaceText(start, end, text);
 				}
 			}
-			
-			public void replaceSelection(String text) {
-				if (!text.matches("[a-z]")){
-					super.replaceSelection(text);
-				}
-			}
 		};
 		// Determining if mass or atom needs to be used. 
-		if (basisBox.getValue() == "mass"){
-			isoWeightFrac.textProperty().addListener(new ChangeListener<String>(){
-				@Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-					isoData.mass = Double.parseDouble(newValue);
-				}
-			});
-		} else {
-			isoWeightFrac.textProperty().addListener(new ChangeListener<String>(){
-				@Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-					isoData.atom = Double.parseDouble(newValue);
-				}
-			});
-		}
+		isoWeightFrac.textProperty().addListener(new ChangeListener<String>(){
+			@Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
+				isoData.value = Double.parseDouble(newValue);
+			}
+		});
 		isoWeightFrac.setPromptText("0.0");
 		recipeGrid.add(isoWeightFrac, 3, rowNumber);
 		recipeGrid.add(removeIsotope(recipe, isoData), 4, rowNumber);
@@ -260,29 +248,13 @@ public class RecipeForm extends ViewBase{
 						super.replaceText(start, end, text);
 					}
 				}
-				
-				/*public void replaceSelection(String text) {
-					if (!text.matches("[a-z]")){
-						super.replaceSelection(text);
-					}
-				}*/
 			};
-			if (basisBox.getValue() == "mass"){
-				isoWeightFrac.textProperty().addListener(new ChangeListener<String>(){
-					@Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-						iso.mass = Double.parseDouble(newValue);
-					}
-				});
-				isoWeightFrac.setText(String.valueOf(iso.mass));
-			} else {
-				isoWeightFrac.textProperty().addListener(new ChangeListener<String>(){
-					@Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-						iso.atom = Double.parseDouble(newValue);
-					}
-				});
-				isoWeightFrac.setText(String.valueOf(iso.atom));
-			}
-			
+			isoWeightFrac.textProperty().addListener(new ChangeListener<String>(){
+				@Override public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
+					iso.value = Double.parseDouble(newValue);
+				}
+			});
+			isoWeightFrac.setText(String.valueOf(iso.value));	
 			isoWeightFrac.setMaxSize(80, 20);
 			recipeGrid.add(isoWeightFrac, 3, rowNumber);
 			recipeGrid.add(removeIsotope(recipe, iso), 4, rowNumber);
