@@ -1,9 +1,7 @@
 package edu.utexas.cycic;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -30,7 +28,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
@@ -60,15 +57,12 @@ import org.apache.log4j.Logger;
 import edu.utah.sci.cyclist.Cyclist;
 import edu.utah.sci.cyclist.core.controller.CyclistController;
 import edu.utah.sci.cyclist.core.event.dnd.DnD;
-import edu.utah.sci.cyclist.core.event.dnd.DnD.LocalClipboard;
-import edu.utah.sci.cyclist.core.event.notification.CyclistNotification;
 import edu.utah.sci.cyclist.core.model.CyclusJob;
 import edu.utah.sci.cyclist.core.model.CyclusJob.Status;
 import edu.utah.sci.cyclist.core.model.Preferences;
 import edu.utah.sci.cyclist.core.ui.components.ViewBase;
 import edu.utah.sci.cyclist.core.util.AwesomeIcon;
 import edu.utah.sci.cyclist.core.util.GlyphRegistry;
-import edu.utexas.cycic.presenter.CycicPresenter;
 
 public class Cycic extends ViewBase{
 	static Logger log = Logger.getLogger(Cycic.class);

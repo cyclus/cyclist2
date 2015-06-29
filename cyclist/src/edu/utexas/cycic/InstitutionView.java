@@ -201,8 +201,6 @@ public class InstitutionView extends ViewBase {
 						columnNumber -= 1;
 					}
 				} else if (facArray.get(2).toString().equalsIgnoreCase("oneOrMoreMap")){
-					//facArray = (ArrayList<Object>) facArray.get(1);
-					//dataArray = (ArrayList<Object>) dataArray.get(0);
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = new Label((String) facArray.get(0));
 						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){

@@ -121,7 +121,7 @@ public class CycicCircles{
 						skinList = skin.images.keySet().toArray();
 					}
 				}
-				ChoiceDialog dg = new ChoiceDialog(circle.niche, skinList);
+				ChoiceDialog<String> dg = new ChoiceDialog(circle.niche, skinList);
 				dg.setResizable(true);
 				dg.setContentText("New Niche: ");
 				Optional<String> result = dg.showAndWait();
