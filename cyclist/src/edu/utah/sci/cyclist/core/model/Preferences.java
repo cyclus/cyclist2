@@ -1,7 +1,5 @@
 package edu.utah.sci.cyclist.core.model;
 
-import java.awt.datatransfer.StringSelection;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.collections.FXCollections;
@@ -22,7 +20,8 @@ public class Preferences {
 	private boolean _dirty = false;
     private int _currentServer = 0;
     private ObservableList<String> _servers = FXCollections.observableArrayList();
-
+    private String _cyclus = "cyclus";
+    
     private Preferences() {
     	_servers.addListener(new InvalidationListener() {
 			@Override
@@ -57,6 +56,15 @@ public class Preferences {
 		_dirty = true;
 	}
 	
+	public String getCyclusPath() {
+		return _cyclus;
+	}
+	
+	public void setCyclusPath(String path) {
+		_cyclus = path;
+		_dirty = true;
+	}
+	
 	public boolean isDirty() {
 		return _dirty;
 	}
@@ -71,6 +79,9 @@ public class Preferences {
 			if (server != "")
 				m.createChild("server").putTextData(server);
 		}
+		
+		memento.createChild("cyclus").putString("path", _cyclus);
+		
 		_dirty = false;
 	}
 	
@@ -95,6 +106,10 @@ public class Preferences {
 			}
 		}
 		
+		IMemento c = memento.getChild("cyclus");
+		if (c != null) {
+			_cyclus = c.getString("path");
+		}
 		_dirty = prev;
 	}
 }

@@ -815,7 +815,7 @@ public class Cycic extends ViewBase{
                   // BufferedWriter output = new BufferedWriter(new FileWriter(temp));
                   // output.write(OutPut.xmlStringGen());
                   // output.close();
-                  Process p = Runtime.getRuntime().exec("cyclus -o " + outfile + " " + infile);
+                  Process p = Runtime.getRuntime().exec(Preferences.getInstance().getCyclusPath()+" -o " + outfile + " " + infile);
                   p.waitFor();
                   String line = null;
                   BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -897,7 +897,7 @@ public class Cycic extends ViewBase{
                 if (Preferences.LOCAL_SERVER.equals(currentServer)) {
                     // Local metadata collection
                     try {
-                        Process readproc = Runtime.getRuntime().exec("cyclus -m");
+                        Process readproc = Runtime.getRuntime().exec(Preferences.getInstance().getCyclusPath()+" -m");
                         BufferedReader metaBuf = new BufferedReader(new InputStreamReader(readproc.getInputStream()));
                         String line=null;
                         String metadata = new String();
