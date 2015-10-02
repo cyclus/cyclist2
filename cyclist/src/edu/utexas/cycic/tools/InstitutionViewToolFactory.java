@@ -12,6 +12,16 @@ public class InstitutionViewToolFactory implements ToolFactory {
 	}
 
 	@Override
+	public String getToolType() {
+		return InstitutionViewTool.TYPE;
+	}
+	
+	@Override
+	public boolean isUserLevel() {
+		return true;
+	}
+	
+	@Override
 	public AwesomeIcon getIcon() {
 		return InstitutionViewTool.ICON;
 	}

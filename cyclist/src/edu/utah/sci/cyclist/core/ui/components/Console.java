@@ -1,38 +1,80 @@
 package edu.utah.sci.cyclist.core.ui.components;
 
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.application.Platform;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.ErrorHandler;
 import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
 
 public class Console extends ScrollPane {
-	private TextArea _text;
-    private String _current;
-	
+	private TextFlow _textFlow;
+    private Map<Level, Color> _colors = new HashMap<>();
+    private Map<Level, String> _prefix = new HashMap<>();
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[hh:mm]");
+    private Font regular = Font.getDefault();
+    private Font bold = Font.font(regular.getFamily(), FontWeight.BOLD, regular.getSize());
+
+    private boolean active = true;
+    
 	public Console() {
 		super();
 		build();
 		init();
 	}
 	
-	private void init() {
-		Logger.getRootLogger().addAppender(new CyclistAppender());
+	public void setActive(boolean value) {
+		active = value;
 	}
 	
+	//	TODO: upgrade to Log4j2.x
+	private void init() {
+		Logger.getRootLogger().addAppender(new CyclistAppender());
+		
+		_colors.put(Level.FATAL, Color.RED);
+		_colors.put(Level.ERROR, Color.RED);
+		_colors.put(Level.WARN, Color.BLACK);
+		_colors.put(Level.INFO, Color.BLACK);
+		_colors.put(Level.DEBUG, Color.BLUE);
+		_colors.put(Level.TRACE, Color.GRAY);
+		_colors.put(Level.ALL, Color.GRAY);	
+		
+		_prefix.put(Level.FATAL, "FATAL: ");
+		_prefix.put(Level.ERROR, "Error: ");
+		_prefix.put(Level.WARN, "Warning: ");
+		_prefix.put(Level.INFO, "");
+		_prefix.put(Level.DEBUG, "");
+		_prefix.put(Level.TRACE, "");
+		_prefix.put(Level.ALL, "");	
+	}
+
 	private void build() {
 		getStyleClass().add("console");
         setFitToWidth(true);
         setFitToHeight(true);
 		setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
-		_text = new TextArea();
-		setContent(_text);
+		_textFlow = new TextFlow();
+		setContent(_textFlow);
+	}
+	
+	private Color color(Level level) {
+		Color c = _colors.get(level);
+		return c != null ? c : _colors.get(Level.ALL);  
 	}
 	
 	class CyclistAppender implements Appender {
@@ -57,16 +99,32 @@ public class Console extends ScrollPane {
 		}
 
         @Override
-        public void doAppend(LoggingEvent event) {
-            StringBuilder builder = new StringBuilder();
-            _current = builder.append(_current).append(event.getMessage()).append("\n").toString();
-            Platform.runLater(new Runnable() {                          
-                @Override
-                public void run() {
-                    _text.setText(_current);
-                    _text.end();
-                }
-            });
+        public void doAppend(LoggingEvent e) {
+        	if (!active) return;
+        	
+            StringBuilder builder = new StringBuilder()
+            	.append(" [")
+            	.append(LocalTime.now().format(formatter))
+            	.append("] ")
+            	.append(_prefix.get(e.getLevel()))
+            	.append(": ")
+            	.append(e.getMessage())
+            	.append("\n");
+            
+        	Text text = new Text(builder.toString());
+        	text.setFill(color(e.getLevel()));
+        	text.setFont(e.getLevel() == Level.WARN ? bold : regular);
+        	
+        	_textFlow.getChildren().add(text);
+        	
+        	final Console self = Console.this;
+    		Platform.runLater(new Runnable() {	
+    			@Override
+    			public void run() {
+    				self.setVvalue(1);
+    			}
+    		});
+        	
         }
 
 		@Override

@@ -11,6 +11,16 @@ public class InstitutionCorralViewToolFactory implements ToolFactory {
 	}
 	
 	@Override
+	public String getToolType() {
+		return InstitutionCorralViewTool.TYPE;
+	}
+	
+	@Override
+	public boolean isUserLevel() {
+		return true;
+	}
+	
+	@Override
 	public Tool create() {
 		return new InstitutionCorralViewTool();
 	}

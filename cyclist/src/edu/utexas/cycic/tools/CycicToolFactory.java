@@ -12,6 +12,16 @@ public class CycicToolFactory implements ToolFactory {
 	}
 
 	@Override
+	public String getToolType() {
+		return CycicTool.TYPE;
+	}
+
+	@Override
+	public boolean isUserLevel() {
+		return true;
+	}
+	
+	@Override
 	public AwesomeIcon getIcon() {
 		return CycicTool.ICON;
 	}
@@ -20,7 +30,4 @@ public class CycicToolFactory implements ToolFactory {
 	public Tool create() {
 		return new CycicTool();
 	}
-
-
-
 }

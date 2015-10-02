@@ -1,5 +1,6 @@
 package edu.utexas.cycic.tools;
 
+import edu.utah.sci.cyclist.ToolsLibrary;
 import edu.utah.sci.cyclist.core.event.notification.EventBus;
 import edu.utah.sci.cyclist.core.presenter.ViewPresenter;
 import edu.utah.sci.cyclist.core.tools.Tool;
@@ -12,6 +13,7 @@ public class SimulationInfoTool implements Tool {
 
 	public static final String ID 			= "edu.utexas.cycic.SimulationInfoTool";
 	public static final String TOOL_NAME 	= "CycIC - Commodities and Details";
+    public static final String TYPE			= ToolsLibrary.SCENARIO_TOOL;
 	public static final AwesomeIcon ICON 	= AwesomeIcon.EYE;
 	
 	private View _view = null;
@@ -25,6 +27,11 @@ public class SimulationInfoTool implements Tool {
 	@Override
 	public String getName() {
 		return TOOL_NAME;
+	}
+	
+	@Override
+	public boolean isUserLevel() {
+		return true;
 	}
 
 	@Override

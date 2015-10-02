@@ -3,7 +3,6 @@ package edu.utexas.cycic;
 import java.io.File;
 import java.util.ArrayList;
 
-import edu.utah.sci.cyclist.core.presenter.SelectionModel;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -11,14 +10,10 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Shape;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -105,6 +100,29 @@ public class FormBuilderFunctions {
 	 * @param node
 	 * @return
 	 */
+	static TextField lifetimeFieldBuilder(final facilityNode node){
+		TextField textField = new TextField() {
+			@Override public void replaceText(int start, int end, String text) {
+				if (!text.matches("[a-z]")){
+					super.replaceText(start, end, text);
+				}
+			}
+		};
+		textField.setText((String)node.facLifetime);
+		
+		textField.textProperty().addListener(new ChangeListener<String>(){         
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
+				node.facLifetime = newValue;
+			}
+		});
+		return textField;
+	}
+
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
 	static TextField nameFieldBuilder(final facilityNode node){
 		TextField textField = new TextField();
 		textField.setText((String)node.name);
@@ -139,8 +157,8 @@ public class FormBuilderFunctions {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				node.name = (String) newValue;
 
-				regionNode.regionCircle.name.equals(newValue);
-				regionNode.regionCircle.text.setText(newValue);
+				regionNode.regionShape.name.equals(newValue);
+				regionNode.regionShape.text.setText(newValue);
 			}
 		});
 		return textField;
@@ -281,19 +299,21 @@ public class FormBuilderFunctions {
 		cb.setMinWidth(80);
 		cb.setOnMousePressed(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
-				for(int i =0; i < facNode.cycicCircle.incommods.size(); i++){
+				/*for(int i =0; i < facNode.cycicCircle.incommods.size(); i++){
 					if(facNode.cycicCircle.incommods.get(i) == cb.getValue()){
 						facNode.cycicCircle.incommods.remove(i);
 					}
-				}
+				}*/
 				cb.getItems().clear();
 
 				for(CommodityNode label: DataArrays.CommoditiesList){
-					cb.getItems().add(label.name.getText());
+					if(!label.name.getText().equalsIgnoreCase("")){
+						cb.getItems().add(label.name.getText());
+					}
 				}
 				cb.getItems().add("New Commodity");
 				
-				if(!defaultValue.get(0).equals("")) {
+				if(defaultValue.get(0) != null) {
 					cb.setValue((String) defaultValue.get(0));
 				}
 			}
@@ -304,7 +324,14 @@ public class FormBuilderFunctions {
 		cb.setPromptText("Select a commodity");
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-				if (newValue == "New Commodity"){
+				if(newValue == null || newValue.equalsIgnoreCase("")){
+					for (int i = 0; i < facNode.cycicCircle.incommods.size(); i++) {
+						if (facNode.cycicCircle.incommods.get(i).equals((String) oldValue)){
+							facNode.cycicCircle.incommods.remove(i);
+							break;
+						}
+					}
+				} else if (newValue == "New Commodity"){
 					Cycic.addNewCommodity();
 				} else {
 					facNode.cycicCircle.incommods.add(newValue);
@@ -313,8 +340,8 @@ public class FormBuilderFunctions {
 						facArray.set(10, true);
 					}
 					for (int i = 0; i < facNode.cycicCircle.incommods.size(); i++) {
-						if (facNode.cycicCircle.incommods.get(i) == (String) oldValue){
-							facNode.cycicCircle.incommods.remove(i);
+						if (facNode.cycicCircle.incommods.get(i).equals((String) oldValue)){
+							String string = facNode.cycicCircle.incommods.remove(i);
 							break;
 						}
 					}
@@ -340,18 +367,20 @@ public class FormBuilderFunctions {
 				
 		cb.setOnMousePressed(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
-					for(int i = 0; i < facNode.cycicCircle.outcommods.size(); i++){
-						if(facNode.cycicCircle.outcommods.get(i) == cb.getValue()){
-							facNode.cycicCircle.outcommods.remove(i);
-						}
+				/*for(int i = 0; i < facNode.cycicCircle.outcommods.size(); i++){
+					if(facNode.cycicCircle.outcommods.get(i) == cb.getValue()){
+						facNode.cycicCircle.outcommods.remove(i);
 					}
+				}*/
 				cb.getItems().clear();
 				for (CommodityNode label: DataArrays.CommoditiesList){
-					cb.getItems().add(label.name.getText());
+					if(!label.name.getText().equalsIgnoreCase("")){
+						cb.getItems().add(label.name.getText());
+					}
 				}
 				cb.getItems().add("New Commodity");
 				
-				if (defaultValue.get(0) != "") {
+				if (defaultValue.get(0) != null) {
 					cb.setValue((String) defaultValue.get(0));
 				}
 			}
@@ -362,7 +391,14 @@ public class FormBuilderFunctions {
 		cb.setPromptText("Select a commodity");
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-				if (newValue == "New Commodity"){
+				if(newValue == null || newValue.equalsIgnoreCase("")){
+					for (int i = 0; i < facNode.cycicCircle.outcommods.size(); i++) {
+						if (facNode.cycicCircle.outcommods.get(i).equals((String) oldValue)){
+							facNode.cycicCircle.outcommods.remove(i);
+							break;
+						}
+					}
+				} else if (newValue == "New Commodity"){
 					Cycic.addNewCommodity(); 
 				} else {
 					facNode.cycicCircle.outcommods.add(newValue);
@@ -371,7 +407,7 @@ public class FormBuilderFunctions {
 						facArray.set(10, true);
 					}
 					for (int i = 0; i < facNode.cycicCircle.outcommods.size(); i++) {
-						if (facNode.cycicCircle.outcommods.get(i) == (String) oldValue){
+						if (facNode.cycicCircle.outcommods.get(i).equals((String) oldValue)){
 							facNode.cycicCircle.outcommods.remove(i);
 							break;
 						}
@@ -431,17 +467,24 @@ public class FormBuilderFunctions {
 			public void handle(MouseEvent e){
 				cb.getItems().clear();
 				for (CommodityNode label: DataArrays.CommoditiesList){
-					cb.getItems().add(label.name.getText());
+					if(!label.name.getText().equalsIgnoreCase("")){
+						cb.getItems().add(label.name.getText());
+					}
 				}
-				//cb.getItems().add("New Commodity");
+				cb.getItems().add("New Commodity");
 			}
 		});
 		
 		cb.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-				defaultValue.set(0, newValue);
-				if((Boolean) facArray.get(10) == false){
-					facArray.set(10, true);
+				if(newValue == null || newValue.equalsIgnoreCase("")){
+				} else if (newValue == "New Commodity"){
+					Cycic.addNewCommodity(); 
+				} else {
+					defaultValue.set(0, newValue);
+					if((Boolean) facArray.get(10) == false){
+						facArray.set(10, true);
+					}
 				}
 			}
 		});

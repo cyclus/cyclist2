@@ -12,6 +12,16 @@ public class FormBuilderToolFactory implements ToolFactory {
 	}
 
 	@Override
+	public String getToolType() {
+		return FormBuilderTool.TYPE;
+	}
+	
+	@Override
+	public boolean isUserLevel() {
+		return true;
+	}
+	
+	@Override
 	public AwesomeIcon getIcon() {
 		return FormBuilderTool.ICON;
 	}

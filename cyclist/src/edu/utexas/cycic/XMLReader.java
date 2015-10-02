@@ -23,20 +23,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import edu.utah.sci.cyclist.Cyclist;
+
 
 
 public class XMLReader {
-	/**
-	 * 
-	 */
-	static skinSet SC2 = new skinSet(){
-		{
-			name = "SC2";
-			images.put("reactor", new Image(new File("skinImages/reactor.png").toURI().toString()));
-			images.put("facility", new Image(new File("skinImages/sourceFacSC2.jpg").toURI().toString()));
-		}
-	};
-	
 	/**
 	 * 
 	 * @param path
@@ -48,14 +39,14 @@ public class XMLReader {
 				name = "DSARR";
 				radius = 45;
 				textPlacement = "bottom";
-				images.put("abr", new Image(new File(path + "/skinImages/fuelcycle_abr.png").toURI().toString(), 100, 100, false, false));
-				images.put("facility", new Image(new File(path + "/skinImages/fuelcycle_enr.png").toURI().toString()));
-				images.put("fuel fabrication", new Image(new File(path + "/skinImages/fuelcycle_fab.png").toURI().toString(), 100, 100, false, false));
-				images.put("repository", new Image(new File(path + "/skinImages/fuelcycle_geo.png").toURI().toString()));
-				images.put("mine", new Image(new File(path + "/skinImages/fuelcycle_mine.png").toURI().toString()));
-				images.put("reactor", new Image(new File(path + "/skinImages/fuelcycle_rxtr.png").toURI().toString(), true));
-				images.put("reprocessing", new Image(new File(path + "/skinImages/fuelcycle_sep.png").toURI().toString()));
-				images.put("separations", new Image(new File(path + "/skinImages/fuelcycle_sep.png").toURI().toString()));
+				images.put("abr", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_abr.png").toExternalForm()));
+				images.put("facility", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_enr.png").toExternalForm()));
+				images.put("fuel fabrication", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_fab.png").toExternalForm()));
+				images.put("repository", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_geo.png").toExternalForm()));
+				images.put("mine", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_mine.png").toExternalForm()));
+				images.put("reactor", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_rxtr.png").toExternalForm()));
+				images.put("reprocessing", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_sep.png").toExternalForm()));
+				images.put("separations", new Image(Cyclist.class.getResource("assets/skinImages/"+this.name+"/fuelcycle_sep.png").toExternalForm()));
 			}
 		};
 		return skin;
@@ -81,8 +72,7 @@ public class XMLReader {
 			add("StubFacility:StubFacility:StubFacility");
 			add(":cycaless:BatchReactor");
 			add(":cycamore:BatchReactor");
-			//add(":cycamore:DeployInst");
-			//add(":cycamore:Separations");
+			add(":cycaless:DeplayInst");
 			add("commodconverter:CommodConverter:CommodConverter");
 		}
 	};
@@ -230,7 +220,6 @@ public class XMLReader {
 				JsonArray defType = null;
 				if(anno1.get("default") != null){
 					if(anno1.get("default").getValueType() == JsonValue.ValueType.OBJECT){
-						System.out.println("OBJECT "  + anno1.getJsonObject("default"));
 						JsonObject defTypeObj = anno1.getJsonObject("default");
 						if(defTypeObj.size() == 0){
 							defType = Json.createArrayBuilder()
@@ -244,7 +233,6 @@ public class XMLReader {
 							//TODO add method for walking arrays. 
 						}
 					} else if(anno1.get("default").getValueType() == JsonValue.ValueType.ARRAY){
-						System.out.println("ARRAY "  + anno1.getJsonArray("default"));
 						JsonArray defTypeArray = anno1.getJsonArray("default");
 						if(defTypeArray.size() == 0){
 							defType = Json.createArrayBuilder()
@@ -255,9 +243,7 @@ public class XMLReader {
 							//TODO add method for walking arrays
 						}
 					} else if(anno1.get("default").getValueType() == JsonValue.ValueType.STRING){
-						System.out.println("STRING "  + anno1.getJsonString("default"));
 					} else if(anno1.get("default").getValueType() == JsonValue.ValueType.NUMBER){
-						System.out.println("NUMBER "  + anno1.getJsonNumber("default"));
 					} 
 				}
 				JsonArray userLevel = anno1.getJsonArray("userlevel");

@@ -273,8 +273,11 @@ public class Field implements Resource {
     		for(IMemento entry:entries) {
     			String key = entry.getString("key");
     			String cls = entry.getString("class");
-    							
-    			if((String.class.toString().equals(cls))){
+    						
+    			if (cls == null) {
+    				set(key, cls);
+    			} 
+    			else if((String.class.toString().equals(cls))){
     				String value = entry.getTextData();
     				set(key, value);
     			}

@@ -1,5 +1,6 @@
 package edu.utexas.cycic.tools;
 
+import edu.utah.sci.cyclist.ToolsLibrary;
 import edu.utah.sci.cyclist.core.event.notification.EventBus;
 import edu.utah.sci.cyclist.core.presenter.ViewPresenter;
 import edu.utah.sci.cyclist.core.tools.Tool;
@@ -12,6 +13,7 @@ public class TimelineDisplayTool implements Tool {
 
 	public static final String ID 			= "edu.utexas.cycic.TimelineDisplayTool";
 	public static final String TOOL_NAME 	= "Timeline";
+    public static final String TYPE			= ToolsLibrary.SCENARIO_TOOL;
 	public static final AwesomeIcon ICON 	= AwesomeIcon.QUESTION_CIRCLE;
 	
 	private View _view = null;
@@ -27,6 +29,11 @@ public class TimelineDisplayTool implements Tool {
 		return TOOL_NAME;
 	}
 
+	@Override
+	public boolean isUserLevel() {
+		return true;
+	}
+	
 	@Override
 	public View getView() {
 		if (_view == null) 

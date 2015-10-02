@@ -30,6 +30,7 @@ public interface Tool {
 
 	String getId();
 	String getName();
+	boolean isUserLevel();
 	View getView();
 	ViewPresenter getPresenter(EventBus bus);
 }

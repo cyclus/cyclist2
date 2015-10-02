@@ -11,8 +11,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -37,24 +37,12 @@ public class InstitutionShape extends Ellipse {
 				boolean test = false;
 				if(event.getDragboard().hasContent(CycICDnD.UNASSOC_FAC)){
 					String facName = event.getDragboard().getContent(CycICDnD.UNASSOC_FAC).toString();
-					if(institBackTrace.availFacilities.size() > 0){
-						for(facilityItem fac: institBackTrace.availFacilities){
-							if(facName.equalsIgnoreCase(fac.name)){
-								int temp  = Integer.parseInt(fac.number);
-								temp += 1;
-								fac.number = String.valueOf(temp);
-								test = true;
-							}
-							if (test == false){
-								facilityItem temp_fac = new facilityItem(facName, 1);
-								institBackTrace.availFacilities.add(temp_fac);
-							}
-						}
-					} else {
-						facilityItem temp_fac = new facilityItem(facName, 1);
-						institBackTrace.availFacilities.add(temp_fac);
-					}
-					event.consume();
+                    Integer numFac = 1;
+                    if (institBackTrace.availFacilities.containsKey(facName)) {
+                            numFac = numFac + institBackTrace.availFacilities.get(facName);
+                    }
+                    institBackTrace.availFacilities.put(facName, numFac);
+                    event.consume();
 				} else {
 					event.consume();
 				}
@@ -69,7 +57,7 @@ public class InstitutionShape extends Ellipse {
 	protected static double deltay;
 	Object name;
 	Label text = new Label("");
-	MenuBar menuBar = new MenuBar();
+	ContextMenu menu;
 	static instituteNode institBackTrace;
 	ArrayList<Integer> rgbColor = new ArrayList<Integer>();
 	
@@ -104,56 +92,49 @@ public class InstitutionShape extends Ellipse {
 
 		//Adding the circle's menu and its functions.
 
-		MenuItem regionForm = new MenuItem("Region Form");
+		MenuItem regionForm = new MenuItem("Configure");
 		regionForm.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent event){
-				CyclistController._presenter.addTool(new RegionViewTool());
-				institution.menuBar.setVisible(false);
+				CyclistController._presenter.addTool(new InstitutionViewTool());
 			}
 		});
+
+        MenuItem helpDialog = new MenuItem("Institution Documentation");
+        helpDialog.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e){
+                FormBuilder.showHelpDialog(instit.doc);
+            }
+        });
+            
 
 		EventHandler<ActionEvent> deleteEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent deleteEvent) {
 				deleteInstitution(institution, instit);
-				institution.menuBar.setVisible(false);
 			}
 		};
 		MenuItem delete = new MenuItem("Delete");
 		delete.setOnAction(deleteEvent);
 
-		EventHandler<ActionEvent> exitEvent = new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent exitEvent) {
-				institution.menuBar.setVisible(false);
-			}
-		};
-		MenuItem exit = new MenuItem("Exit");
-		exit.setOnAction(exitEvent);
-		
-		final Menu menu = new Menu("Options");
-		menu.getItems().addAll(regionForm, delete, exit);		
+		institution.menu = new ContextMenu();
+		institution.menu.getItems().addAll(regionForm, helpDialog, delete);		
 
-		institution.menuBar.getMenus().add(menu);
-		institution.menuBar.setLayoutX(institution.getLayoutX());
-		institution.menuBar.setLayoutY(institution.getLayoutY());
-		institution.menuBar.setVisible(false);
 
 		institution.onMouseClickedProperty().set(new EventHandler <MouseEvent>(){
 			@Override
 			public void handle(MouseEvent menuEvent){
 				if(menuEvent.getButton().equals(MouseButton.SECONDARY)){
-					institution.menuBar.setVisible(true);
-					institution.menuBar.setLayoutX(institution.getLayoutX());
-					institution.menuBar.setLayoutY(institution.getLayoutY());
+					institution.menu.show(institution,menuEvent.getScreenX(),menuEvent.getScreenY());
+					menuEvent.consume();
 				}
 				
 				if(menuEvent.getClickCount() == 2){
                     menuEvent.consume();
 					CyclistController._presenter.addTool(new InstitutionViewTool());
 				}
-				for(int i = 0; i < RegionCorralView.corralPane.getChildren().size(); i++){
-					if(RegionCorralView.corralPane.getChildren().get(i).getId() == "this"){
-						((Shape) RegionCorralView.corralPane.getChildren().get(i)).setStroke(Color.BLACK);
-						((Shape) RegionCorralView.corralPane.getChildren().get(i)).setStrokeWidth(1);
+				for(int i = 0; i < InstitutionCorralView.institutionPane.getChildren().size(); i++){
+					if(InstitutionCorralView.institutionPane.getChildren().get(i).getId() == "this"){
+						((Shape) InstitutionCorralView.institutionPane.getChildren().get(i)).setStroke(Color.BLACK);
+						((Shape) InstitutionCorralView.institutionPane.getChildren().get(i)).setStrokeWidth(1);
 					}
 				}
 				InstitutionCorralView.workingInstitution = instit;
@@ -190,29 +171,28 @@ public class InstitutionShape extends Ellipse {
 		institution.onMouseDraggedProperty().set(new EventHandler<MouseEvent>(){
 			@Override
 			public void handle(MouseEvent event){
-				double tempX = institution.getLayoutX();
-				double tempY = institution.getLayoutY();
-				institution.setLayoutX(x+event.getX());
-				institution.setLayoutY(y+event.getY());
+				//double tempX = institution.getCenterX();
+				//double tempY = institution.getCenterY();
+				institution.setCenterX(x+mousex);
+				institution.setCenterY(y+mousey);
 
-				if(tempX <= InstitutionCorralView.institutionPane.getLayoutBounds().getMinX()){
-					institution.setLayoutX(InstitutionCorralView.institutionPane.getLayoutBounds().getMinX());
+				if(institution.getCenterX() <= InstitutionCorralView.institutionPane.getLayoutBounds().getMinX()+institution.getRadiusX()*0.5){
+					institution.setCenterX(InstitutionCorralView.institutionPane.getLayoutBounds().getMinX()+institution.getRadiusX()*0.5);
 				}
-				if(tempY <= InstitutionCorralView.institutionPane.getLayoutBounds().getMinY()){
-					institution.setLayoutY(InstitutionCorralView.institutionPane.getLayoutBounds().getMinY());
+				if(institution.getCenterY() <= InstitutionCorralView.institutionPane.getLayoutBounds().getMinY()-institution.getRadiusY()*0.2){
+					institution.setCenterY(InstitutionCorralView.institutionPane.getLayoutBounds().getMinY()-institution.getRadiusY()*0.2);
 				}
-				if(tempY >= InstitutionCorralView.institutionPane.getLayoutBounds().getMaxY()-institution.getRadiusY()){
-					institution.setLayoutY(InstitutionCorralView.institutionPane.getLayoutBounds().getMaxY()-institution.getRadiusY());
+				if(institution.getCenterY() >= InstitutionCorralView.institutionPane.getLayoutBounds().getMaxY()-institution.getRadiusY()*2.3){
+					institution.setCenterY(InstitutionCorralView.institutionPane.getLayoutBounds().getMaxY()-institution.getRadiusY()*2.3);
 				}
-				if(tempX >= InstitutionCorralView.institutionPane.getLayoutBounds().getMaxX()-institution.getRadiusX()){
-					institution.setLayoutX(InstitutionCorralView.institutionPane.getLayoutBounds().getMaxX()-institution.getRadiusX());
+				if(institution.getCenterX() >= InstitutionCorralView.institutionPane.getLayoutBounds().getMaxX()-institution.getRadiusX()*1.8){
+					institution.setCenterX(InstitutionCorralView.institutionPane.getLayoutBounds().getMaxX()-institution.getRadiusX()*1.8);
 				}
                 
 				VisFunctions.placeTextOnEllipse(institution,"middle");
 
-				institution.menuBar.setLayoutX(institution.getLayoutX()+institution.getRadiusX()*0.2);
-				institution.menuBar.setLayoutY(institution.getLayoutY()+institution.getRadiusY()*0.2);
-
+				mousex = event.getX();
+				mousey = event.getY();
 			}
 		});
 
@@ -225,15 +205,15 @@ public class InstitutionShape extends Ellipse {
 
 	static void deleteInstitution(InstitutionShape circle, instituteNode instit){
 		DataArrays.institNodes.remove(instit);
-		InstitutionCorralView.institutionPane.getChildren().removeAll(circle, circle.menuBar, circle.text);
+		InstitutionCorralView.institutionPane.getChildren().removeAll(circle, circle.text);
 	};
 
 	{
 		onMousePressedProperty().set(new EventHandler<MouseEvent>(){
 			@Override
 			public void handle(MouseEvent event){
-				x = getLayoutX() - event.getX();
-				y = getLayoutY() - event.getY();
+				x = getCenterX() - event.getX();
+				y = getCenterY() - event.getY();
 				mousex = event.getX();
 				mousey = event.getY();
 			}

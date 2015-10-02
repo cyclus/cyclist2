@@ -10,7 +10,17 @@ public class RecipeFormToolFactory implements ToolFactory {
 	public String getToolName() {
 		return RecipeFormTool.TOOL_NAME;
 	}
-
+	
+	@Override
+	public String getToolType() {
+		return RecipeFormTool.TYPE;
+	}
+	
+	@Override
+	public boolean isUserLevel() {
+		return true;
+	}
+	
 	@Override
 	public AwesomeIcon getIcon() {
 		return RecipeFormTool.ICON;

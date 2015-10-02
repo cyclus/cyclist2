@@ -87,7 +87,7 @@ public class Clones {
 		
 		// Adding the facility menu //
 		final Menu menu1 = new Menu((String) clone.name);
-		MenuItem facForm = new MenuItem("Facility Form");
+		MenuItem facForm = new MenuItem("Configure");
 		MenuItem delete = new MenuItem("Delete");
 		delete.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
@@ -125,7 +125,7 @@ public class Clones {
 					
 					Dragboard db = clone.startDragAndDrop(TransferMode.COPY);
 					ClipboardContent content = new ClipboardContent();				
-					content.put( DnD.TOOL_FORMAT, "Facility Form");
+					content.put( DnD.TOOL_FORMAT, "Configure");
 					db.setContent(content);
 					
 //					DnDIcon.getInstance().show(icon, title);

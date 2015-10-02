@@ -43,14 +43,14 @@ import edu.utah.sci.cyclist.core.util.GlyphRegistry;
 
 public class InputPanel extends TitledPanel {
     public static final String ID = "input-panel";
-    public static final String TITLE = "Scenario Builder";
+    public static final String TITLE = "Views";
 
 
 	public ImageView dragView = new ImageView();
 	public Pane root;
 
     public InputPanel() {
-        super(TITLE, GlyphRegistry.get(AwesomeIcon.SHARE));
+        super(TITLE, GlyphRegistry.get(AwesomeIcon.EDIT));
 	}
 
 	public void setToolFactories(List<ToolFactory> factories) {                

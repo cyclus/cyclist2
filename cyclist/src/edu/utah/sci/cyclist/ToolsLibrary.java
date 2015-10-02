@@ -22,6 +22,10 @@
  *******************************************************************************/
 package edu.utah.sci.cyclist;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import edu.utah.sci.cyclist.core.tools.SimpleToolFactory;
 import edu.utah.sci.cyclist.core.tools.Tool;
 import edu.utah.sci.cyclist.core.tools.ToolFactory;
@@ -31,59 +35,105 @@ import edu.utexas.cycic.tools.InstitutionCorralViewToolFactory;
 //import edu.utexas.cycic.tools.InstitutionCorralViewToolFactory;
 import edu.utexas.cycic.tools.RecipeFormToolFactory;
 import edu.utexas.cycic.tools.RegionCorralViewToolFactory;
-import edu.utexas.cycic.tools.TimelineDisplayToolFactory;
 
 public class ToolsLibrary {
-
-    public static final ToolFactory[] factories = {
-		new SimpleToolFactory("edu.utah.sci.cyclist.core", 
-				"Table", AwesomeIcon.LIST_ALT, 
-				"ui.views.SimpleTableView", 
-				"presenter.TablePresenter"),
-		
-		new SimpleToolFactory("edu.utah.sci.cyclist.core", 
-				"Plot", AwesomeIcon.BAR_CHART_ALT, 
-				"ui.views.ChartView", 
-				"presenter.ChartPresenter"),
-		
-		new SimpleToolFactory("edu.utah.sci.cyclist.neup", 
-				"Flow", AwesomeIcon.RANDOM, 
-				"ui.views.flow.FlowView", 
-				"presenter.NEUPPresenter"),	
-		
-		new SimpleToolFactory("edu.utah.sci.cyclist.neup", 
-				"Inventory", AwesomeIcon.BOOK, 
-				"ui.views.inventory.InventoryView", 
-				"presenter.NEUPPresenter"),
-		
-		new SimpleToolFactory("edu.utah.sci.cyclist.core", 
-				"Workspace", AwesomeIcon.DESKTOP, 
-				"ui.views.Workspace", 
-                "presenter.WorkspacePresenter")
-	};
-
-    public static final ToolFactory[] inputFactories = {
-        new CycicToolFactory(),
-        new InstitutionCorralViewToolFactory(),
-        new RecipeFormToolFactory(),
-        new RegionCorralViewToolFactory(),
-        //new TimelineDisplayToolFactory()
-    };
+	public static final String VIS_TOOL = "vis_tool";
+	public static final String SCENARIO_TOOL = "scenario_tool";
+	
+    private static List<ToolFactory> factories = new ArrayList<>();
+ 
+    public static void register(ToolFactory... list) {
+    	for (ToolFactory factory : list) 
+    		factories.add(factory);
+    }
     
-	public static ToolFactory findFactory(String name) {
-		for (int i=0; i<factories.length; i++) {
-			if (factories[i].getToolName().equals(name))
-				return factories[i];
-		}
-		return null;
+    
+	public static ToolFactory getFactory(String name) {
+		return factories
+				.stream()
+				.filter(f -> f.getToolName().equals(name))
+				.findFirst()
+				.get();
+	}
+	
+	public static List<ToolFactory> getFactoriesOfType(String type) {
+		return factories
+			.stream()
+			.filter(f -> f.getToolType().equals(type))
+			.collect(Collectors.toList());
+	}
+
+	public static List<ToolFactory> getFactoriesOfType(String type, boolean level) {
+		return factories
+			.stream()
+			.filter(f -> f.getToolType().equals(type))
+			.filter(f -> f.isUserLevel() == level)
+			.collect(Collectors.toList());
 	}
 	
 	public static Tool createTool(String name) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 		Tool tool = null;
-		ToolFactory factory = findFactory(name);
+		ToolFactory factory = getFactory(name);
 		if (factory != null)
 			tool = factory.create();
 		return tool;
 	}
 	
+	
+	static {
+		register(
+			new SimpleToolFactory("edu.utah.sci.cyclist.core", 
+					"Table", VIS_TOOL, true, AwesomeIcon.LIST_ALT, 
+					"ui.views.SimpleTableView", 
+					"presenter.TablePresenter"),
+			
+			new SimpleToolFactory("edu.utah.sci.cyclist.core", 
+					"Plot", VIS_TOOL, true, AwesomeIcon.BAR_CHART_ALT, 
+					"ui.views.ChartView", 
+					"presenter.ChartPresenter"),
+			
+			new SimpleToolFactory("edu.utah.sci.cyclist.neup", 
+					"Flow", VIS_TOOL, true, AwesomeIcon.RANDOM, 
+					"ui.views.flow.FlowView", 
+					"presenter.NEUPPresenter"),	
+			
+			new SimpleToolFactory("edu.utah.sci.cyclist.neup", 
+					"Inventory", VIS_TOOL, true, AwesomeIcon.BOOK, 
+					"ui.views.inventory.InventoryView", 
+					"presenter.NEUPPresenter"),
+			
+			new SimpleToolFactory("edu.utah.sci.cyclist.core", 
+					"Workspace", VIS_TOOL, true, AwesomeIcon.DESKTOP, 
+					"ui.views.Workspace", 
+	              "presenter.WorkspacePresenter")
+          );
+		
+		register(
+			new SimpleToolFactory("edu.utexas.cycic",
+					"Cycic", SCENARIO_TOOL, false, AwesomeIcon.EYE,
+					"Cycic",
+					"presenter.CycicPresenter"
+					),
+			new SimpleToolFactory("edu.utexas.cycic",
+					"Institution Corral", SCENARIO_TOOL, true, AwesomeIcon.GLOBE,
+					"InstitutionCorralView",
+					"presenter.InstitutionCorralViewPresenter"
+					),
+					new SimpleToolFactory("edu.utexas.cycic",
+					"Recipe Builder", SCENARIO_TOOL, true, AwesomeIcon.SORT_ALPHA_DESC,
+					"RecipeForm",
+					"presenter.RecipeFormPresenter"
+					),
+			new SimpleToolFactory("edu.utexas.cycic",
+					"Region Corral", SCENARIO_TOOL, true, AwesomeIcon.GLOBE,
+					"RegionCorralView",
+					"presenter.RegionCorralViewPresenter"
+			)
+//	      new CycicToolFactory(),
+//	      new InstitutionCorralViewToolFactory(),
+//	      new RecipeFormToolFactory(),
+//	      new RegionCorralViewToolFactory()
+		);
+	}
+
 } 

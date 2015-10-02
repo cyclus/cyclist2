@@ -66,10 +66,8 @@ public class MemoryScroll extends ScrollPane{
 		for(facilityNode fac:DataArrays.FacilityNodes){
 			test = false;
 			for(instituteNode inst:DataArrays.institNodes){
-				for(facilityItem fac_item:inst.availFacilities){
-					if((fac.cycicCircle.text.getText().equalsIgnoreCase(fac_item.name))){
-						test = true;
-					}
+                if (inst.availFacilities.containsKey(fac.cycicCircle.text.getText())) {
+                    test = true;
 				}
 			}
 			if(test == false){

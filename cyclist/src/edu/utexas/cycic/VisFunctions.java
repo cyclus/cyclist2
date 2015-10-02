@@ -1,8 +1,12 @@
 package edu.utexas.cycic;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.effect.Bloom;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.Light.Distant;
@@ -137,24 +141,24 @@ public class VisFunctions {
         Double shiftX, shiftY, heightRatio, widthRatio;
 
         if (location.equals("bottom")) {
-            shiftX = -1.5;
+            shiftX = -0.7;
             shiftY = 1.2;
             heightRatio = 1.2;
             widthRatio = -2*shiftX;
         } else if (location.equals("top")) {
-            shiftX = -1.5;
+            shiftX = -0.7;
             shiftY = -1.2;
             heightRatio = 1.2;
             widthRatio = -2*shiftX;
         } else {
-            shiftX = -1.0;
-            shiftY = -0.6;
+            shiftX = 0.1;
+            shiftY = +0.5;
             heightRatio = 1.2;
-            widthRatio = -2*shiftX;
+            widthRatio = 1.;
         }
         
-        ellipse.text.setLayoutX(ellipse.getLayoutX()+ellipse.getRadiusX()*shiftX);
-        ellipse.text.setLayoutY(ellipse.getLayoutY()+ellipse.getRadiusY()*shiftY);	
+        ellipse.text.setLayoutX(ellipse.getCenterX()+ellipse.getRadiusX()*shiftX);
+        ellipse.text.setLayoutY(ellipse.getCenterY()+ellipse.getRadiusY()*shiftY);	
         ellipse.text.setMaxHeight(ellipse.getRadiusY()*heightRatio);
         ellipse.text.setMaxWidth(ellipse.getRadiusX()*widthRatio);
         ellipse.text.setTextAlignment(TextAlignment.CENTER);
@@ -183,10 +187,10 @@ public class VisFunctions {
             heightRatio = 1.2;
             widthRatio = -2*shiftX;
         } else {
-            shiftX = -1.0;
+            shiftX = -0.8;
             shiftY = -0.6;
-            heightRatio = 1.2;
-            widthRatio = -2*shiftX;
+            heightRatio = 1.;
+            widthRatio = -1.7*shiftX;
         }
         
         ellipse.text.setLayoutX(ellipse.getLayoutX()+ellipse.getRadiusX()*shiftX);
@@ -339,6 +343,7 @@ public class VisFunctions {
 		link.target = target;
 		Line line = link.line;
 		link.line.text.setText(commod);
+		link.line.text.setFont(new Font("ComicSans", 14));
 		line.setStartX(source.getCenterX());
 		line.setStartY(source.getCenterY());
 		line.setEndX(target.getCenterX());
@@ -357,17 +362,21 @@ public class VisFunctions {
 	static void redrawPane(){
 		Cycic.pane.getChildren().remove(0, Cycic.pane.getChildren().size());
 		for(int i = 0; i < CycicScenarios.workingCycicScenario.FacilityNodes.size(); i++){
-			Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle);
-			Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.text);
-			Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.image);
-			for(int ii = 0; ii < CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.size(); ii++){
-				Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.get(ii));
-				Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.get(ii).text);
-				Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenList.get(ii).image);
-			}
-			for(int n = 0; n < CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenLinks.size(); n++){
-				Cycic.pane.getChildren().add(CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenLinks.get(n).line);
-				CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle.childrenLinks.get(n).line.toBack();
+			FacilityCircle circle = CycicScenarios.workingCycicScenario.FacilityNodes.get(i).cycicCircle;
+			Cycic.pane.getChildren().add(circle);
+			Cycic.pane.getChildren().add(circle.text);
+			VisFunctions.placeTextOnCircle(circle, "middle");
+			Cycic.pane.getChildren().add(circle.image);
+			if(!Cycic.currentSkin.equalsIgnoreCase("Default Skin")){
+				for(int j = 0; j < DataArrays.visualizationSkins.size(); j++){
+					skinSet skin = DataArrays.visualizationSkins.get(j);
+					if(skin.name.equalsIgnoreCase(Cycic.currentSkin)){
+						circle.image.setImage(skin.images.getOrDefault(DataArrays.FacilityNodes.get(i).niche, skin.images.get("facility")));
+						circle.image.setVisible(true);
+						circle.setOpacity(0);
+						VisFunctions.placeTextOnCircle(circle, skin.textPlacement);
+					}
+				}
 			}
 		}
 		CycicScenarios.workingCycicScenario.Links.clear();
@@ -375,12 +384,28 @@ public class VisFunctions {
 			for (int i = 0; i < outFac.cycicCircle.outcommods.size(); i++) {
 				for (facilityNode inFac: CycicScenarios.workingCycicScenario.FacilityNodes) {
 					for (int j = 0; j < inFac.cycicCircle.incommods.size(); j++) {
-						if (outFac.cycicCircle.outcommods.get(i) == inFac.cycicCircle.incommods.get(j)){
+						if (outFac.cycicCircle.outcommods.get(i).toString().equalsIgnoreCase(inFac.cycicCircle.incommods.get(j).toString())){
 							linkFacToFac(outFac.cycicCircle, inFac.cycicCircle, inFac.cycicCircle.incommods.get(j));
 						}
 					}
 				}
 			}
+		}
+	}
+	
+	static void redrawRegionPane(){
+		RegionCorralView.corralPane.getChildren().remove(0, RegionCorralView.corralPane.getChildren().size());
+		for(regionNode region: CycicScenarios.workingCycicScenario.regionNodes){
+			RegionCorralView.corralPane.getChildren().add(region.regionShape);
+			RegionCorralView.corralPane.getChildren().add(region.regionShape.text);
+		}
+	}
+	
+	static void redrawInstitPane(){
+		InstitutionCorralView.institutionPane.getChildren().remove(0, InstitutionCorralView.institutionPane.getChildren().size());
+		for(instituteNode inst: CycicScenarios.workingCycicScenario.institNodes){
+			InstitutionCorralView.institutionPane.getChildren().add(inst.institutionShape);
+			InstitutionCorralView.institutionPane.getChildren().add(inst.institutionShape.text);
 		}
 	}
 }

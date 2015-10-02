@@ -1,42 +1,21 @@
 package edu.utexas.cycic;
 
-import java.io.FileReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.regex.Pattern;
+import java.util.List;
+import java.util.Optional;
 
-import org.apache.log4j.Logger;
-
-import edu.utah.sci.cyclist.Cyclist;
-import edu.utah.sci.cyclist.core.Resources1;
-import edu.utah.sci.cyclist.core.event.dnd.DnD;
-import edu.utah.sci.cyclist.core.ui.components.ViewBase;
-import edu.utah.sci.cyclist.core.util.AwesomeIcon;
-import edu.utah.sci.cyclist.core.util.GlyphRegistry;
-import edu.utah.sci.cyclist.core.controller.CyclistController;
-import edu.utah.sci.cyclist.core.model.CyclusJob;
-import edu.utah.sci.cyclist.core.model.CyclusJob.Status;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-
-import javax.imageio.ImageIO;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.json.JsonString;
-import javax.swing.AbstractAction;
-
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
@@ -44,18 +23,15 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.WritableImage;
@@ -71,12 +47,26 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
+import javax.imageio.ImageIO;
+
+import org.apache.log4j.Logger;
+
+import edu.utah.sci.cyclist.Cyclist;
+import edu.utah.sci.cyclist.core.controller.CyclistController;
+import edu.utah.sci.cyclist.core.event.dnd.DnD;
+import edu.utah.sci.cyclist.core.model.CyclusJob;
+import edu.utah.sci.cyclist.core.model.CyclusJob.Status;
+import edu.utah.sci.cyclist.core.model.Preferences;
+import edu.utah.sci.cyclist.core.ui.components.ViewBase;
+import edu.utah.sci.cyclist.core.util.AwesomeIcon;
+import edu.utah.sci.cyclist.core.util.GlyphRegistry;
+
 public class Cycic extends ViewBase{
 	static Logger log = Logger.getLogger(Cycic.class);
+	
 	/**
 	 * Function for building the CYCIC Pane and GridPane of this view. 
 	 */
@@ -103,11 +93,10 @@ public class Cycic extends ViewBase{
 	static boolean marketHideBool = true;
 	static Window window;
 	static ToggleGroup opSwitch = new ToggleGroup();
-	static ToggleButton localToggle = new ToggleButton("Local");
-	static ToggleButton remoteToggle = new ToggleButton("Remote");
     static CyclusJob _remoteDashA;
     private static Object monitor = new Object();
     static String currentSkin = "Default Skin";
+    static String currentServer = "";
 	
     
 	/**
@@ -262,15 +251,10 @@ public class Cycic extends ViewBase{
 	 * Initiates the Pane and GridPane.
 	 */
 	private void init(){
-		Resources1 resource = new Resources1();
-		File file = new File(resource.getCurrentPath());
-		String path = "/" + file.getParent();
-		try {
-			defaultJsonReader(path);
-			log.info("Meta data loaded for default archetypes. If you wish to add others, please use the DISCOVER ARCHETYPES button. Thanks!");
-		} catch (IOException e1) {
-			log.warn("Could not read default meta data. Please use DISCOVER ARCHETYPES button. Thanks!");
-		}
+
+		setCloseable(false);
+		enableDragging(false);
+        DataArrays.cycicInitLoader("facility");
 
         final ContextMenu paneMenu = new ContextMenu();
         MenuItem linkColor = new MenuItem("Change Link Color...");
@@ -285,9 +269,6 @@ public class Cycic extends ViewBase{
                 updateBgColor();
             }
             });
-
-		DataArrays.visualizationSkins.add(XMLReader.SC2);
-		DataArrays.visualizationSkins.add(XMLReader.loadSkin(path));
 
         Menu skinMenu = new Menu("Change skin");
         MenuItem defSkin = new MenuItem("Default Skin");
@@ -332,7 +313,7 @@ public class Cycic extends ViewBase{
 		});
 		pane.setOnDragOver(new EventHandler <DragEvent>(){
 			public void handle(DragEvent event){
-				event.acceptTransferModes(TransferMode.ANY);
+				event.acceptTransferModes(TransferMode.COPY);
 			}
 		});
 		pane.setOnDragDropped(new EventHandler<DragEvent>(){
@@ -345,11 +326,13 @@ public class Cycic extends ViewBase{
 						if(DataArrays.simFacilities.get(i).facilityName.equalsIgnoreCase(facility.facilityType)){
 							facility.facilityStructure = DataArrays.simFacilities.get(i).facStruct;
 							facility.niche = DataArrays.simFacilities.get(i).niche;
+							facility.doc = DataArrays.simFacilities.get(i).doc;
 							facility.archetype = DataArrays.simFacilities.get(i).facilityArch;
 						}
 					}
 					event.consume();
 					facility.name = "";
+					facility.facLifetime = "";
 					facility.cycicCircle = CycicCircles.addNode((String)facility.name, facility);
 					facility.cycicCircle.setCenterX(event.getX());
 					facility.cycicCircle.setCenterY(event.getY());
@@ -435,11 +418,13 @@ public class Cycic extends ViewBase{
 					if(DataArrays.simFacilities.get(i).facilityName.equalsIgnoreCase(facility.facilityType)){
 						facility.facilityStructure = DataArrays.simFacilities.get(i).facStruct;
 						facility.niche = DataArrays.simFacilities.get(i).niche;
+						facility.doc = DataArrays.simFacilities.get(i).doc;
 						facility.archetype = DataArrays.simFacilities.get(i).facilityArch;
 					}
 				}
 				event.consume();
 				facility.name = facNameField.getText();
+				facility.facLifetime = "";
 				facility.cycicCircle = CycicCircles.addNode((String)facility.name, facility);
 				facility.cycicCircle.setCenterX(80);
 				facility.cycicCircle.setCenterY(80);
@@ -468,16 +453,16 @@ public class Cycic extends ViewBase{
 		scroll.setMinHeight(120);
 		scroll.setContent(nodesPane);
 		
-		opSwitch.getToggles().clear();
-        opSwitch.getToggles().addAll(localToggle, remoteToggle);
-        try {
-            Process readproc = Runtime.getRuntime().exec("cyclus -V");
-            new BufferedReader(new InputStreamReader(readproc.getInputStream()));
-            localToggle.setSelected(true);
-        } catch (RuntimeException | IOException e) {
-            localToggle.setSelected(false);
-            remoteToggle.setSelected(true);
-        };
+//		opSwitch.getToggles().clear();
+//        opSwitch.getToggles().addAll(localToggle, remoteToggle);
+//        try {
+//            Process readproc = Runtime.getRuntime().exec("cyclus -V");
+//            new BufferedReader(new InputStreamReader(readproc.getInputStream()));
+//            localToggle.setSelected(true);
+//        } catch (RuntimeException | IOException e) {
+//            localToggle.setSelected(false);
+//            remoteToggle.setSelected(true);
+//        };
 
 		cycicBox.getChildren().addAll(grid, scroll, pane);
 		
@@ -502,86 +487,6 @@ public class Cycic extends ViewBase{
 		setContent(mainView);
 	}
 	
-	/**
-	 * 
-	 */
-    public void retrieveSchema(String rawMetadata) {
-        // rawMetadata is a JSON string.
-        Reader metaReader = new StringReader(rawMetadata);
-        JsonReader metaJsonReader = Json.createReader(metaReader);
-        JsonObject metadata = metaJsonReader.readObject();
-        metaJsonReader.close();
-        JsonObject schemas = metadata.getJsonObject("schema");
-        JsonObject annotations = metadata.getJsonObject("annotations");
-            
-        DataArrays.simFacilities.clear();
-        DataArrays.simRegions.clear();
-        DataArrays.simInstitutions.clear();
-        for(javax.json.JsonString specVal : metadata.getJsonArray("specs").getValuesAs(JsonString.class)){
-        	String spec = specVal.getString();
-            boolean test = true;
-            for(int j = 0; j < XMLReader.blackList.size(); j++){
-                if(spec.equalsIgnoreCase(XMLReader.blackList.get(j))){
-                    test = false;
-                }
-            }
-            if(test == false){
-                continue;
-            }
-            
-            
-            String schema = schemas.getString(spec);
-            String pattern1 = "<!--.*?-->";
-            Pattern p = Pattern.compile(pattern1, Pattern.DOTALL);
-            schema = p.matcher(schema).replaceAll("");
-            if(schema.length() > 12){
-            	if(!schema.substring(0, 12).equals("<interleave>")){
-                	schema = "<interleave>" + schema + "</interleave>"; 
-                }
-            }
-            JsonObject anno = annotations.getJsonObject(spec);
-            switch(anno.getString("entity")){
-            case "facility":
-                log.info("Adding archetype "+spec);
-                facilityStructure node = new facilityStructure();
-                node.facAnnotations = anno.toString();
-                node.facilityArch = spec;
-                node.niche = anno.getString("niche", "facility");
-                JsonObject facVars = anno.getJsonObject("vars");
-                ArrayList<Object> facArray = new ArrayList<Object>();
-                node.facStruct = XMLReader.nodeBuilder(facVars, facArray, XMLReader.readSchema_new(schema));
-                node.facilityName = spec.replace(":", " ");
-                DataArrays.simFacilities.add(node);
-                break;
-            case "region":
-                log.info("Adding archetype "+spec);
-                regionStructure rNode = new regionStructure();
-                rNode.regionAnnotations = anno.toString();
-                rNode.regionArch = spec;
-                JsonObject regionVars = anno.getJsonObject("vars");
-                ArrayList<Object> regionArray = new ArrayList<Object>();
-                rNode.regionName = spec.replace(":", " ");
-                DataArrays.simRegions.add(rNode);
-                break;
-            case "institution":
-                log.info("Adding archetype "+spec);
-                institutionStructure iNode = new institutionStructure();
-                iNode.institArch = spec;
-                iNode.institAnnotations = anno.toString();
-                JsonObject instVars = anno.getJsonObject("vars");
-                ArrayList<Object> instArray = new ArrayList<Object>();
-                iNode.institStruct = XMLReader.nodeBuilder(instVars, instArray, XMLReader.readSchema_new(schema));
-                iNode.institName = spec.replace(":", " ");
-                DataArrays.simInstitutions.add(iNode);
-                break;
-            default:
-                log.error(spec+" is not of the 'facility', 'region' or 'institution' type. "
-                    + "Please check the entity value in the archetype annotation.");
-            break;
-            };  
-        }
-        log.info("Schema discovery complete");
-	}
 	
 	/**
 	 * 
@@ -603,6 +508,11 @@ public class Cycic extends ViewBase{
 				Dragboard db = circle.startDragAndDrop(TransferMode.COPY);
 				ClipboardContent content = new ClipboardContent();				
 				content.put(DnD.VALUE_FORMAT, name);
+				SnapshotParameters snapParams = new SnapshotParameters();
+	            snapParams.setFill(Color.TRANSPARENT);
+	            
+	            content.putImage(circle.snapshot(snapParams, null)); 
+	            
 				db.setContent(content);
 				e.consume();
 			}
@@ -653,6 +563,7 @@ public class Cycic extends ViewBase{
 								facility.cycicCircle.outcommods.remove(i);
 							}
 						}
+						commodListRm(facility.facilityStructure, facility.facilityData, commod);
 					}
 					VisFunctions.redrawPane();
 					buildCommodPane();
@@ -681,16 +592,13 @@ public class Cycic extends ViewBase{
 		buildCommodPane();
 	}
 	
-	HashMap<String, String> months = new HashMap<String, String>();
-	ArrayList<String> monthList = new ArrayList<String>();
+	static HashMap<String, String> months = new HashMap<String, String>();
+	static ArrayList<String> monthList = new ArrayList<String>();
 	/**
 	 * Quick hack to convert months into their integer values.
 	 * i.e. January = 0, Feb = 1, etc...
 	 */
 	public void months(){
-		
-		Cycic.workingScenario.simulationData.startMonth = "0";
-		
 		monthList.add("January");
 		monthList.add("February");
 		monthList.add("March");
@@ -717,12 +625,47 @@ public class Cycic extends ViewBase{
 		months.put("November", "11");
 		months.put("December", "12");
 	}
-	public void details(){
+	
+	/**
+	 * 
+	 */
+	public static void details(){
+	    TextField duration = VisFunctions.numberField();
+		ComboBox<String> startMonth = new ComboBox<String>();
+		TextField startYear = VisFunctions.numberField();
+		TextArea description = new TextArea();
+		ComboBox<String> decay = new ComboBox<String>();
+		TextField simHandle = new TextField();
+		
+		
 		Label simDets = new Label("Simulation Details");
 		simDets.setTooltip(new Tooltip("The top level details of the simulation."));
 		simDets.setFont(new Font("Times", 16));
-		simInfo.add(simDets, 0, 0);
-		TextField duration = VisFunctions.numberField();
+		simInfo.add(simDets, 0, 0, 2, 1);
+		
+		Button clear = new Button("Clear Scenario");
+		clear.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+			      Dialog<ButtonType> dg = new Dialog();
+			      dg.setTitle("Scenario Clear");
+			      dg.setHeaderText("Warning: You will lose all unsaved work");
+			      dg.setContentText("Are you sure you want to clear the scenario?");
+			      dg.getDialogPane().getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+			      Optional<ButtonType> result = dg.showAndWait();
+			      if(result.get() == ButtonType.YES){
+			    	  clearScenario();	
+			    	  Cycic.details();
+			    	  VisFunctions.redrawPane();
+			    	  VisFunctions.redrawInstitPane();
+			    	  VisFunctions.redrawRegionPane();
+			    	  buildCommodPane();
+			    	  
+			    	  
+			      }
+			}
+		});
+		simInfo.add(clear, 4, 0);
+		
 		duration.setMaxWidth(150);
 		duration.setPromptText("Length of Simulation");
 		duration.setText(Cycic.workingScenario.simulationData.duration);
@@ -732,26 +675,23 @@ public class Cycic extends ViewBase{
 				Cycic.workingScenario.simulationData.duration = newValue;
 			}
 		});
-		simInfo.add(new Label("Duration (Months)"), 0, 1);
-		simInfo.add(duration, 1, 1);
+		simInfo.add(new Label("Duration (Months)"), 0, 1, 2, 1);
+		simInfo.add(duration, 2, 1);
 		
-
-		final ComboBox<String> startMonth = new ComboBox<String>();
-		startMonth.setValue(months.get(Cycic.workingScenario.simulationData.startMonth));
 		for(int i = 0; i < 12; i++ ){
 			startMonth.getItems().add(monthList.get(i));
 		}
 		Cycic.workingScenario.simulationData.startMonth = "1";
-		startMonth.setValue(monthList.get(Integer.parseInt(Cycic.workingScenario.simulationData.startMonth)));
+		startMonth.setValue(monthList.get(Integer.parseInt(Cycic.workingScenario.simulationData.startMonth)-1));
 		startMonth.valueProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				Cycic.workingScenario.simulationData.startMonth = months.get(newValue);
 			}
 		});
 		startMonth.setPromptText("Select Month");
-		simInfo.add(new Label("Start Month"), 0, 2);
-		simInfo.add(startMonth, 1, 2);
-		TextField startYear = VisFunctions.numberField();
+		simInfo.add(new Label("Start Month"), 0, 2, 2, 1);
+		simInfo.add(startMonth, 2, 2);
+		
 		startYear.setText(Cycic.workingScenario.simulationData.startYear);
 		Cycic.workingScenario.simulationData.startYear = "0";
 		startYear.textProperty().addListener(new ChangeListener<String>(){
@@ -761,120 +701,195 @@ public class Cycic extends ViewBase{
 		});
 		startYear.setPromptText("Starting Year");
 		startYear.setMaxWidth(150);
-		simInfo.add(new Label("Start Year"), 0, 3);
-		simInfo.add(startYear, 1, 3);
+		simInfo.add(new Label("Start Year"), 0, 3, 2, 1);
+		simInfo.add(startYear, 2, 3);
 				
-		TextArea description = new TextArea();
+		decay.getItems().addAll("manual", "never");
+		decay.setValue("Never");
+		Cycic.workingScenario.simulationData.decay = "never";
+		decay.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+				Cycic.workingScenario.simulationData.decay = decay.getValue();
+			}
+		});
+		simInfo.add(new Label("Decay"), 0, 4);
+		simInfo.add(decay, 2, 4);
+		
+		simHandle.setPromptText("Optional Simulation Name");
+		simHandle.textProperty().addListener(new ChangeListener<String>(){
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
+				Cycic.workingScenario.simulationData.simHandle = newValue;
+			}
+		});
+		simInfo.add(new Label("Simulation Handle"), 0, 5, 2, 1);
+		simInfo.add(simHandle, 2, 5);
+		
 		description.setMaxSize(250, 50);
 		description.setWrapText(true);
 		description.textProperty().addListener(new ChangeListener<String>(){
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
-				Cycic.workingScenario.simulationData.description = newValue;
-			}
-		});
-		simInfo.add(new Label("Description"), 0, 4);
-		simInfo.add(description, 1, 4);
-		
-		TextArea notes = new TextArea();
-		notes.setMaxSize(250, 50);
-		notes.setWrapText(true);
-		notes.textProperty().addListener(new ChangeListener<String>(){
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				Cycic.workingScenario.simulationData.notes = newValue;
 			}
 		});
-		simInfo.add(new Label("Notes"), 0, 5);
-		simInfo.add(notes, 1, 5);
+		simInfo.add(new Label("Description"), 0, 6, 2, 1);
+		simInfo.add(description, 2, 6);
 		
 	
 		// Prints the Cyclus input associated with this simulator. 
-		Button output = new Button("Generate Cyclus Input");
+		Button output = new Button("Generate");
 		output.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent event){
-				if(OutPut.inputTest()){
-					FileChooser fileChooser = new FileChooser();
-					//Set extension filter
-					FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
-					fileChooser.getExtensionFilters().add(extFilter);
-					fileChooser.setTitle("Please save as Cyclus input file.");
-					fileChooser.setInitialFileName("*.xml");
-					//Show save file dialog
-					File file = fileChooser.showSaveDialog(window);
-					OutPut.output(file);
-				}
+                          OutPut.CheckInjection();
+                          if(OutPut.inputTest()){
+                            FileChooser fileChooser = new FileChooser();
+                            //Set extension filter
+                            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+                            fileChooser.getExtensionFilters().add(extFilter);
+                            fileChooser.setTitle("Save Cyclus input file");
+                            fileChooser.setInitialFileName("*.xml");
+                            //Show save file dialog
+                            File file = fileChooser.showSaveDialog(window);
+                            OutPut.output(file);
+                          }
 			}
 		});
-		simInfo.add(output, 0, 6);
+		simInfo.add(output, 0, 7, 2, 1);
 		
-        Button runCyclus = new Button("Run Cyclus!");
+		Button load = new Button("Load");
+		load.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+				FileChooser fileChooser = new FileChooser();
+				//Set extension filter
+				FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("XML files (*.xml)", "*.xml");
+				fileChooser.getExtensionFilters().add(extFilter);
+				fileChooser.setTitle("Select input file to load.");
+				fileChooser.setInitialFileName("*.xml");
+				//Show save file dialog
+				File file = fileChooser.showOpenDialog(window);
+				OutPut.loadFile(file);   
+			}
+		});
+		simInfo.add(load, 2, 7);
+		
+        Button runCyclus = new Button("Execute");
+        simInfo.add(runCyclus, 0, 8, 1, 1);    
+        
+        
+        final List<String> serversList = FXCollections.observableArrayList(Preferences.getInstance().servers());
+        serversList.add(0, "-- add new --");
+        ComboBox<String> serverBox = new ComboBox<>();
+        serverBox.getItems().addAll(serversList);
+        serverBox.setVisibleRowCount(Math.min(6,  serverBox.getItems().size()));
+        
+        int currentIndex = Preferences.getInstance().getCurrentServerIndex()+1;
+        currentServer = serversList.get(currentIndex);
+        
+        serverBox.setPromptText("server");
+        serverBox.setEditable(true);
+        serverBox.getSelectionModel().select(currentIndex);
+        
+        serverBox.valueProperty().addListener(
+        		(ov, from, to)-> {
+        			int idx = serverBox.getSelectionModel().getSelectedIndex();
+					if (idx-1 != Preferences.getInstance().getCurrentServerIndex()) {
+						Preferences.getInstance().setCurrentServerIndex(idx-1);
+					} else if (Preferences.LOCAL_SERVER.equals(from)) {
+						serverBox.getSelectionModel().select(idx);
+    				} else if ("".equals(to)) {
+    					serverBox.getItems().remove(from);
+    					Preferences.getInstance().servers().remove(from);
+
+    				} else if (serverBox.getItems().indexOf(to) == -1) {
+						serverBox.getItems().add(to);
+						Preferences.getInstance().servers().add(to);
+						Preferences.getInstance().setCurrentServerIndex(serverBox.getItems().size()-2);
+						serverBox.setVisibleRowCount(Math.min(6,  serverBox.getItems().size()));
+    				}
+					currentServer = serverBox.getValue();
+    			});
+
+        Label serverLabel = new Label("Server:");
+        GridPane.setHalignment(serverLabel, HPos.RIGHT);
+    	simInfo.add(serverLabel, 1, 8, 1, 1);
+        simInfo.add(serverBox, 2, 8);
+        
         runCyclus.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent e){
-                if(!OutPut.inputTest()){
-                    log.info("Cyclus Input Not Well Formed!");
-                    return;  // safety dance
+              OutPut.CheckInjection();
+              if(!OutPut.inputTest()){
+                log.error("Cyclus Input Not Well Formed!");
+                return;  // safety dance
+              }
+              String server = serverBox.getValue();
+              if (Preferences.LOCAL_SERVER.equals(server)) {
+                // local execution
+                String tempHash = Integer.toString(OutPut.xmlStringGen().hashCode());
+                String prefix = "cycic" + tempHash;
+                String infile = prefix + ".xml";
+                String outfile = prefix + ".sqlite";
+                try {
+                  File temp = new File(infile);
+                  log.trace("Writing file " + temp.getName());
+                  log.trace("lines:\n" + OutPut.xmlStringGen());
+                  OutPut.output(temp);
+                  // BufferedWriter output = new BufferedWriter(new FileWriter(temp));
+                  // output.write(OutPut.xmlStringGen());
+                  // output.close();
+                  Process p = Runtime.getRuntime().exec("cyclus -o " + outfile + " " + infile);
+                  p.waitFor();
+                  String line = null;
+                  BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                  while ((line = input.readLine()) != null) {        
+                    log.info(line);
+                  }
+                  input.close();
+                  input = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                  while ((line = input.readLine()) != null) {        
+                    log.warn(line);
+                  }
+                  input.close();
+                  log.info("Cyclus run complete");
+                } catch (Exception e1) {
+                  //                        e1.printStackTrace();
+                  log.error(e1.getMessage());
                 }
-                if (localToggle.isSelected()) {
-                    // local execution
-                    String tempHash = Integer.toString(OutPut.xmlStringGen().hashCode());
-                    String cycicTemp = "cycic"+tempHash;
-                    try {
-                        File temp = File.createTempFile(cycicTemp, ".xml");
-                        FileWriter fileOutput = new FileWriter(temp);
-                        new BufferedWriter(fileOutput);
-                        Process p = Runtime.getRuntime().exec("cyclus -o "+cycicTemp +".sqlite "+cycicTemp);
-                        p.waitFor();
-                        String line = null;
-                        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                        while ((line = input.readLine()) != null) {        
-                            log.info(line);
-                        }
-                        input.close();
-                        log.info("Cyclus run complete");
-                    } catch (Exception e1) {
-                        e1.printStackTrace();
-                    }
-                } else {
-                    // remote execution
-            		String cycicXml = OutPut.xmlStringGen();
-            		CyclistController._cyclusService.submit(cycicXml);
-            	}
+              } else {
+                // remote execution
+                String cycicXml = OutPut.xmlStringGen();
+                CyclistController._cyclusService.submit(cycicXml, server);
+              }
             }
-        });;
-        simInfo.add(runCyclus, 1,6);    
-        HBox toggleBox = new HBox();
-        toggleBox.getChildren().addAll(localToggle, remoteToggle);
-        simInfo.add(new Label("Execution Environment: "), 0, 7);
-        simInfo.add(toggleBox, 1, 7);
+          });;
+   
     }
 
 
     public void addArcheToBar(String archeType){
-        
-		for(int i = 0; i < DataArrays.simFacilities.size(); i++){
-			if(DataArrays.simFacilities.get(i).facilityName.equalsIgnoreCase(archeType)){
-				if(DataArrays.simFacilities.get(i).loaded == true){
-					return;
-				}
-				facilityStructure test = DataArrays.simFacilities.get(i);
-				try {
-					test.loaded = true;
-					FacilityCircle circle = new FacilityCircle();
-					int pos = 0;
-					for(int k = 0; k < DataArrays.simFacilities.size(); k++){
-						if(DataArrays.simFacilities.get(k).loaded == true){
-							pos+=1;
-						}
-					}
-					buildDnDCircle(circle, pos-1, test.facilityName);
-					nodesPane.getChildren().addAll(circle, circle.text);
-				} catch (Exception eq) {
-					
-				}
-			}
-		}
-
+    	nodesPane.getChildren().clear();
+    	int pos = 0;
+    	for(int i = 0; i < DataArrays.simFacilities.size(); i++){
+    		facilityStructure test = DataArrays.simFacilities.get(i);
+    		if(test.facilityName.equalsIgnoreCase(archeType)){
+    			if(test.loaded == true){
+    				pos = placeDnDCircle(pos, test);
+    				continue;
+    			}
+    			test.loaded = true;
+    			pos = placeDnDCircle(pos, test);
+    		} else if(test.loaded == true){
+    			pos = placeDnDCircle(pos, test);
+    		}
+    	} 
     }
 
+    public int placeDnDCircle(int pos, facilityStructure test){
+		FacilityCircle circle = new FacilityCircle();
+		pos += 1;
+		buildDnDCircle(circle, pos-1, test.facilityName);
+		nodesPane.getChildren().addAll(circle, circle.text);
+		return pos;
+    }
+    
 	public void createArchetypeBar(GridPane grid){
 		ComboBox<String> archetypes = new ComboBox<String>();
 		for(int i = 0; i < DataArrays.simFacilities.size(); i++){
@@ -890,7 +905,9 @@ public class Cycic extends ViewBase{
 		});
 		archetypes.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
-				addArcheToBar(archetypes.getValue());
+				if(archetypes.getValue() != null){
+					addArcheToBar(archetypes.getValue());
+				}	
 			}
 		});
 
@@ -898,7 +915,7 @@ public class Cycic extends ViewBase{
         cyclusDashM.setTooltip(new Tooltip("Use this button to search for all local Cyclus modules."));
         cyclusDashM.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent e){
-                if (localToggle.isSelected()) {
+                if (Preferences.LOCAL_SERVER.equals(currentServer)) {
                     // Local metadata collection
                     try {
                         Process readproc = Runtime.getRuntime().exec("cyclus -m");
@@ -907,25 +924,30 @@ public class Cycic extends ViewBase{
                         String metadata = new String();
                         while ((line = metaBuf.readLine()) != null) {metadata += line;}
                         metaBuf.close();
-                        retrieveSchema(metadata);
+                        DataArrays.retrieveSchema(metadata, "facility");
                     } catch (IOException ex) {
-                        // TODO Auto-generated catch block
-                        ex.printStackTrace();
+                        log.error(ex.getMessage());
+//                        ex.printStackTrace();
                     }
                 } else {
                     // Remote metadata collection
-                    CyclistController._cyclusService.submitCmd("cyclus", "-m");
-                    _remoteDashA = CyclistController._cyclusService.latestJob();
-                    _remoteDashA.statusProperty()
-                        .addListener(new ChangeListener<CyclusJob.Status>() {
-                        @Override
-                        public void changed(ObservableValue<? extends Status> observable,
-                            Status oldValue, Status newValue) {
-                            if (newValue == Status.READY) {
-                                retrieveSchema(_remoteDashA.getStdout());
-                            }
-                        }
-                    });
+                	_remoteDashA = CyclistController._cyclusService.submitCmdToRemote(currentServer, "cyclus", "-m");
+//                    _remoteDashA = CyclistController._cyclusService.latestJob();
+                	CyclusJob job = _remoteDashA;
+                	if (_remoteDashA.getStatus() == Status.FAILED) {
+                		// TODO: an error msg was already sent to the console. Do we want to pop up an error msg?
+                	} else {
+	                    _remoteDashA.statusProperty()
+	                        .addListener(new ChangeListener<CyclusJob.Status>() {
+		                        @Override
+		                        public void changed(ObservableValue<? extends Status> observable,
+		                            Status oldValue, Status newValue) {
+		                            if (newValue == Status.READY) {
+		                                DataArrays.retrieveSchema(_remoteDashA.getStdout(), "facility");
+		                            }
+		                        }
+	                    });
+                	}
                 }
             }
         });
@@ -949,22 +971,55 @@ public class Cycic extends ViewBase{
 		        log.error("Error writing image to file: "+e.getMessage());
 		    }
 		} else {
+			log.error("File did not generate correctly.");
 			System.out.println("File did not generate correctly.");
 		}
 	}
 	
-	private void defaultJsonReader(String path) throws IOException{
-	    BufferedReader reader = new BufferedReader( new FileReader (path + "/default-metadata.json"));
-	    String         line = null;
-	    StringBuilder  stringBuilder = new StringBuilder();
-	    String         ls = System.getProperty("line.separator");
-
-	    while( ( line = reader.readLine() ) != null ) {
-	        stringBuilder.append( line );
-	        stringBuilder.append( ls );
-	    }
-	    reader.close();
-	    
-		retrieveSchema(stringBuilder.toString());
+	public static void commodListRm(ArrayList<Object> facArray, ArrayList<Object> dataArray, String commod){
+		if(facArray.get(0) instanceof ArrayList){
+			for(int i = 0; i < facArray.size(); i++){
+				commodListRm((ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i), commod);
+			}
+		} else if(facArray.get(1) instanceof ArrayList){
+			for(int i = 0; i < dataArray.size(); i++){
+				commodListRm((ArrayList<Object>) facArray.get(1), (ArrayList<Object>) dataArray.get(i), commod);
+			}
+		} else {
+			switch ((String) facArray.get(2).toString().toLowerCase()){
+			case "incommodity":
+				if(dataArray.get(0).toString().equalsIgnoreCase(commod)){
+					dataArray.set(0, "");
+				}
+				break;
+			case "outcommodity":
+				if(dataArray.get(0).toString().equalsIgnoreCase(commod)){
+					dataArray.set(0, "");
+				}
+				break;
+			}
+		}
 	}
+	
+	public static void clearScenario(){
+		CycicScenarios.workingCycicScenario.Recipes.clear();
+		CycicScenarios.workingCycicScenario.institNodes.clear();
+		CycicScenarios.workingCycicScenario.regionNodes.clear();
+		CycicScenarios.workingCycicScenario.FacilityNodes.clear();
+		CycicScenarios.workingCycicScenario.CommoditiesList.clear();
+		CycicScenarios.workingCycicScenario.Links.clear();
+		CycicScenarios.workingCycicScenario.RecipesList.clear();
+		CycicScenarios.workingCycicScenario.FacilityTypes.clear();
+		clearSimDetails();
+	}
+	
+	public static void clearSimDetails(){
+		CycicScenarios.workingCycicScenario.simulationData.decay = "never";
+		CycicScenarios.workingCycicScenario.simulationData.description = "";
+		CycicScenarios.workingCycicScenario.simulationData.duration = null;
+		CycicScenarios.workingCycicScenario.simulationData.simHandle = null;
+		CycicScenarios.workingCycicScenario.simulationData.startMonth = "January";
+		CycicScenarios.workingCycicScenario.simulationData.startYear = null;
+	}
+	
 }

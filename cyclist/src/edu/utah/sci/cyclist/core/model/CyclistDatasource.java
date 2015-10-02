@@ -217,14 +217,14 @@ public class CyclistDatasource implements DataSource, Resource {
 	public void releaseConnection() {
 		if (isSQLite()) {
 			if (_currentThread != Thread.currentThread()) {
-				log.warn("SQLite: wrong thread close connection: ignored");
+				log.debug("SQLite: wrong thread close connection: ignored");
 				return;
 			}
 			try {
 				_SQLiteConnection.close();
 				_SQLiteConnection = null;
 			} catch (SQLException e) {
-				log.warn("Error while closing sqlite connection: ",e);
+				log.debug("Error while closing sqlite connection: ",e);
 				e.printStackTrace();
 			}
 			_SQLiteSemaphore.release();

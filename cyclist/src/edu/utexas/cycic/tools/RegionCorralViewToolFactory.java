@@ -12,6 +12,16 @@ public class RegionCorralViewToolFactory implements ToolFactory {
 	}
 	
 	@Override
+	public String getToolType() {
+		return RegionCorralViewTool.TYPE;
+	}
+	
+	@Override
+	public boolean isUserLevel() {
+		return true;
+	}
+	
+	@Override
 	public Tool create() {
 		return new RegionCorralViewTool();
 	}

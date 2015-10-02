@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -55,7 +56,7 @@ public class SaveWsWizard extends VBox {
 			vbox.setSpacing(10);
 			vbox.setAlignment(Pos.CENTER);
 			
-			Text text = new Text("WorkSpace has been modified. Save changed? ");  
+			Text text = new Text("Workspace has been modified. Save changed? ");  
 			text.setFont(new Font(12));
 			
 			HBox hbox = new HBox();
@@ -65,12 +66,14 @@ public class SaveWsWizard extends VBox {
 			hbox.setMinWidth(300);
 			
 			Button yes = new Button("Yes");
+//			yes.setDefaultButton(true);
 			yes.setMinWidth(50);
 			yes.setAlignment(Pos.CENTER);
 			Button no = new Button("No");
 			no.setMinWidth(50);
 			no.setAlignment(Pos.CENTER);
 			Button cancel = new Button("Cancel");
+			cancel.setCancelButton(true);
 			cancel.setMinWidth(50);
 			cancel.setAlignment(Pos.CENTER);
 			hbox.getChildren().addAll(yes,no,cancel);
@@ -80,6 +83,8 @@ public class SaveWsWizard extends VBox {
 					_dialog.hide();
 				};
 			});
+			cancel.setOnKeyPressed((ke)-> { if (ke.getCode() == KeyCode.ENTER) { cancel.fire(); } } );
+
 			yes.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent arg0) {
@@ -87,6 +92,8 @@ public class SaveWsWizard extends VBox {
 					_dialog.hide();
 				};
 			});
+			yes.setOnKeyPressed((ke)-> {if (ke.getCode() == KeyCode.ENTER) yes.fire(); } );
+			
 			no.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent arg0) {
@@ -94,6 +101,7 @@ public class SaveWsWizard extends VBox {
 					_dialog.hide();
 				};
 			});
+			no.setOnKeyPressed((ke)-> { if (ke.getCode() == KeyCode.ENTER) no.fire(); } );
 			
 			vbox.getChildren().addAll(text,hbox);
 			

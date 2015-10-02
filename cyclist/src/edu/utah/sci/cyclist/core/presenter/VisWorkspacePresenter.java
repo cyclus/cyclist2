@@ -284,13 +284,21 @@ public class VisWorkspacePresenter extends CyclistViewPresenter {
 		broadcast(getLocalEventBus(), new CyclistSimulationNotification(CyclistNotifications.SIMULATION_REMOVE, sim));
 	}
 
-	private Presenter addTool(Tool tool, double x, double y) {
+	public Presenter addTool(Tool tool, double x, double y) {
 		ViewBase view = (ViewBase) tool.getView();
 		ViewPresenter presenter = tool.getPresenter(getLocalEventBus());
 		
 		_tools.add(tool);
 		
 		return addTool(view, presenter, x, y);
+	}
+	
+	public boolean hasTool(String name) {
+		for(Tool tool : _tools) {
+			if (tool.getName().equals(name))
+				return true;
+		}
+		return false;
 	}
 	
 	private Presenter addTool(ViewBase view, ViewPresenter presenter, double x, double y) {

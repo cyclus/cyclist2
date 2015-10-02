@@ -63,6 +63,7 @@ public class VisWorkspace extends CyclistViewBase implements CyclistView {
 	static final Logger log = LogManager.getLogger(VisWorkspace.class.getName());
 	
 	private Pane _pane;
+	private Console _console;
 	
 	private WorkspacePanelArea _filtersPane;
 	ScrollBar _wb;
@@ -82,6 +83,10 @@ public class VisWorkspace extends CyclistViewBase implements CyclistView {
 	
 	public void setOnShowTable(Closure.V4<Tool, Table, Double, Double> action) {
 		_onShowTable = action;
+	}
+	
+	public Console getConsole() {
+		return _console;
 	}
 	
 	// -- Properties
@@ -124,16 +129,16 @@ public class VisWorkspace extends CyclistViewBase implements CyclistView {
 		_pane = ipane.getPane();
 		_pane.getStyleClass().add("workspace-pane");
 		
-		Console console = new Console();
+		_console = new Console();
 		
 		// arrange console bellow the infinite workspace
 		SplitPane sp1 = new SplitPane();
 		sp1.setOrientation(Orientation.VERTICAL);
 		sp1.setDividerPosition(0, 0.9);
-		sp1.getItems().addAll(ipane, console);
+		sp1.getItems().addAll(ipane, _console);
 
 		SplitPane.setResizableWithParent(ipane, true);
-		SplitPane.setResizableWithParent(console, false);
+		SplitPane.setResizableWithParent(_console, false);
 
 		// arrange filters to the right
 		_filtersPane = new WorkspacePanelArea();
@@ -174,17 +179,19 @@ public class VisWorkspace extends CyclistViewBase implements CyclistView {
 		});
 		
 		setOnDragOver(event->{
-			if (event.getTarget() == _pane) {
+//			if (event.getTarget() == _pane) {
 				DnD.LocalClipboard clipboard = getLocalClipboard();
-				if (clipboard.hasContent(DnD.TOOL_FORMAT) || clipboard.hasContent(DnD.TABLE_FORMAT)) 
-				{
-					event.acceptTransferModes(TransferMode.COPY);
-					event.consume();
-				} else if (clipboard.hasContent(DnD.FIELD_FORMAT)) {
-					event.acceptTransferModes(TransferMode.MOVE);
-					event.consume();
+				if (clipboard != null) {
+					if (clipboard.hasContent(DnD.TOOL_FORMAT) || clipboard.hasContent(DnD.TABLE_FORMAT)) 
+					{
+						event.acceptTransferModes(TransferMode.COPY);
+						event.consume();
+					} else if (clipboard.hasContent(DnD.FIELD_FORMAT)) {
+						event.acceptTransferModes(TransferMode.MOVE);
+						event.consume();
+					}
 				}
-			}
+//			}
 		});	
 		
 		setOnDragDropped(event->{

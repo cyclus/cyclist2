@@ -77,7 +77,8 @@ public class ViewBase extends BorderPane implements View, Resource {
 	private boolean _toplevel;
 	private boolean _maximized = false;
 	private final Resize resize = new Resize();
-	
+	private boolean _closeable = true;
+
 	private boolean _enableDragging = true;
 	
 	// Actions
@@ -185,6 +186,16 @@ public class ViewBase extends BorderPane implements View, Resource {
 		}
 	}
 	
+	public void setCloseable(boolean value) {
+		if (_closeable == value) return;
+		_closeable = value;
+		_closeButton.setVisible(value);
+		_closeButton.setManaged(value);
+	}
+	
+	public boolean isCloseable() {
+		return _closeable;
+	}
 	/*
 	 * Max/min button
 	 */
@@ -292,7 +303,16 @@ public class ViewBase extends BorderPane implements View, Resource {
 	}
 	
 	protected void enableDragging(Boolean value) {
+		if (_enableDragging == value) return;
 		_enableDragging = value;
+		if (value) {
+			setHeaderListeners();
+		} else {
+			_header.setOnMousePressed(null);
+			_header.setOnMouseClicked(null);
+			_header.setOnMouseDragged(null);
+			setOnMouseClicked(null);
+		}
 	}
 	
 	protected boolean isDragginEnabled() {

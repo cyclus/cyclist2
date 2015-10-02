@@ -70,7 +70,7 @@ public class SorterCircles{
 			
 		// Adding the menu and it's menu items.
 		final Menu menu1 = new Menu("Options");
-		MenuItem facForm = new MenuItem("Facility Form");
+		MenuItem facForm = new MenuItem("Configure");
 		MenuItem delete = new MenuItem("Delete");
 		
 		delete.setOnAction(new EventHandler<ActionEvent>(){
@@ -159,7 +159,7 @@ public class SorterCircles{
 					
 					Dragboard db = circle.startDragAndDrop(TransferMode.COPY);
 					ClipboardContent content = new ClipboardContent();				
-					content.put( DnD.TOOL_FORMAT, "Facility Form");
+					content.put( DnD.TOOL_FORMAT, "Configure");
 					db.setContent(content);
 					
 					event.consume();

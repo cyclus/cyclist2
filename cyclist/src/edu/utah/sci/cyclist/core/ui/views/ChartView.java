@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -65,6 +69,7 @@ import org.mo.closure.v1.Closure;
 
 import edu.utah.sci.cyclist.Cyclist;
 import edu.utah.sci.cyclist.core.controller.IMemento;
+import edu.utah.sci.cyclist.core.event.Pair;
 import edu.utah.sci.cyclist.core.event.dnd.DnD;
 import edu.utah.sci.cyclist.core.event.ui.FilterEvent;
 import edu.utah.sci.cyclist.core.model.Context;
@@ -94,6 +99,8 @@ public class ChartView extends CyclistViewBase {
 	public static final String TITLE = "Plot";
 	static Logger log = Logger.getLogger(ChartView.class);
 
+	public static Double CYCLUS_INFINITY = 1e50;
+	
 	enum ViewType { CROSS_TAB, BAR, LINE, SCATTER_PLOT, GANTT, NA }
 
 	enum MarkType { TEXT, BAR, LINE, SHAPE, GANTT, NA }
@@ -119,7 +126,7 @@ public class ChartView extends CyclistViewBase {
 	private ObservableList<Indicator> _indicators = FXCollections.observableArrayList();
 	private Map<Indicator, LineIndicator> _lineIndicators = new HashMap<>();
 	private List<DistanceIndicator> _distanceIndicators = new ArrayList<>();
-
+	private Set<MultiKey> _seriesWithInfinity = new HashSet<MultiKey>();
 	private Closure.V0 _onDuplicate = null;
 	
 	private Spec _currentSpec = null;
@@ -128,6 +135,8 @@ public class ChartView extends CyclistViewBase {
 	private DropArea _xArea;
 	private DropArea _yArea;
 	private DropArea _lodArea;
+	private Text _warningText = new Text();
+	private Text _warningLabel = new Text("Warning");
 
 	private ObjectProperty<Table> _currentTableProperty = new SimpleObjectProperty<>();
 
@@ -475,40 +484,22 @@ public class ChartView extends CyclistViewBase {
 	@SuppressWarnings("unchecked")
     private void assignData(List<TableRow> list, Spec spec) {
 		log.debug("chart data has "+list.size()+" rows");
-		// TODO: fix this Hack
-		for (TableRow r : list) {
-			
-		}
-//		for (TableRow r : list) {
-//			for (int i=0; i<r.value.length; i++) {
-//				if (i>0) System.out.print(", "); 
-//				System.out.print(r.value[i]);
-//			}
-//			System.out.println();
-//		}
+		_seriesWithInfinity.clear();
 		if (list.size() == 0) {
 			log.debug("no data");
 			getChart().getData().clear();
 			_currentSpec = spec;
+			checkForInfinities(null);
 			return;
 		}
-		
-		log.debug("data has "+list.size()+" rows");
-//		if (list.size() > 5000) {
-//			log.warn("Too many data points (>5000). Ignored");
-//			return;
-//		}
-		
+				
+
 		Map<MultiKey, ObservableList<XYChart.Data<Object, Object>>> dataMap = split(list, spec);
 		
-		int c = _currentSpec.seriesMap.size();
-		int r = 0;
-		int n = 0;
 		// remove current series that are not part of the new data
 		for (MultiKey key : _currentSpec.seriesMap.keySet()) {
 			if (!dataMap.containsKey(key)) {
 				getChart().getData().remove(_currentSpec.seriesMap.get(key));
-				r++;
 			}
 		}
 		
@@ -520,17 +511,40 @@ public class ChartView extends CyclistViewBase {
 				series = new XYChart.Series<Object, Object>();
 				series.setName(createLabel(key));
 				add.add(series);
-				n++;
 			}
 			ObservableList<XYChart.Data<Object, Object>> data = dataMap.get(key);
 			series.setData(data);
 			spec.seriesMap.put(key, series);			
 		}
 		spec.dataMap = dataMap;
-		log.debug(" p: "+c+"  r:"+r+"  n:"+n);
 		getChart().getData().addAll(add);
 		getChart().setLegendVisible(spec.seriesMap.size() > 1);
 		_currentSpec = spec;
+		
+		checkForInfinities(dataMap.keySet());
+		
+	}
+	
+	private void checkForInfinities(Collection<MultiKey> keys ) {
+		String s = "";
+		if (keys != null) {
+			for (MultiKey bad : _seriesWithInfinity) {
+				if (keys.contains(bad)) {
+					s += createLabel(bad) + " ";
+				}
+			}
+		}
+
+		if (s.equals("")) {
+			_warningLabel.setVisible(false);
+			_warningText.setText("");
+		}
+		else {
+			s = s.equals(" ") ? "Infinity values removed" :
+				("Infinity values removed from: "+s);		
+			_warningText.setText(s);
+			_warningLabel.setVisible(true);
+		}
 	}
 	
 	private String createLabel(MultiKey key) {
@@ -565,18 +579,25 @@ public class ChartView extends CyclistViewBase {
 				for (TableRow row : list) {
 					// pt
 					XYChart.Data<Object, Object> pt = createPoint(row.value[ix], row.value[iy], cx, cy);
+					
 					// key
 					Object [] index = Arrays.copyOfRange(row.value, nx+ny-2, cols); // copy two extra to the left. 
 					index[0] = xInfo.field.getName();
 					index[1] = yInfo.field.getName();
 					
 					MultiKey key = new MultiKey(index, false);
+					
 					ObservableList<XYChart.Data<Object, Object>> series = map.get(key);
 					if (series == null) {
 						series = FXCollections.observableArrayList();
 						map.put(key, series);
 					}
-					series.add(pt);
+					
+					if (pt == null) {
+						_seriesWithInfinity.add(key); 
+					} else {
+						series.add(pt);
+					}
 				}
 			}
 		}
@@ -587,6 +608,7 @@ public class ChartView extends CyclistViewBase {
 	private XYChart.Data<Object, Object> createPoint(Object x, Object y, Classification cx, Classification cy) {
 		x = convert(x, cx);
 		y = convert(y, cy);
+		if (x == null || y == null) return null;
 		XYChart.Data<Object, Object> pt = new XYChart.Data<Object, Object>(x, y);
 		return pt;
 	}
@@ -612,7 +634,7 @@ public class ChartView extends CyclistViewBase {
 		case Qi:
 		case Qd:
 			if (v instanceof Number) {
-				// ignore
+				if (v instanceof Double && ((Double) v) > CYCLUS_INFINITY) return null;
 			} else if (v instanceof CyclistData) {
 				v = ((CyclistData)v).toNumber();
 			} else {
@@ -758,7 +780,7 @@ public class ChartView extends CyclistViewBase {
 			_currentSpec = spec != null? spec : new Spec();
 			setChart(chart);
 		} else {
-			Text text = new Text("Unsupported fields combination");
+			Text text = new Text("No data");
 			_stackPane.getChildren().add(0, text);			
 			_currentSpec = new Spec();
 		}
@@ -1232,6 +1254,10 @@ public class ChartView extends CyclistViewBase {
 		_xArea = createControlArea(grid, "X", 0, 0, 1, DropArea.Policy.SINGLE, DropArea.AcceptedRoles.ALL);
 		_yArea = createControlArea(grid, "Y", 1, 0, 1, DropArea.Policy.MULTIPLE, DropArea.AcceptedRoles.ALL);
 		_lodArea = createControlArea(grid, "Group by", 0, 2, 2, DropArea.Policy.MULTIPLE, DropArea.AcceptedRoles.DIMENSION);
+		
+		_warningLabel.setVisible(false);
+		grid.add(_warningLabel, 2, 1);
+		grid.add(_warningText, 3, 1);
 
 		return grid;
 	}
@@ -1276,8 +1302,8 @@ public class ChartView extends CyclistViewBase {
 			Filter filter = (Filter) o;		
 			// LOD filters only show/hide data. No need to fetch new data 
 			// TODO: is this true only for classification == C? Seems to be true for any field that is not range
-			if(isInLodArea(filter.getField()) && filter.getField().getClassification() == Classification.C ) {
-				invalidateLODFilters(filter);
+			if(_currentSpec != null && isInLodArea(filter.getField()) && filter.getField().getClassification() == Classification.C ) {
+//				invalidateLODFilters(filter);
 				filter.setValid(true);
 				reassignData(filter);
 			} else {
@@ -1393,10 +1419,10 @@ public class ChartView extends CyclistViewBase {
 		for (MultiKey multikey : _currentSpec.seriesMap.keySet()) {
 			Object keyValue = multikey.getKey(idx);
 			if (!filter.getSelectedValues().contains(keyValue)) {
-				// remove
 				keys.add(multikey);
 			} 
 		}
+		
 		for (MultiKey multikey : keys) {
 			getChart().getData().remove(_currentSpec.seriesMap.get(multikey));
 			_currentSpec.seriesMap.remove(multikey);
@@ -1404,15 +1430,19 @@ public class ChartView extends CyclistViewBase {
 		
 		keys.clear();
 		// add series
-		for (MultiKey multikey : _currentSpec.dataMap.keySet()) {
-			Object keyValue = multikey.getKey(idx);
-			if (filter.getSelectedValues().contains(keyValue)
-					&& !_currentSpec.seriesMap.containsKey(multikey)) {
+		
+		keys = new ArrayList<>(_currentSpec.dataMap.keySet());
+		for (Pair<Integer, Filter> p : getLODFilters()) {
+			Iterator<MultiKey> i = keys.iterator();
+			while (i.hasNext()) {
+				MultiKey key = i.next();
+				Object keyValue = key.getKey(p.v1+2);
+				if (!p.v2.getSelectedValues().contains(keyValue)
+					|| _currentSpec.seriesMap.containsKey(key)) 
 				{ 
-					// add
-					keys.add(multikey);
+					i.remove();
 				}	
-			}
+			}	
 		}
 		
 		for (MultiKey multikey : keys) {
@@ -1424,9 +1454,36 @@ public class ChartView extends CyclistViewBase {
 		}
 		
 		getChart().setLegendVisible(_currentSpec.seriesMap.size() > 1);
+		checkForInfinities(_currentSpec.seriesMap.keySet());
 	}
 	
-
+	private List<Pair<Integer, Filter>> getLODFilters() {
+		List<Pair<Integer, Filter>> list = new ArrayList<>();
+		int idx = -1;
+		for (FieldInfo info : _currentSpec.lod) {
+			idx++;
+			boolean found = false;
+			String name = info.field.getName();
+			for (Filter f : filters()) {
+				if (f.getField().getName().equals(name)) {
+					list.add(new Pair<Integer, Filter>(idx, f));
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				for (Filter f : remoteFilters()) {
+					if (f.getField().getName().equals(name)) {
+						list.add(new Pair<Integer, Filter>(idx, f));
+						found = true;
+						break;
+					}
+				}
+			}
+		}
+		return list;
+	}
+	
 	/*Name: setAreaFiltersListeners 
 	 * This method handles fields which are connected to a filter
 	 * If the field SQL function has changed the filter has to be changed accordingly 

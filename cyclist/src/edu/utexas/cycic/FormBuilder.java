@@ -37,11 +37,13 @@ public class FormBuilder extends ViewBase {
 		super();
 		formNode = Cycic.workingNode;
 		TITLE = (String) Cycic.workingNode.name;
-		//System.out.println(formNode.facilityStructure);
-		formBuilder(grid, formNode.facilityStructure, formNode.facilityData);
-		
+		userLevel = formNode.userLevel;
 		Button button = new Button();
 		button.setText(formNode.facilityType);
+
+		Label lifetimeLabel    = new Label("Lifetime");
+		TextField lifetimeField = FormBuilderFunctions.lifetimeFieldBuilder(formNode);
+
 		for(int i = 0; i < 4; i++){
 			userLevelBox.getItems().add(String.format("%d", i));
 		}
@@ -50,8 +52,13 @@ public class FormBuilder extends ViewBase {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
 				userLevelBox.setValue(newValue);
 				userLevel = Integer.parseInt(newValue);
+				formNode.userLevel = Integer.parseInt(newValue);
 				grid.getChildren().clear();
-				rowNumber = 0;
+				if (userLevel > 0) {
+					grid.add(lifetimeLabel,0,0);
+					grid.add(lifetimeField,1,0);
+				}            
+				rowNumber = 1;
 				formBuilder(grid, formNode.facilityStructure, formNode.facilityData);
 			}
 		});
@@ -79,12 +86,12 @@ public class FormBuilder extends ViewBase {
 		scroll.setContent(grid);
 		formGrid.getChildren().addAll(topGrid, scroll);
 		
-		// This is a quick hack. 
 		setOnMousePressed(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
 				Cycic.workingNode = formNode;
 			}
 		});
+		formBuilder(grid, formNode.facilityStructure, formNode.facilityData);
 		setTitle(TITLE);
 		setContent(formGrid);
 	}
@@ -136,9 +143,10 @@ public class FormBuilder extends ViewBase {
 	public Button arrayListRemove(final GridPane grid, final ArrayList<Object> dataArray, final int dataArrayNumber, ArrayList<Object> facArray){
 		Button button = new Button();
 		button.setText("Remove");
-		ArrayList<Object> tempData = (ArrayList<Object>) ((ArrayList<Object>) dataArray.get(dataArrayNumber)).get(0);
 		button.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e) {
+				commodRemoval((ArrayList<Object>) facArray.get(1), (ArrayList<Object>) dataArray.get(dataArrayNumber));
+				VisFunctions.redrawPane();
 				dataArray.remove(dataArrayNumber);
 				if(dataArray.size() == 0){
 					facArray.set(10, false);
@@ -150,6 +158,62 @@ public class FormBuilder extends ViewBase {
 		});		
 		
 		return button;
+	}
+	
+    public static void showHelpDialog(String help) {
+        Dialog dg = new Dialog();
+        dg.setResizable(true);
+        ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
+        dg.setContentText(help);
+        dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+        dg.show();
+    }
+
+    public static EventHandler<MouseEvent> helpDialogHandler(String help) {
+        return new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent e){
+                if(e.getClickCount() == 2){
+                    showHelpDialog(help);
+                }
+            }
+        };
+    }
+
+
+	/**
+	 * 
+	 * @param facArray
+	 * @param dataArray
+	 */
+	public void commodRemoval(ArrayList<Object> facArray, ArrayList<Object> dataArray){
+		if(facArray.get(0) instanceof ArrayList){
+			for(int i = 0; i < facArray.size(); i++){
+				commodRemoval((ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
+			}
+		} else if(facArray.get(1) instanceof ArrayList){
+			for(int i = 0; i < dataArray.size(); i++){
+				commodRemoval((ArrayList<Object>) facArray.get(1), (ArrayList<Object>) dataArray.get(i));
+			}
+		} else {
+			switch ((String) facArray.get(2).toString().toLowerCase()){
+			case "incommodity":
+				for(int i = 0; i < formNode.cycicCircle.incommods.size(); i++){
+					if(dataArray.get(0).toString().equalsIgnoreCase(formNode.cycicCircle.incommods.get(i))){
+						formNode.cycicCircle.incommods.remove(i);
+						break;
+					}
+				}
+				break;
+			case "outcommodity":
+				for(int i = 0; i < formNode.cycicCircle.outcommods.size(); i++){
+					if(dataArray.get(0).toString().equalsIgnoreCase(formNode.cycicCircle.outcommods.get(i))){
+						formNode.cycicCircle.outcommods.remove(i);
+						break;
+					}
+				}
+				break;
+			}
+		}
 	}
 	
 	/**
@@ -169,7 +233,7 @@ public class FormBuilder extends ViewBase {
 			if (facArray.get(i) instanceof ArrayList && facArray.get(0) instanceof ArrayList) {
 				formBuilder(grid, (ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
 			} else if (i == 0){
-				if (facArray.get(2) == "oneOrMore"){
+				if (facArray.get(2).toString().equalsIgnoreCase("oneOrMore")){
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = new Label((String) facArray.get(0));
 						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
@@ -178,18 +242,7 @@ public class FormBuilder extends ViewBase {
 							name.setText((String) facArray.get(0));	
 						}
 						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						String help = (String) facArray.get(8);
-						name.setOnMouseClicked(new EventHandler<MouseEvent>(){
-							public void handle(MouseEvent e){
-								if(e.getClickCount() == 2){
-									Dialog dg = new Dialog();
-									ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
-									dg.setContentText(help);
-									dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-									dg.show();
-								}
-							}
-						});
+						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						rowNumber += 1;
@@ -197,7 +250,6 @@ public class FormBuilder extends ViewBase {
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								System.out.println(facArray);
 								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
 							}
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
@@ -207,7 +259,7 @@ public class FormBuilder extends ViewBase {
 						columnNumber -= 1;
 						
 					}
-				} else if (facArray.get(2) == "oneOrMoreMap"){
+				} else if (facArray.get(2).toString().equalsIgnoreCase("oneOrMoreMap")){
 					//facArray = (ArrayList<Object>) facArray.get(1);
 					//dataArray = (ArrayList<Object>) dataArray.get(0);
 					if ((int)facArray.get(6) <= userLevel && i == 0){
@@ -218,18 +270,7 @@ public class FormBuilder extends ViewBase {
 							name.setText((String) facArray.get(0));	
 						}
 						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						String help = (String) facArray.get(8);
-						name.setOnMouseClicked(new EventHandler<MouseEvent>(){
-							public void handle(MouseEvent e){
-								if(e.getClickCount() == 2){
-									Dialog dg = new Dialog();
-									ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
-									dg.setContentText(help);
-									dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-									dg.show();
-								}
-							}
-						});
+						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						rowNumber += 1;
@@ -237,7 +278,6 @@ public class FormBuilder extends ViewBase {
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								System.out.println(facArray);
 								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
 							}
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
@@ -246,7 +286,7 @@ public class FormBuilder extends ViewBase {
 						// resetting the indent
 						columnNumber -= 1;
 					}
-				} else if (facArray.get(2) == "zeroOrMore") {
+				} else if (facArray.get(2).toString().equalsIgnoreCase("zeroOrMore")) {
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = new Label((String) facArray.get(0));
 						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
@@ -254,18 +294,20 @@ public class FormBuilder extends ViewBase {
 						} else {
 							name.setText((String) facArray.get(0));	
 						}
+						name.setTooltip(new Tooltip((String)facArray.get(7)));
+						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
 						grid.add(name, columnNumber, rowNumber);
+						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						// Indenting a sub structure
+						rowNumber += 1;
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
-							System.out.println(facArray);
 							grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
 						}
 						// resetting the indent
 						columnNumber -= 1;
-						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber, rowNumber);
 						rowNumber += 1;
 					}
 				} else if (facArray.get(1) instanceof ArrayList) {
@@ -291,18 +333,7 @@ public class FormBuilder extends ViewBase {
 						name.setText((String) facArray.get(0));	
 					}
 					name.setTooltip(new Tooltip((String) facArray.get(7)));
-					String help = (String) facArray.get(8);
-					name.setOnMouseClicked(new EventHandler<MouseEvent>(){
-						public void handle(MouseEvent e){
-							if(e.getClickCount() == 2){
-								Dialog dg = new Dialog();
-								ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
-								dg.setContentText(help);
-								dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-								dg.show();
-							}
-						}
-					});
+					name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
 					grid.add(name, columnNumber, rowNumber);
 					// Setting up the input type for the label
 					if (facArray.get(4) != null){

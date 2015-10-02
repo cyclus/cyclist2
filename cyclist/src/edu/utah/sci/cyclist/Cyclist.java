@@ -31,6 +31,7 @@ import edu.utah.sci.cyclist.core.event.notification.SimpleEventBus;
 import edu.utah.sci.cyclist.core.ui.MainScreen;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -62,6 +63,7 @@ public class Cyclist extends Application {
 		
 		primaryStage.setTitle(TITLE);
         primaryStage.setScene(scene);
+        primaryStage.getIcons().add(new Image(Cyclist.class.getResourceAsStream("assets/cyclist.png")));
         
 		MainScreen root = new MainScreen(primaryStage);
         
