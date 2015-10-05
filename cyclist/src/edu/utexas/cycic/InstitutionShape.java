@@ -102,7 +102,7 @@ public class InstitutionShape extends Ellipse {
         MenuItem helpDialog = new MenuItem("Institution Documentation");
         helpDialog.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e){
-                FormBuilder.showHelpDialog(instit.doc);
+                FormBuilderFunctions.showHelpDialog(instit.doc);
             }
         });
             

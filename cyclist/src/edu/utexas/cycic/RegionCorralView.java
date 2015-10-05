@@ -83,7 +83,7 @@ public class RegionCorralView extends ViewBase {
 	 */
 	public RegionCorralView() {
 		super(); 
-		
+		setTitle("Region Corral");
 		DataArrays.cycicInitLoader("region");
 
 		// Create content for RegionCorralView header 

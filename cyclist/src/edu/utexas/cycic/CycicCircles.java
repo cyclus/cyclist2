@@ -95,7 +95,7 @@ public class CycicCircles{
 		MenuItem helpDialog = new MenuItem("Facility Documentation");
 		helpDialog.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e){
-				FormBuilder.showHelpDialog(parent.doc);
+				FormBuilderFunctions.showHelpDialog(parent.doc);
 			}
 		});
 
@@ -188,11 +188,11 @@ public class CycicCircles{
 			public void handle(MouseEvent event){
 				Line line = new Line();
 				if(event.isShiftDown() == true){
-					Cycic.pane.getChildren().add(line);
+					/*Cycic.pane.getChildren().add(line);
 					line.setEndX(event.getX());
 					line.setEndY(event.getY());
 					line.setStartX(circle.getCenterX());
-					line.setStartY(circle.getCenterY());
+					line.setStartY(circle.getCenterY());*/
 				} else {
 					circle.setCenterX(mousex+x);
 					circle.setCenterY(mousey+y);

@@ -25,10 +25,10 @@ public class RecipeForm extends ViewBase{
 	 */
 	public RecipeForm(){
 		super();
+		setTitle("Recipe Builder");
 		init();
 		recipeGrid.setHgap(5);
 		recipeGrid.setVgap(8);
-		
 		topRecipeGrid.setHgap(5);
 		topRecipeGrid.setVgap(8);
 		VBox recipeBox = new VBox();
