@@ -38,8 +38,8 @@ public class FormBuilder extends ViewBase {
 		formNode = Cycic.workingNode;
 		TITLE = (String) Cycic.workingNode.name;
 		userLevel = formNode.userLevel;
-		Button button = new Button();
-		button.setText(formNode.facilityType);
+		Label nameLabel = new Label(formNode.facilityType);
+		nameLabel.setOnMouseClicked(FormBuilderFunctions.helpDialogHandler(formNode.doc));
 
 		Label lifetimeLabel    = new Label("Lifetime");
 		TextField lifetimeField = FormBuilderFunctions.lifetimeFieldBuilder(formNode);
@@ -65,7 +65,7 @@ public class FormBuilder extends ViewBase {
 		
 		topGrid.add(new Label("User Level"), 0, 0);
 		topGrid.add(userLevelBox, 1, 0);
-		topGrid.add(button, 2, 0);
+		topGrid.add(nameLabel, 2, 0);
 		topGrid.setPadding(new Insets(10, 10, 20, 10));
 		topGrid.setHgap(10);
 		topGrid.setVgap(10);

@@ -641,6 +641,7 @@ public class FormBuilderFunctions {
 			TextField fileField = fileTextField(facArray, dataArray);
 			grid.add(fileField, col, row);
 			grid.add(fileChooserButton(fileField), col+1, row);
+			break;
 		default:
 			grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), col, row);
 			break;
