@@ -62,7 +62,6 @@ public class DataArrays{
 
 
     public static void cycicInitLoader(String entity) {
-        
         Resources1 resource = new Resources1();
         File file = new File(resource.getCurrentPath());
         String path = "/" + file.getParent();

@@ -264,7 +264,7 @@ public class Cycic extends ViewBase{
 	private void init(){
 
 		setCloseable(false);
-		enableDragging(false);
+		//enableDragging(false);
         DataArrays.cycicInitLoader("facility");
 
         final ContextMenu paneMenu = new ContextMenu();
@@ -677,7 +677,7 @@ public class Cycic extends ViewBase{
 			      }
 			}
 		});
-		simInfo.add(clear, 4, 0);
+		simInfo.add(clear, 3, 0);
 		
 		duration.setMaxWidth(150);
 		duration.setPromptText("Length of Simulation");
@@ -853,6 +853,10 @@ public class Cycic extends ViewBase{
         GridPane.setHalignment(serverLabel, HPos.RIGHT);
     	simInfo.add(serverLabel, 1, 8, 1, 1);
         simInfo.add(serverBox, 2, 8);
+        
+        Button cyclusHelp = new Button("Cyclus Help");
+        cyclusHelp.setOnAction(CyclusHelp.helpDialogHandler());
+        simInfo.add(cyclusHelp, 3, 8);
         
         runCyclus.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent e){

@@ -417,7 +417,7 @@
     "cyclus::TimeListener", 
     "cyclus::Trader"
    ], 
-   "doc": "A reactor facility is provided as a skeleton for the design of new facility agents.", 
+   "doc": "A reactor facility capable of moduling reactors for nuclear fuel cycle simulation.", 
    "entity": "facility", 
    "name": "reactor::ReactorFacility", 
    "niche": "reactor", 
@@ -427,9 +427,9 @@
      "alias": ["CR_fissile", "val"], 
      "index": 31, 
      "tooltip": ["List of fissile isotopes for conversion ratio calculation.", ""], 
-     "type": ["std::vector", "std::string"], 
-     "uilabel": ["CR_fissile", ""], 
-     "units": ["NUCID", "NUCID"]
+     "type": ["std::vector", "std::string"],
+     "uilabel": ["CR Isotopes", ""], 
+     "units": ["", "NUCID"]
     }, 
     "CR_lower": {
      "alias": "CR_lower", 
