@@ -720,11 +720,12 @@
      "alias": "nonleakage", 
      "default": 0.980, 
      "doc": "Varies from 0 - 1.", 
+     "range": "0...1",
      "index": 12, 
      "tooltip": "Non-leakage probability", 
      "type": "double", 
      "uilabel": "nonleakage", 
-     "userlevel": 1
+     "userlevel": 0
     }, 
     "out_commod": {
      "alias": "out_commod", 
