@@ -58,7 +58,7 @@ public class ConnectorLine extends Line {
 
 		left1.setEndX((x1 + (x2-x1)*0.38)-5.0*(y2-y1)/Math.sqrt(Math.pow((y2-y1), 2)+Math.pow(x2-x1, 2)));
 		left1.setEndY((y1 + (y2-y1)*0.38)+5.0*(x2-x1)/Math.sqrt(Math.pow((y2-y1), 2)+Math.pow(x2-x1, 2)));
-		
+		  	
 		right.setStartX(x1 + (x2-x1)*0.66);
 		right.setStartY(y1 + (y2-y1)*0.66);
 		
