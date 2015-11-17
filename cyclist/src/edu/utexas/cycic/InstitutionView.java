@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -95,7 +97,13 @@ public class InstitutionView extends ViewBase {
 		topGrid.setVgap(2);
 
 		topGrid.add(new Label("Name"), 0, 0);
-		topGrid.add(FormBuilderFunctions.institNameBuilder(InstitutionCorralView.workingInstitution), 1, 0, 2, 1);
+		TextField nameField = FormBuilderFunctions.institNameBuilder(InstitutionCorralView.workingInstitution);
+		nameField.textProperty().addListener(new ChangeListener<String>(){         
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
+				setTitle(newValue);
+			}
+		});
+		topGrid.add(nameField, 1, 0, 2, 1);
 		Label initFac = new Label("Add Intital Facilities"){
 			{
 				setTooltip(new Tooltip("Add intitial facilities to the institution here."));

@@ -71,7 +71,13 @@ public class FormBuilder extends ViewBase {
 		topGrid.setVgap(10);
 		
 		topGrid.add(new Label("Name"), 0, 1);
-		topGrid.add(FormBuilderFunctions.nameFieldBuilder(formNode), 1, 1);
+		TextField nameField = FormBuilderFunctions.nameFieldBuilder(formNode);
+		nameField.textProperty().addListener(new ChangeListener<String>(){         
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
+				setTitle(newValue);
+			}
+		});
+		topGrid.add(nameField, 1, 1);
 		
 		grid.setAlignment(Pos.BASELINE_CENTER);
 		grid.setVgap(15);
