@@ -642,6 +642,10 @@ public class FormBuilderFunctions {
 			grid.add(fileField, col, row);
 			grid.add(fileChooserButton(fileField), col+1, row);
 			break;
+		case "popup":
+			break;
+		case "resizer":
+			break;
 		default:
 			grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), col, row);
 			break;
