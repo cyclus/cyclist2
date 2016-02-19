@@ -262,11 +262,6 @@ public class RegionView extends ViewBase{
 				} else {
 					// Adding the label
 					Label name = FormBuilderFunctions.nameLabelMaker(facArray);
-					if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-						name.setText((String) facArray.get(9));
-					} else {
-						name.setText((String) facArray.get(0));	
-					}
 					grid.add(name, columnNumber, rowNumber);
 					// Setting up the input type for the label
 					if (facArray.get(4) != null){

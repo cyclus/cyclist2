@@ -221,11 +221,6 @@ public class InstitutionView extends ViewBase {
 				if (facArray.get(2).toString().equalsIgnoreCase("oneOrMore")){
 					if ((int)facArray.get(6) <= userLevel && i == 0){
 						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), 1+columnNumber, rowNumber);
 						rowNumber += 1;
