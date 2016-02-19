@@ -8,10 +8,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
@@ -564,7 +568,47 @@ public class FormBuilderFunctions {
 	}
 	
 	/**
-	/**
+	 * 
+	 * @param help
+	 */
+    public static void showHelpDialog(String help) {
+        Dialog dg = new Dialog();
+        dg.setResizable(true);
+        ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
+        dg.setContentText(help);
+        dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+        dg.show();
+    }
+
+    
+    /**
+     * 
+     * @param help
+     * @return
+     */
+    public static EventHandler<MouseEvent> helpDialogHandler(String help) {
+        return new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent e){
+                if(e.getClickCount() == 2){
+                    showHelpDialog(help);
+                }
+            }
+        };
+    }
+
+	
+    public static Label nameLabelMaker(ArrayList<Object> facArray){
+    	Label name = new Label((String) facArray.get(0));
+		if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
+			name.setText((String) facArray.get(9));
+		} else {
+			name.setText((String) facArray.get(0));	
+		}
+		name.setTooltip(new Tooltip((String)facArray.get(7)));
+		name.setOnMouseClicked(FormBuilderFunctions.helpDialogHandler( (String) facArray.get(8)));
+		return name;
+    }
+    
 	/**
 	 * 
 	 * @param grid
@@ -597,6 +641,7 @@ public class FormBuilderFunctions {
 			TextField fileField = fileTextField(facArray, dataArray);
 			grid.add(fileField, col, row);
 			grid.add(fileChooserButton(fileField), col+1, row);
+			break;
 		default:
 			grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), col, row);
 			break;

@@ -14,6 +14,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -21,6 +22,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 /**
  * A View Class for generating the form required for interacting with a Cyclus region.
@@ -36,6 +38,13 @@ public class RegionView extends ViewBase{
 		super();
 		TITLE = (String) RegionCorralView.workingRegion.name;
 		workingRegion = RegionCorralView.workingRegion;
+		
+		setOnMousePressed(new EventHandler<MouseEvent>(){
+			public void handle(MouseEvent e){
+				RegionCorralView.workingRegion = workingRegion;
+			}
+		});
+		
 		//Institution list view for the region.
 		final ListView<String> institList = new ListView<String>();
 		institList.setOrientation(Orientation.VERTICAL);
@@ -78,6 +87,7 @@ public class RegionView extends ViewBase{
 			}
 		});
 		Button addInstit = new Button();
+		
 		addInstit.setText("Add Institution");
 		addInstit.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent event){
@@ -90,44 +100,71 @@ public class RegionView extends ViewBase{
 				}
 			}
 		});
+		Label addInst = new Label("Adding Institutions"){
+			{
+				setTooltip(new Tooltip("Use to add institutions to a region."));
+				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("To add an institution to a region select an institution from the drop down menu and " +
+						"click the 'Add Institution' button. An institution may exist in only one region. If you wish to have identical institution in regions " +
+						"you will need to add two of the exact same institution. Ideally you will name each institution <institutionname - region>."));
+				setFont(new Font(14));				
+			}
+		};
+		
+		Label protoDetails = new Label("Region Details"){
+			{
+				setTooltip(new Tooltip("Use to set the details of this region"));
+				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("In this form the user can enter information into the region archetype to make it a cyclus region. " +
+						"The region will take on the properties listed in the table below during the cyclus simulation. This form is derived from the module developer's code. " +
+						"If you have questions about the form fields you may hover over or double click on the form field name for more information. If this is not enough help you may "+
+						"the module developer / cyclus developer team. "));
+				setFont(new Font(14));							
+			}
+		};
+		titleGrid.add(protoDetails, 0, 5);
+		titleGrid.setVgap(1);
+		titleGrid.setStyle("-fx-background-color:transparent;");
 		
 		// Setting up the view visuals.
+		topGrid.add(new Label("Name"), 0, 0);
+		topGrid.add(FormBuilderFunctions.regionNameBuilder(RegionCorralView.workingRegion), 1, 0);
+		topGrid.add(addInst, 0, 2);
 		topGrid.add(addNewInstitBox, 0, 3);
 		topGrid.add(addInstit, 1, 3);
+		topGrid.setPadding(new Insets(0, 0, 5, 0));
 		topGrid.setHgap(10);
 		topGrid.setVgap(2);
-		
-		topGrid.add(new Label("Name"), 0, 4);
-		topGrid.add(FormBuilderFunctions.regionNameBuilder(RegionCorralView.workingRegion), 1, 4);
+		topGrid.setStyle("-fx-border-color: black;");
+
 		
 		grid.autosize();
 		grid.setAlignment(Pos.BASELINE_CENTER);
 		grid.setVgap(10);
 		grid.setHgap(5);
 		grid.setPadding(new Insets(5, 5, 5, 5));
-		grid.setStyle("-fx-background-color: silver;");
-				
-		HBox regionSideBar = new HBox();
-		VBox institBox = new VBox();
-		institBox.getChildren().addAll(new Label("Institutions"), institList);
-		regionSideBar.setPadding(new Insets(0, 5, 0, 0));
-		regionSideBar.getChildren().addAll(institBox);
+		grid.setStyle("-fx-background-color: transparent;");
 		
-		VBox regionGridBox = new VBox();
-		regionGridBox.getChildren().addAll(topGrid, grid);		
+		ScrollPane scroll = new ScrollPane();
+		scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		scroll.setMaxHeight(500);
+		scroll.setContent(grid);
+		VBox institBox = new VBox(new Label("Institutions"), institList);
+		institBox.setStyle("-fx-border-color: black;");
+		VBox gridBox = new VBox(titleGrid, scroll);
+		gridBox.setStyle("-fx-background-color: #CCCCCC; -fx-border-color: black;");
+		VBox regionGridBox = new VBox(topGrid, gridBox);
 		
-		HBox regionBox = new HBox();
-		regionBox.getChildren().addAll(regionSideBar, regionGridBox);
+		HBox regionBox = new HBox(institBox, regionGridBox);
 		
 		setTitle(TITLE);
 		setContent(regionBox);
-		formBuilder(RegionCorralView.workingRegion.regionStruct, RegionCorralView.workingRegion.regionData);
+		formBuilder(workingRegion.regionStruct, workingRegion.regionData);
 		
 	}
 	
 	//private ComboBox<String> structureCB = new ComboBox<String>();
-	private GridPane grid = new GridPane();
-	private GridPane topGrid = new GridPane();
+	GridPane titleGrid = new GridPane();
+	GridPane grid = new GridPane();
+	GridPane topGrid = new GridPane();
 	private int rowNumber = 0;
 	private int columnNumber = 0;
 	private int columnEnd = 0;
@@ -155,14 +192,7 @@ public class RegionView extends ViewBase{
 			} else if (i == 0){
 				if (facArray.get(2) == "oneOrMore"){
 					if ((int)facArray.get(6) <= userLevel && i == 0){
-						Label name = new Label((String) facArray.get(0));
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
-						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						rowNumber += 1;
@@ -170,7 +200,7 @@ public class RegionView extends ViewBase{
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								grid.add(arrayListRemove(dataArray, ii), columnNumber+2, rowNumber);
+								grid.add(arrayListRemove(dataArray, ii), columnNumber-1, rowNumber);
 							}
 							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
@@ -183,14 +213,7 @@ public class RegionView extends ViewBase{
 					//facArray = (ArrayList<Object>) facArray.get(1);
 					//dataArray = (ArrayList<Object>) dataArray.get(0);
 					if ((int)facArray.get(6) <= userLevel && i == 0){
-						Label name = new Label((String) facArray.get(0));
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
-						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						rowNumber += 1;
@@ -198,7 +221,7 @@ public class RegionView extends ViewBase{
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								grid.add(arrayListRemove(dataArray, ii), columnNumber+2, rowNumber);
+								grid.add(arrayListRemove(dataArray, ii), columnNumber-1, rowNumber);
 							}
 							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
@@ -208,21 +231,14 @@ public class RegionView extends ViewBase{
 					}				
 				} else if (facArray.get(2) == "zeroOrMore") {
 					if ((int)facArray.get(6) <= userLevel && i == 0){
-						Label name = new Label((String) facArray.get(0));
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
-						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						// Indenting a sub structure
 						rowNumber += 1;
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
-							grid.add(arrayListRemove(dataArray, ii), columnNumber+2, rowNumber);
+							grid.add(arrayListRemove(dataArray, ii), columnNumber-1, rowNumber);
 							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
 						}
@@ -232,13 +248,7 @@ public class RegionView extends ViewBase{
 					}
 				} else if (facArray.get(1) instanceof ArrayList) {
 					if ((int)facArray.get(6) <= userLevel){
-						Label name = new Label((String) facArray.get(0));
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
-						name.setTooltip(new Tooltip ((String)facArray.get(7)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						rowNumber += 1;
 						// Indenting a sub structure
@@ -251,8 +261,7 @@ public class RegionView extends ViewBase{
 					}
 				} else {
 					// Adding the label
-					Label name = new Label((String) facArray.get(0));
-					name.setTooltip(new Tooltip((String) facArray.get(7)));
+					Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 					if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
 						name.setText((String) facArray.get(9));
 					} else {

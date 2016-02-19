@@ -89,8 +89,8 @@ public class InstitutionCorralView extends ViewBase{
 	 */
 	public InstitutionCorralView(){
 		super();
-
-		DataArrays.cycicInitLoader();
+		setTitle("Institution Corral");
+		DataArrays.cycicInitLoader("institution");
 
 		TextField institName = new TextField();
 		
@@ -169,7 +169,7 @@ public class InstitutionCorralView extends ViewBase{
 
 	}
 	
-	private GridPane topGrid = new GridPane(){
+	static GridPane topGrid = new GridPane(){
 		{
 			setHgap(10);
 			setVgap(5);

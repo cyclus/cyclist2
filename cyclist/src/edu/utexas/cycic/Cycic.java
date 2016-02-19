@@ -1,9 +1,7 @@
 package edu.utexas.cycic;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -30,7 +28,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
@@ -57,18 +54,17 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 
+import com.sun.glass.ui.Cursor;
+
 import edu.utah.sci.cyclist.Cyclist;
 import edu.utah.sci.cyclist.core.controller.CyclistController;
 import edu.utah.sci.cyclist.core.event.dnd.DnD;
-import edu.utah.sci.cyclist.core.event.dnd.DnD.LocalClipboard;
-import edu.utah.sci.cyclist.core.event.notification.CyclistNotification;
 import edu.utah.sci.cyclist.core.model.CyclusJob;
 import edu.utah.sci.cyclist.core.model.CyclusJob.Status;
 import edu.utah.sci.cyclist.core.model.Preferences;
 import edu.utah.sci.cyclist.core.ui.components.ViewBase;
 import edu.utah.sci.cyclist.core.util.AwesomeIcon;
 import edu.utah.sci.cyclist.core.util.GlyphRegistry;
-import edu.utexas.cycic.presenter.CycicPresenter;
 
 public class Cycic extends ViewBase{
 	static Logger log = Logger.getLogger(Cycic.class);
@@ -103,12 +99,6 @@ public class Cycic extends ViewBase{
     private static Object monitor = new Object();
     static String currentSkin = "Default Skin";
     static String currentServer = "";
-    static TextField duration = VisFunctions.numberField();
-	static ComboBox<String> startMonth = new ComboBox<String>();
-	static TextField startYear = VisFunctions.numberField();
-	static TextArea description = new TextArea();
-	static ComboBox<String> decay = new ComboBox<String>();
-	static TextField simHandle = new TextField();
 	
     
 	/**
@@ -168,6 +158,12 @@ public class Cycic extends ViewBase{
 							setTooltip(new Tooltip("Commodities facilitate the transfer of materials from one facility to another."
 									+ "Facilities with the same commodities are allowed to trade with each other."));
 							setFont(new Font("Times", 16));
+							setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("Commodities represent possible connections between facilities. " +
+							"If two facilities share a commodity then they can trade material with eacher and will make bids and offers to each other during " +
+							"the resource exchange phase. This commodity may be tied to a specific recipe by does not need to be, the facilities may decide " +
+							"the recipe of the materials being traded themselves." + System.lineSeparator() + System.lineSeparator() +
+							System.lineSeparator() +"Commodity priorities are used to determine the order that commodities "+ 
+							"are solved in the dynamic resource exchange."));
 						}
 					});
 					getChildren().add(addNewCommod);
@@ -189,6 +185,9 @@ public class Cycic extends ViewBase{
 				{
 					setText("Add Available Archetypes");
 					setTooltip(new Tooltip("Use the drop down menu to select archetypes to add to the simulation."));
+					setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("This button will allow CycIC to find any Cyclus modules currently" + 
+					" installed on the machine you are running Cyclus on. For example, this might be your local machine. Or it might be the remote " +
+					"server you are connecting to."));
 					setFont(new Font("Times", 16));
 				}
 			}, 0, 0);
@@ -265,8 +264,8 @@ public class Cycic extends ViewBase{
 	private void init(){
 
 		setCloseable(false);
-		enableDragging(false);
-        DataArrays.cycicInitLoader();
+		//enableDragging(false);
+        DataArrays.cycicInitLoader("facility");
 
         final ContextMenu paneMenu = new ContextMenu();
         MenuItem linkColor = new MenuItem("Change Link Color...");
@@ -442,7 +441,6 @@ public class Cycic extends ViewBase{
 				facility.cycicCircle.setCenterY(80);
 				VisFunctions.placeTextOnCircle(facility.cycicCircle, "middle");
 
-				
 				for(int i = 0; i < DataArrays.visualizationSkins.size(); i++){
 					if(DataArrays.visualizationSkins.get(i).name.equalsIgnoreCase(currentSkin)){
 						facility.cycicCircle.image.setImage(DataArrays.visualizationSkins.get(i).images.getOrDefault(facility.niche,DataArrays.visualizationSkins.get(i).images.get("facility")));
@@ -456,7 +454,8 @@ public class Cycic extends ViewBase{
 				facility.cycicCircle.image.setLayoutY(facility.cycicCircle.getCenterY()-60);
 				
 				facility.sorterCircle = SorterCircles.addNode((String)facility.name, facility, facility);
-				FormBuilderFunctions.formArrayBuilder(facility.facilityStructure, facility.facilityData);		
+				FormBuilderFunctions.formArrayBuilder(facility.facilityStructure, facility.facilityData);	
+				facNameField.clear();
 			}
 		});
 		grid.add(submit1, 4, 0);
@@ -604,7 +603,7 @@ public class Cycic extends ViewBase{
 		buildCommodPane();
 	}
 	
-	HashMap<String, String> months = new HashMap<String, String>();
+	static HashMap<String, String> months = new HashMap<String, String>();
 	static ArrayList<String> monthList = new ArrayList<String>();
 	/**
 	 * Quick hack to convert months into their integer values.
@@ -641,11 +640,45 @@ public class Cycic extends ViewBase{
 	/**
 	 * 
 	 */
-	public void details(){
+	public static void details(){
+	    TextField duration = VisFunctions.numberField();
+		ComboBox<String> startMonth = new ComboBox<String>();
+		TextField startYear = VisFunctions.numberField();
+		TextArea description = new TextArea();
+		ComboBox<String> decay = new ComboBox<String>();
+		TextField simHandle = new TextField();
+		
+		
 		Label simDets = new Label("Simulation Details");
 		simDets.setTooltip(new Tooltip("The top level details of the simulation."));
+		simDets.setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("The top level simulations details can be set in this " +
+		"section of the user interface. The details for each field can be found by double clicking each field."));
 		simDets.setFont(new Font("Times", 16));
 		simInfo.add(simDets, 0, 0, 2, 1);
+		
+		Button clear = new Button("Clear Scenario");
+		clear.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e){
+			      Dialog<ButtonType> dg = new Dialog();
+			      dg.setTitle("Scenario Clear");
+			      dg.setHeaderText("Warning: You will lose all unsaved work");
+			      dg.setContentText("Are you sure you want to clear the scenario?");
+			      dg.getDialogPane().getButtonTypes().addAll(ButtonType.YES, ButtonType.NO);
+			      Optional<ButtonType> result = dg.showAndWait();
+			      if(result.get() == ButtonType.YES){
+			    	  clearScenario();	
+			    	  Cycic.details();
+			    	  VisFunctions.redrawPane();
+			    	  VisFunctions.redrawInstitPane();
+			    	  VisFunctions.redrawRegionPane();
+			    	  buildCommodPane();
+			    	  
+			    	  
+			      }
+			}
+		});
+		simInfo.add(clear, 3, 0);
+		
 		duration.setMaxWidth(150);
 		duration.setPromptText("Length of Simulation");
 		duration.setText(Cycic.workingScenario.simulationData.duration);
@@ -655,7 +688,13 @@ public class Cycic extends ViewBase{
 				Cycic.workingScenario.simulationData.duration = newValue;
 			}
 		});
-		simInfo.add(new Label("Duration (Months)"), 0, 1, 2, 1);
+		simInfo.add(new Label("Duration (Months)"){
+			{
+				setTooltip(new Tooltip("Used to set the duration of the simulation in number of timesteps (default timestep is one month)."));
+				setFont(new Font("Times", 12));
+				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("Used to set the duration of the simulation in number of timesteps (default timestep is one month)."));
+			}
+		}, 0, 1, 2, 1);
 		simInfo.add(duration, 2, 1);
 		
 		for(int i = 0; i < 12; i++ ){
@@ -669,7 +708,13 @@ public class Cycic extends ViewBase{
 			}
 		});
 		startMonth.setPromptText("Select Month");
-		simInfo.add(new Label("Start Month"), 0, 2, 2, 1);
+		simInfo.add(new Label("Start Month"){
+			{
+				setTooltip(new Tooltip("Used to set the starting month of the simulation."));
+				setFont(new Font("Times", 12));
+				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("Used to set the starting month of the simulation."));
+			}
+		}, 0, 2, 2, 1);
 		simInfo.add(startMonth, 2, 2);
 		
 		startYear.setText(Cycic.workingScenario.simulationData.startYear);
@@ -681,10 +726,17 @@ public class Cycic extends ViewBase{
 		});
 		startYear.setPromptText("Starting Year");
 		startYear.setMaxWidth(150);
-		simInfo.add(new Label("Start Year"), 0, 3, 2, 1);
+		simInfo.add(new Label("Start Year"){
+			{
+				setTooltip(new Tooltip("Used to set the starting year of the simulation."));
+				setFont(new Font("Times", 12));
+				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("This does not represent an actual year (i.e. no real historical data is build in). " +
+				"It simply provides the user with a basis for the current timestep. It may be set to any value so long as the user knows the start year."));
+			}
+		}, 0, 3, 2, 1);
 		simInfo.add(startYear, 2, 3);
 				
-		decay.getItems().addAll("manual", "never");
+		decay.getItems().addAll("manual", "never", "lazy");
 		decay.setValue("Never");
 		Cycic.workingScenario.simulationData.decay = "never";
 		decay.setOnAction(new EventHandler<ActionEvent>(){
@@ -692,7 +744,16 @@ public class Cycic extends ViewBase{
 				Cycic.workingScenario.simulationData.decay = decay.getValue();
 			}
 		});
-		simInfo.add(new Label("Decay"), 0, 4);
+		simInfo.add(new Label("Decay"){
+			{
+				setTooltip(new Tooltip("Used to set the decay type of the simulation."));
+				setFont(new Font("Times", 12));
+				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("Decay types are as follows." + System.lineSeparator() + System.lineSeparator() +
+						" Never: Simulation will never decay even if facilities would typically do so." + System.lineSeparator() + 
+						" Manual: Facilities can decay materials within themselves if they desire. This is typically set by the module developer." +
+						System.lineSeparator() + "Lazy: System decays all material in each time step. This is the most system intensive setting."));
+			}
+		}, 0, 4);
 		simInfo.add(decay, 2, 4);
 		
 		simHandle.setPromptText("Optional Simulation Name");
@@ -793,6 +854,10 @@ public class Cycic extends ViewBase{
     	simInfo.add(serverLabel, 1, 8, 1, 1);
         simInfo.add(serverBox, 2, 8);
         
+        Button cyclusHelp = new Button("Cyclus Help");
+        cyclusHelp.setOnAction(CyclusHelp.helpDialogHandler());
+        simInfo.add(cyclusHelp, 3, 8);
+        
         runCyclus.setOnAction(new EventHandler<ActionEvent>(){
             public void handle(ActionEvent e){
               OutPut.CheckInjection();
@@ -845,32 +910,31 @@ public class Cycic extends ViewBase{
 
 
     public void addArcheToBar(String archeType){
-        
-		for(int i = 0; i < DataArrays.simFacilities.size(); i++){
-			if(DataArrays.simFacilities.get(i).facilityName.equalsIgnoreCase(archeType)){
-				if(DataArrays.simFacilities.get(i).loaded == true){
-					return;
-				}
-				facilityStructure test = DataArrays.simFacilities.get(i);
-				try {
-					test.loaded = true;
-					FacilityCircle circle = new FacilityCircle();
-					int pos = 0;
-					for(int k = 0; k < DataArrays.simFacilities.size(); k++){
-						if(DataArrays.simFacilities.get(k).loaded == true){
-							pos+=1;
-						}
-					}
-					buildDnDCircle(circle, pos-1, test.facilityName);
-					nodesPane.getChildren().addAll(circle, circle.text);
-				} catch (Exception eq) {
-					
-				}
-			}
-		}
-
+    	nodesPane.getChildren().clear();
+    	int pos = 0;
+    	for(int i = 0; i < DataArrays.simFacilities.size(); i++){
+    		facilityStructure test = DataArrays.simFacilities.get(i);
+    		if(test.facilityName.equalsIgnoreCase(archeType)){
+    			if(test.loaded == true){
+    				pos = placeDnDCircle(pos, test);
+    				continue;
+    			}
+    			test.loaded = true;
+    			pos = placeDnDCircle(pos, test);
+    		} else if(test.loaded == true){
+    			pos = placeDnDCircle(pos, test);
+    		}
+    	} 
     }
 
+    public int placeDnDCircle(int pos, facilityStructure test){
+		FacilityCircle circle = new FacilityCircle();
+		pos += 1;
+		buildDnDCircle(circle, pos-1, test.facilityName);
+		nodesPane.getChildren().addAll(circle, circle.text);
+		return pos;
+    }
+    
 	public void createArchetypeBar(GridPane grid){
 		ComboBox<String> archetypes = new ComboBox<String>();
 		for(int i = 0; i < DataArrays.simFacilities.size(); i++){
@@ -886,7 +950,9 @@ public class Cycic extends ViewBase{
 		});
 		archetypes.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent e){
-				addArcheToBar(archetypes.getValue());
+				if(archetypes.getValue() != null){
+					addArcheToBar(archetypes.getValue());
+				}	
 			}
 		});
 
@@ -903,7 +969,7 @@ public class Cycic extends ViewBase{
                         String metadata = new String();
                         while ((line = metaBuf.readLine()) != null) {metadata += line;}
                         metaBuf.close();
-                        DataArrays.retrieveSchema(metadata);
+                        DataArrays.retrieveSchema(metadata, "facility");
                     } catch (IOException ex) {
                         log.error(ex.getMessage());
 //                        ex.printStackTrace();
@@ -922,7 +988,7 @@ public class Cycic extends ViewBase{
 		                        public void changed(ObservableValue<? extends Status> observable,
 		                            Status oldValue, Status newValue) {
 		                            if (newValue == Status.READY) {
-		                                DataArrays.retrieveSchema(_remoteDashA.getStdout());
+		                                DataArrays.retrieveSchema(_remoteDashA.getStdout(), "facility");
 		                            }
 		                        }
 	                    });
@@ -978,6 +1044,27 @@ public class Cycic extends ViewBase{
 				break;
 			}
 		}
+	}
+	
+	public static void clearScenario(){
+		CycicScenarios.workingCycicScenario.Recipes.clear();
+		CycicScenarios.workingCycicScenario.institNodes.clear();
+		CycicScenarios.workingCycicScenario.regionNodes.clear();
+		CycicScenarios.workingCycicScenario.FacilityNodes.clear();
+		CycicScenarios.workingCycicScenario.CommoditiesList.clear();
+		CycicScenarios.workingCycicScenario.Links.clear();
+		CycicScenarios.workingCycicScenario.RecipesList.clear();
+		CycicScenarios.workingCycicScenario.FacilityTypes.clear();
+		clearSimDetails();
+	}
+	
+	public static void clearSimDetails(){
+		CycicScenarios.workingCycicScenario.simulationData.decay = "never";
+		CycicScenarios.workingCycicScenario.simulationData.description = "";
+		CycicScenarios.workingCycicScenario.simulationData.duration = null;
+		CycicScenarios.workingCycicScenario.simulationData.simHandle = null;
+		CycicScenarios.workingCycicScenario.simulationData.startMonth = "January";
+		CycicScenarios.workingCycicScenario.simulationData.startYear = null;
 	}
 	
 }

@@ -16,13 +16,17 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import edu.utah.sci.cyclist.core.ui.components.ViewBase;
 
 public class InstitutionView extends ViewBase {
@@ -44,6 +48,15 @@ public class InstitutionView extends ViewBase {
 		super();
 		TITLE = (String) InstitutionCorralView.workingInstitution.name;
 		workingInstitution = InstitutionCorralView.workingInstitution;
+		GridPane grid = new GridPane();
+		GridPane topGrid = new GridPane();
+		
+		GridPane titleGrid = new GridPane();
+		setOnMousePressed(new EventHandler<MouseEvent>(){
+			public void handle(MouseEvent e){
+				InstitutionCorralView.workingInstitution = workingInstitution;
+			}
+		});
 
 		//Initial facility list view for the institution.
 
@@ -83,7 +96,16 @@ public class InstitutionView extends ViewBase {
 
 		topGrid.add(new Label("Name"), 0, 0);
 		topGrid.add(FormBuilderFunctions.institNameBuilder(InstitutionCorralView.workingInstitution), 1, 0, 2, 1);
-		
+		Label initFac = new Label("Add Intital Facilities"){
+			{
+				setTooltip(new Tooltip("Add intitial facilities to the institution here."));
+				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("Initital facilities are facilities that are built into the simulation at the first timestep. " +
+				"These facilities will operate during the first timestep. Adding a new intital facility will show up as <Prototype> - <Number>. This indicates " +
+						"that <number> facilities of <prototype> will be built at the start of the simulation."));
+				setFont(new Font(14));				
+			}
+		};
+		topGrid.add(initFac, 0, 1);
 		topGrid.add(new Label("Prototype"), 0, 2);
 		ComboBox<String> protoName = new ComboBox<String>();
 		protoName.setOnMouseClicked(new EventHandler<MouseEvent>(){
@@ -126,31 +148,51 @@ public class InstitutionView extends ViewBase {
 			}
 		});
 		topGrid.add(protoButton, 4, 2);
+		Label protoDetails = new Label("Institution Details"){
+			{
+				setTooltip(new Tooltip("Use to set the details of this prototype"));
+				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("In this form the user can enter information into the institution archetype to make it a cyclus institution. " +
+						"The institution will take on the properties listed in the table below during the cyclus simulation. This form is derived from the module developer's code. " +
+						"If you have questions about the form fields you may hover over or double click on the form field name for more information. If this is not enough help you may "+
+						"the module developer / cyclus developer team. "));
+				setFont(new Font(14));				
+			}
+		};
+		titleGrid.add(protoDetails, 0, 5);
+		
+		titleGrid.setVgap(1);
+		titleGrid.setStyle("-fx-background-color:transparent;");
+		topGrid.setVgap(5);
+		topGrid.setPadding(new Insets(5, 5, 5, 5));
+		topGrid.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: black;");
 		grid.autosize();
 		grid.setAlignment(Pos.BASELINE_CENTER);
 		grid.setVgap(10);
 		grid.setHgap(5);
 		grid.setPadding(new Insets(5, 5, 5, 5));
-		grid.setStyle("-fx-background-color: silver;");
-
-		VBox regionGridBox = new VBox();
-		regionGridBox.getChildren().addAll(topGrid, grid);		
+		grid.setStyle("-fx-background-color:transparent;");
 		
+		ScrollPane scroll = new ScrollPane();
+		scroll.setContent(grid);
+		scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		scroll.setStyle("-fx-background-color:transparent;");
+		scroll.setMaxHeight(500);
+		VBox gridBox = new VBox(titleGrid, scroll);
+		gridBox.setStyle("-fx-background-color: #CCCCCC; -fx-border-color: black;");
+		VBox institutionGridBox = new VBox(topGrid, gridBox);
+		scroll.setPrefWidth(gridBox.getWidth());
 		VBox listBox = new VBox();
 		listBox.getChildren().addAll(new Label("Initial Facilities"), facilityList);
-		HBox overView = new HBox();
-		overView.getChildren().addAll(listBox, regionGridBox);
+		facilityList.setStyle("-fx-background-color:transparent;");
+		listBox.setStyle("-fx-border-color: black;");
+		HBox overView = new HBox(listBox, institutionGridBox);
 		
 		setTitle(TITLE);
-		setContent(overView);
-		//setPrefSize(600,400);		
-		formBuilder(InstitutionCorralView.workingInstitution.institStruct, InstitutionCorralView.workingInstitution.institData);
-
+		setContent(overView);	
+		formBuilder(InstitutionCorralView.workingInstitution.institStruct, InstitutionCorralView.workingInstitution.institData, grid);
 	}
 
 	//private ComboBox<String> structureCB = new ComboBox<String>();
-	private GridPane grid = new GridPane();
-	private GridPane topGrid = new GridPane();
 	private int rowNumber = 0;
 	private int columnNumber = 0;
 	private int columnEnd = 0;
@@ -167,18 +209,18 @@ public class InstitutionView extends ViewBase {
 	 * of the facility structure passed to the form. 
 	 */
 	@SuppressWarnings("unchecked")
-	public void formBuilder(ArrayList<Object> facArray, ArrayList<Object> dataArray){
+	public void formBuilder(ArrayList<Object> facArray, ArrayList<Object> dataArray, GridPane grid){
 		if (facArray.size() == 0){
 			grid.add(new Label("This archetype has no form to fill out."), 0, 0);
 			return;
 		}
 		for (int i = 0; i < facArray.size(); i++){
 			if (facArray.get(i) instanceof ArrayList && facArray.get(0) instanceof ArrayList) {
-				formBuilder((ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i));
+				formBuilder((ArrayList<Object>) facArray.get(i), (ArrayList<Object>) dataArray.get(i), grid);
 			} else if (i == 0){
-				if (facArray.get(2) == "oneOrMore"){
+				if (facArray.get(2).toString().equalsIgnoreCase("oneOrMore")){
 					if ((int)facArray.get(6) <= userLevel && i == 0){
-						Label name = new Label((String) facArray.get(0));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
 							name.setText((String) facArray.get(9));
 						} else {
@@ -191,26 +233,17 @@ public class InstitutionView extends ViewBase {
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								grid.add(arrayListRemove(dataArray, ii), columnNumber-1, rowNumber);
+								grid.add(arrayListRemove(dataArray, ii, grid), columnNumber-1, rowNumber);
 							}
-							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
+							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii), grid);	
 							rowNumber += 1;
 						}
 						// resetting the indent
 						columnNumber -= 1;
 					}
-				} else if (facArray.get(2) == "oneOrMoreMap"){
-					//facArray = (ArrayList<Object>) facArray.get(1);
-					//dataArray = (ArrayList<Object>) dataArray.get(0);
+				} else if (facArray.get(2).toString().equalsIgnoreCase("oneOrMoreMap")){
 					if ((int)facArray.get(6) <= userLevel && i == 0){
-						Label name = new Label((String) facArray.get(0));
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
-						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						rowNumber += 1;
@@ -218,47 +251,47 @@ public class InstitutionView extends ViewBase {
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								grid.add(arrayListRemove(dataArray, ii), columnNumber+2, rowNumber);
+								grid.add(arrayListRemove(dataArray, ii, grid), columnNumber-1, rowNumber);
 							}
-							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
+							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii), grid);	
 							rowNumber += 1;
 						}
 						// resetting the indent
 						columnNumber -= 1;
 					}
-				} else if (facArray.get(2) == "zeroOrMore") {
+				} else if (facArray.get(2).toString().equalsIgnoreCase("zeroOrMore")) {
 					if ((int)facArray.get(6) <= userLevel && i == 0){
-						Label name = new Label((String) facArray.get(0));
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
-						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						// Indenting a sub structure
 						rowNumber += 1;
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
-							grid.add(arrayListRemove(dataArray, ii), columnNumber+2, rowNumber);
-							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
+							grid.add(arrayListRemove(dataArray, ii, grid), columnNumber-1, rowNumber);
+							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii), grid);	
 							rowNumber += 1;
 						}
 						// resetting the indent
 						columnNumber -= 1;
 						rowNumber += 1;
+					} 
+				}else if (facArray.get(1) instanceof ArrayList) {
+					if ((int)facArray.get(6) <= userLevel){
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
+						grid.add(name, columnNumber, rowNumber);
+						rowNumber += 1;
+						// Indenting a sub structure
+						columnNumber += 1;
+						for(int ii = 0; ii < dataArray.size(); ii ++){
+							formBuilder((ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii), grid);						
+						}
+						// resetting the indent
+						columnNumber -= 1;
 					}
 				} else {
 					// Adding the label
-					Label name = new Label((String) facArray.get(0));
-					if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-						name.setText((String) facArray.get(9));
-					} else {
-						name.setText((String) facArray.get(0));	
-					}
-					name.setTooltip(new Tooltip((String) facArray.get(7)));
+					Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 					grid.add(name, columnNumber, rowNumber);
 					// Setting up the input type for the label
 					if (facArray.get(4) != null){
@@ -298,9 +331,9 @@ public class InstitutionView extends ViewBase {
 
 
 
-	/**
-	 * Function to add an orMore button to the form. This button allows the user to add additional fields to zeroOrMore or oneOrMore form inputs.
-	 * @param grid This is the grid of the current view. 
+		/**
+		 * Function to add an orMore button to the form. This button allows the user to add additional fields to zeroOrMore or oneOrMore form inputs.
+		 * @param grid This is the grid of the current view. 
 	 * @param facArray The ArrayList<Object> used to make a copy of the one or more field. 
 	 * @param dataArray The ArrayList<Object> the new orMore field will be added to.
 	 * @return Button that will add the orMore field to the dataArray and reload the form.
@@ -314,7 +347,7 @@ public class InstitutionView extends ViewBase {
 				FormBuilderFunctions.formArrayBuilder(facArray, (ArrayList<Object>) dataArray);
 				grid.getChildren().clear();
 				rowNumber = 0;
-				formBuilder(workingInstitution.institStruct, workingInstitution.institData);
+				formBuilder(workingInstitution.institStruct, workingInstitution.institData, grid);
 			}
 		});
 		return button;
@@ -326,7 +359,7 @@ public class InstitutionView extends ViewBase {
 	 * @param dataArrayNumber the index number of the orMore field that is to be removed.
 	 * @return Button for executing the commands in this function.
 	 */
-	public Button arrayListRemove(final ArrayList<Object> dataArray, final int dataArrayNumber){
+	public Button arrayListRemove(final ArrayList<Object> dataArray, final int dataArrayNumber, GridPane grid){
 		Button button = new Button();
 		button.setText("Remove");
 
@@ -335,7 +368,7 @@ public class InstitutionView extends ViewBase {
 				dataArray.remove(dataArrayNumber);
 				grid.getChildren().clear();
 				rowNumber = 0;
-				formBuilder(workingInstitution.institStruct, workingInstitution.institData);
+				formBuilder(workingInstitution.institStruct, workingInstitution.institData, grid);
 			}
 		});		
 

@@ -61,13 +61,12 @@ public class DataArrays{
 	static ArrayList<institutionStructure> simInstitutions = new ArrayList<institutionStructure>();	
 
 
-    public static void cycicInitLoader() {
-        
+    public static void cycicInitLoader(String entity) {
         Resources1 resource = new Resources1();
         File file = new File(resource.getCurrentPath());
         String path = "/" + file.getParent();
         try {
-            defaultJsonReader(path);
+            defaultJsonReader(entity);
             log.info("Meta data loaded for default archetypes.\n Use DISCOVER ARCHETYPES button to load more.");
         } catch (IOException e1) {
             log.warn("Could not read default meta data.\n Use DISCOVER ARCHETYPES button to load more.");
@@ -78,18 +77,26 @@ public class DataArrays{
 	/**
 	 * 
 	 */
-    public static void retrieveSchema(String rawMetadata) {
+    public static void retrieveSchema(String rawMetadata, String entity) {
         // rawMetadata is a JSON string.
+    	log.info("Attempting metadata retreival for entity type: "+ entity);
         Reader metaReader = new StringReader(rawMetadata);
         JsonReader metaJsonReader = Json.createReader(metaReader);
         JsonObject metadata = metaJsonReader.readObject();
         metaJsonReader.close();
         JsonObject schemas = metadata.getJsonObject("schema");
         JsonObject annotations = metadata.getJsonObject("annotations");
-            
-        DataArrays.simFacilities.clear();
-        DataArrays.simRegions.clear();
-        DataArrays.simInstitutions.clear();
+        switch (entity.toLowerCase()){
+        case "facility":
+        	DataArrays.simFacilities.clear();
+        	break;
+        case "institution":
+            DataArrays.simInstitutions.clear();
+            break;
+        case "region":
+        	DataArrays.simRegions.clear();
+        	break;
+        } 
         for(javax.json.JsonString specVal : metadata.getJsonArray("specs").getValuesAs(JsonString.class)){
         	String spec = specVal.getString();
             boolean test = true;
@@ -115,6 +122,9 @@ public class DataArrays{
             JsonObject anno = annotations.getJsonObject(spec);
             switch(anno.getString("entity")){
             case "facility":
+            	if(!entity.equalsIgnoreCase("facility")){
+            		continue;
+            	}
                 log.info("Adding archetype "+spec);
                 facilityStructure node = new facilityStructure();
                 node.facAnnotations = anno.toString();
@@ -128,6 +138,9 @@ public class DataArrays{
                 DataArrays.simFacilities.add(node);
                 break;
             case "region":
+            	if(!entity.equalsIgnoreCase("region")){
+            		continue;
+            	}
                 log.info("Adding archetype "+spec);
                 regionStructure rNode = new regionStructure();
                 rNode.regionAnnotations = anno.toString();
@@ -140,6 +153,9 @@ public class DataArrays{
                 DataArrays.simRegions.add(rNode);
                 break;
             case "institution":
+            	if(!entity.equalsIgnoreCase("institution")){
+            		continue;
+            	}
                 log.info("Adding archetype "+spec);
                 institutionStructure iNode = new institutionStructure();
                 iNode.institArch = spec;
@@ -162,7 +178,7 @@ public class DataArrays{
 
 
 
-    private static void defaultJsonReader(String path) throws IOException{
+    private static void defaultJsonReader(String entity) throws IOException{
     	InputStream in = Cyclist.class.getResourceAsStream("assets/default-metadata.json");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String         line = null;
@@ -174,7 +190,7 @@ public class DataArrays{
             stringBuilder.append( ls );
         }
         reader.close();
-        retrieveSchema(stringBuilder.toString());
+        retrieveSchema(stringBuilder.toString(), entity);
     }
 
 

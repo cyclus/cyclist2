@@ -38,8 +38,8 @@ public class FormBuilder extends ViewBase {
 		formNode = Cycic.workingNode;
 		TITLE = (String) Cycic.workingNode.name;
 		userLevel = formNode.userLevel;
-		Button button = new Button();
-		button.setText(formNode.facilityType);
+		Label nameLabel = new Label(formNode.facilityType);
+		nameLabel.setOnMouseClicked(FormBuilderFunctions.helpDialogHandler(formNode.doc));
 
 		Label lifetimeLabel    = new Label("Lifetime");
 		TextField lifetimeField = FormBuilderFunctions.lifetimeFieldBuilder(formNode);
@@ -65,7 +65,7 @@ public class FormBuilder extends ViewBase {
 		
 		topGrid.add(new Label("User Level"), 0, 0);
 		topGrid.add(userLevelBox, 1, 0);
-		topGrid.add(button, 2, 0);
+		topGrid.add(nameLabel, 2, 0);
 		topGrid.setPadding(new Insets(10, 10, 20, 10));
 		topGrid.setHgap(10);
 		topGrid.setVgap(10);
@@ -86,7 +86,6 @@ public class FormBuilder extends ViewBase {
 		scroll.setContent(grid);
 		formGrid.getChildren().addAll(topGrid, scroll);
 		
-		// This is a quick hack. 
 		setOnMousePressed(new EventHandler<MouseEvent>(){
 			public void handle(MouseEvent e){
 				Cycic.workingNode = formNode;
@@ -161,25 +160,6 @@ public class FormBuilder extends ViewBase {
 		return button;
 	}
 	
-    public static void showHelpDialog(String help) {
-        Dialog dg = new Dialog();
-        dg.setResizable(true);
-        ButtonType loginButtonType = new ButtonType("Ok", ButtonData.OK_DONE);
-        dg.setContentText(help);
-        dg.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
-        dg.show();
-    }
-
-    public static EventHandler<MouseEvent> helpDialogHandler(String help) {
-        return new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent e){
-                if(e.getClickCount() == 2){
-                    showHelpDialog(help);
-                }
-            }
-        };
-    }
-
 
 	/**
 	 * 
@@ -236,14 +216,7 @@ public class FormBuilder extends ViewBase {
 			} else if (i == 0){
 				if (facArray.get(2).toString().equalsIgnoreCase("oneOrMore")){
 					if ((int)facArray.get(6) <= userLevel && i == 0){
-						Label name = new Label((String) facArray.get(0));
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
-						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						rowNumber += 1;
@@ -251,7 +224,7 @@ public class FormBuilder extends ViewBase {
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
+								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber-1, rowNumber);
 							}
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
@@ -264,14 +237,7 @@ public class FormBuilder extends ViewBase {
 					//facArray = (ArrayList<Object>) facArray.get(1);
 					//dataArray = (ArrayList<Object>) dataArray.get(0);
 					if ((int)facArray.get(6) <= userLevel && i == 0){
-						Label name = new Label((String) facArray.get(0));
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
-						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						rowNumber += 1;
@@ -279,7 +245,7 @@ public class FormBuilder extends ViewBase {
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
 							if ( ii > 0 ) {
-								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
+								grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber-1, rowNumber);
 							}
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
@@ -289,21 +255,14 @@ public class FormBuilder extends ViewBase {
 					}
 				} else if (facArray.get(2).toString().equalsIgnoreCase("zeroOrMore")) {
 					if ((int)facArray.get(6) <= userLevel && i == 0){
-						Label name = new Label((String) facArray.get(0));
-						if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-							name.setText((String) facArray.get(9));
-						} else {
-							name.setText((String) facArray.get(0));	
-						}
-						name.setTooltip(new Tooltip((String)facArray.get(7)));
-						name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						grid.add(orMoreAddButton(grid, (ArrayList<Object>) facArray, (ArrayList<Object>) dataArray), columnNumber+1, rowNumber);
 						// Indenting a sub structure
 						rowNumber += 1;
 						columnNumber += 1;
 						for(int ii = 0; ii < dataArray.size(); ii ++){
-							grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber+2, rowNumber);
+							grid.add(arrayListRemove(grid, dataArray, ii, facArray), columnNumber-1, rowNumber);
 							formBuilder(grid, (ArrayList<Object>)facArray.get(1), (ArrayList<Object>) dataArray.get(ii));	
 							rowNumber += 1;
 						}
@@ -313,8 +272,7 @@ public class FormBuilder extends ViewBase {
 					}
 				} else if (facArray.get(1) instanceof ArrayList) {
 					if ((int)facArray.get(6) <= userLevel){
-						Label name = new Label((String) facArray.get(0));
-						name.setTooltip(new Tooltip ((String)facArray.get(7)));
+						Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 						grid.add(name, columnNumber, rowNumber);
 						rowNumber += 1;
 						// Indenting a sub structure
@@ -327,14 +285,7 @@ public class FormBuilder extends ViewBase {
 					}
 				} else if ((int) facArray.get(6) <= userLevel){
 					// Adding the label
-					Label name = new Label();
-					if(facArray.get(9) != null && !facArray.get(9).toString().equalsIgnoreCase("")){
-						name.setText((String) facArray.get(9));
-					} else {
-						name.setText((String) facArray.get(0));	
-					}
-					name.setTooltip(new Tooltip((String) facArray.get(7)));
-					name.setOnMouseClicked(FormBuilder.helpDialogHandler( (String) facArray.get(8)));
+					Label name = FormBuilderFunctions.nameLabelMaker(facArray);
 					grid.add(name, columnNumber, rowNumber);
 					// Setting up the input type for the label
 					if (facArray.get(4) != null){

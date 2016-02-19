@@ -80,7 +80,7 @@ public class RegionShape extends Rectangle {
         MenuItem helpDialog = new MenuItem("Region Documentation");
         helpDialog.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e){
-                FormBuilder.showHelpDialog(region.doc);
+                FormBuilderFunctions.showHelpDialog(region.doc);
             }
         });
             
