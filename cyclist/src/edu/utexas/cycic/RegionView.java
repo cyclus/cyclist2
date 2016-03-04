@@ -3,6 +3,8 @@ package edu.utexas.cycic;
 import java.util.ArrayList;
 
 import edu.utah.sci.cyclist.core.ui.components.ViewBase;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -126,7 +128,13 @@ public class RegionView extends ViewBase{
 		
 		// Setting up the view visuals.
 		topGrid.add(new Label("Name"), 0, 0);
-		topGrid.add(FormBuilderFunctions.regionNameBuilder(RegionCorralView.workingRegion), 1, 0);
+		TextField nameField = FormBuilderFunctions.regionNameBuilder(workingRegion);
+		nameField.textProperty().addListener(new ChangeListener<String>(){         
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue){
+				setTitle(newValue);
+			}
+		});
+		topGrid.add(nameField, 1, 0);
 		topGrid.add(addInst, 0, 2);
 		topGrid.add(addNewInstitBox, 0, 3);
 		topGrid.add(addInstit, 1, 3);
