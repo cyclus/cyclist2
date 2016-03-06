@@ -59,6 +59,8 @@ import com.sun.glass.ui.Cursor;
 import edu.utah.sci.cyclist.Cyclist;
 import edu.utah.sci.cyclist.core.controller.CyclistController;
 import edu.utah.sci.cyclist.core.event.dnd.DnD;
+import edu.utah.sci.cyclist.core.event.dnd.DnD.LocalClipboard;
+import edu.utah.sci.cyclist.core.event.notification.CyclistNotification;
 import edu.utah.sci.cyclist.core.model.CyclusJob;
 import edu.utah.sci.cyclist.core.model.CyclusJob.Status;
 import edu.utah.sci.cyclist.core.model.Preferences;
@@ -519,11 +521,11 @@ public class Cycic extends ViewBase{
 				Dragboard db = circle.startDragAndDrop(TransferMode.COPY);
 				ClipboardContent content = new ClipboardContent();				
 				content.put(DnD.VALUE_FORMAT, name);
+			
 				SnapshotParameters snapParams = new SnapshotParameters();
-	            snapParams.setFill(Color.TRANSPARENT);
-	            
-	            content.putImage(circle.snapshot(snapParams, null)); 
-	            
+				snapParams.setFill(Color.TRANSPARENT);
+
+				content.putImage(circle.snapshot(snapParams, null));	    
 				db.setContent(content);
 				e.consume();
 			}
