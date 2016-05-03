@@ -89,8 +89,9 @@ public class InstitutionView extends ViewBase {
         for(Map.Entry<String, Integer> fac : workingInstitution.availFacilities.entrySet()) {
             facilityList.getItems().add(fac.getKey() + " - " + fac.getValue());
         }
-
-		topGrid.add(new Label(InstitutionCorralView.workingInstitution.type), 4, 0);
+        Label institutionTypeLabel = new Label(InstitutionCorralView.workingInstitution.type);
+        institutionTypeLabel.setOnMouseClicked(FormBuilderFunctions.helpDialogHandler(workingInstitution.doc));
+		topGrid.add(institutionTypeLabel, 4, 0);
 
 		// Setting up the view visuals.
 		topGrid.setHgap(10);
@@ -162,7 +163,7 @@ public class InstitutionView extends ViewBase {
 				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("In this form the user can enter information into the institution archetype to make it a cyclus institution. " +
 						"The institution will take on the properties listed in the table below during the cyclus simulation. This form is derived from the module developer's code. " +
 						"If you have questions about the form fields you may hover over or double click on the form field name for more information. If this is not enough help you may "+
-						"the module developer / cyclus developer team. "));
+						"need to contact the module developer / cyclus development team."));
 				setFont(new Font(14));				
 			}
 		};

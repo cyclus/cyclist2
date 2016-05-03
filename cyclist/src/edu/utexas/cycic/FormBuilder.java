@@ -40,7 +40,6 @@ public class FormBuilder extends ViewBase {
 		userLevel = formNode.userLevel;
 		Label nameLabel = new Label(formNode.facilityType);
 		nameLabel.setOnMouseClicked(FormBuilderFunctions.helpDialogHandler(formNode.doc));
-
 		Label lifetimeLabel    = new Label("Lifetime");
 		TextField lifetimeField = FormBuilderFunctions.lifetimeFieldBuilder(formNode);
 

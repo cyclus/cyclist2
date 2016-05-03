@@ -73,10 +73,9 @@ public class RegionView extends ViewBase{
 		for(int i = 0; i < workingRegion.institutions.size(); i++){
 			institList.getItems().add(workingRegion.institutions.get(i));
 		}
-		Label button = new Label(RegionCorralView.workingRegion.type);
-		button.setText(RegionCorralView.workingRegion.type);
-
-		topGrid.add(button, 2, 0);
+		Label regionTypeLabel = new Label(RegionCorralView.workingRegion.type);
+		regionTypeLabel.setOnMouseClicked(FormBuilderFunctions.helpDialogHandler(workingRegion.doc));
+		topGrid.add(regionTypeLabel, 2, 0);
 		
 		// Code to add new institution to region.
 		final ComboBox<String> addNewInstitBox = new ComboBox<String>();
@@ -107,7 +106,7 @@ public class RegionView extends ViewBase{
 				setTooltip(new Tooltip("Use to add institutions to a region."));
 				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("To add an institution to a region select an institution from the drop down menu and " +
 						"click the 'Add Institution' button. An institution may exist in only one region. If you wish to have identical institution in regions " +
-						"you will need to add two of the exact same institution. Ideally you will name each institution <institutionname - region>."));
+						"you will need to add two of the exact same institution. You may want to name each institution <institutionname - region>."));
 				setFont(new Font(14));				
 			}
 		};
@@ -118,7 +117,7 @@ public class RegionView extends ViewBase{
 				setOnMouseClicked(FormBuilderFunctions.helpDialogHandler("In this form the user can enter information into the region archetype to make it a cyclus region. " +
 						"The region will take on the properties listed in the table below during the cyclus simulation. This form is derived from the module developer's code. " +
 						"If you have questions about the form fields you may hover over or double click on the form field name for more information. If this is not enough help you may "+
-						"the module developer / cyclus developer team. "));
+						"need to contact the module developer / cyclus development team."));
 				setFont(new Font(14));							
 			}
 		};
