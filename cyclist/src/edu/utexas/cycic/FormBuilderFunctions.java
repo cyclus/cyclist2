@@ -609,6 +609,10 @@ public class FormBuilderFunctions {
 		return name;
     }
     
+    public static void popUpGen(){
+    	
+    }
+    
 	/**
 	 * 
 	 * @param grid
@@ -643,6 +647,7 @@ public class FormBuilderFunctions {
 			grid.add(fileChooserButton(fileField), col+1, row);
 			break;
 		case "popup":
+			Dialog dg = PopUpFunctions.buildPopUp();
 			break;
 		case "resizer":
 			break;
