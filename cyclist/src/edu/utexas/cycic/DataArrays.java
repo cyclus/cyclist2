@@ -179,7 +179,7 @@ public class DataArrays{
 
 
     private static void defaultJsonReader(String entity) throws IOException{
-    	InputStream in = Cyclist.class.getResourceAsStream("assets/default-metadata.json");
+    	InputStream in = Cyclist.class.getResourceAsStream("assets/cyclus.json");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         String         line = null;
         StringBuilder  stringBuilder = new StringBuilder();

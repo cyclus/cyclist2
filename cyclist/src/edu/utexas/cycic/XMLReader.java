@@ -18,6 +18,7 @@ import javax.json.JsonValue.ValueType;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,6 +29,7 @@ import edu.utah.sci.cyclist.Cyclist;
 
 
 public class XMLReader {
+	static Logger log = Logger.getLogger(XMLReader.class);
 	/**
 	 * 
 	 * @param path
@@ -209,11 +211,11 @@ public class XMLReader {
 			ValueType test = anno1.get("type").getValueType();
 			String doc_s = (anno1.getJsonString("doc") != null) ? anno1.getString("doc") : null;
 			if(test == ValueType.ARRAY){
-				JsonArray type = anno1.getJsonArray("type");
-				JsonArray alias = anno1.getJsonArray("alias");
-				JsonArray uitype = anno1.getJsonArray("uitype");
-				JsonArray units = anno1.getJsonArray("units");
-				JsonArray range = anno1.getJsonArray("range");
+				JsonArray type = JsonArrayBuildTest(var, anno1, "type");
+				JsonArray alias = JsonArrayBuildTest(var, anno1, "alias");
+				JsonArray uitype = JsonArrayBuildTest(var, anno1, "uitype");
+				JsonArray units = JsonArrayBuildTest(var, anno1, "units");
+				JsonArray range = JsonArrayBuildTest(var, anno1, "range");
 				if(range == null){
 					range = anno1.getJsonArray("categorical");
 				}
@@ -769,5 +771,18 @@ public class XMLReader {
 	static JsonArray defaultBuilder(JsonArray defArray){
 		
 		return defArray;
+	}
+	
+	static JsonArray JsonArrayBuildTest(String var, JsonObject anno1, String type){
+		try{
+			JsonArray jArray = anno1.getJsonArray(type);
+			return jArray;
+		}
+		catch(java.lang.ClassCastException ex){
+			log.warn("CycIC can not find an array for the annotation type: " + 
+					type + ". Please double check archetype annotations and ensure this "
+							+ "type matches the other types for the field: " + var);
+		}
+		return null;
 	}
 }
