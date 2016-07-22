@@ -609,6 +609,10 @@ public class FormBuilderFunctions {
 		return name;
     }
     
+    public static void popUpGen(){
+    	
+    }
+    
 	/**
 	 * 
 	 * @param grid
@@ -641,6 +645,11 @@ public class FormBuilderFunctions {
 			TextField fileField = fileTextField(facArray, dataArray);
 			grid.add(fileField, col, row);
 			grid.add(fileChooserButton(fileField), col+1, row);
+			break;
+		case "popup":
+			Dialog dg = PopUpFunctions.buildPopUp();
+			break;
+		case "resizer":
 			break;
 		default:
 			grid.add(FormBuilderFunctions.textFieldBuilder(facArray, (ArrayList<Object>)dataArray), col, row);
