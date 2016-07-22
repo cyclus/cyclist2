@@ -93,8 +93,7 @@ create view DeployedPerYear as
 
 drop view if exists RetiredPerYear;
 create view RetiredPerYear as
-    select b.SimID as SimId, b.Year as Year, max(0, total(d1.n- d.n + b.n)) as n, b.Prototype as
-    Prototype
+    select b.SimID as SimId, b.Year as Year, max(0, total(d1.n- d.n + b.n)) as n, b.Prototype as Prototype
     from BuiltPerYear as b, DeployedPerYear as d, DeployedPerYear as d1
     where b.SimID = d.SimID and b.SimID = d1.SimID
       and b.prototype = d.prototype and b.prototype = d1.prototype

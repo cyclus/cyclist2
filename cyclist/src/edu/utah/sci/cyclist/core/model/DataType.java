@@ -205,11 +205,12 @@ public class DataType {
 		}
     }
 	
+    boolean force = false;
 	private void update() {
 		if (_interp == Interpretation.DISCRETE) {
 			if (_type == Type.DATE || _type == Type.DATETIME || _role== Role.INT_TIME) 
 				_classification = Classification.Cdate;
-			else if (_type == Type.TEXT)
+			else if (_type == Type.TEXT || force)
 				_classification = Classification.C;
 			else
 				_classification = Classification.Qi;

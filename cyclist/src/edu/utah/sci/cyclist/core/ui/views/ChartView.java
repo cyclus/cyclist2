@@ -106,7 +106,7 @@ public class ChartView extends CyclistViewBase {
 
 	public static Double CYCLUS_INFINITY = 1e50;
 	
-	enum ViewType { CROSS_TAB, BAR, LINE, SCATTER_PLOT, GANTT, NA }
+	enum ViewType { CROSS_TAB, BAR, LINE, SCATTER_PLOT, GANTT, NA, AUTO }
 
 	enum MarkType { TEXT, BAR, LINE, SHAPE, GANTT, NA }
 
@@ -133,6 +133,7 @@ public class ChartView extends CyclistViewBase {
 	private ObjectProperty<CyclistAxis.Mode> _yAxisMode = new SimpleObjectProperty<>(CyclistAxis.Mode.LINEAR);
 	private BooleanProperty _xForceZero = new SimpleBooleanProperty(false);
 	private BooleanProperty _yForceZero = new SimpleBooleanProperty(false);
+	private BooleanProperty _stepChart = new SimpleBooleanProperty(false);
 	
 	private ObservableList<Indicator> _indicators = FXCollections.observableArrayList();
 	private Map<Indicator, LineIndicator> _lineIndicators = new HashMap<>();
@@ -533,6 +534,8 @@ public class ChartView extends CyclistViewBase {
 
 		Map<MultiKey, ObservableList<XYChart.Data<Object, Object>>> dataMap = split(list, spec);
 		
+		if (_stepChart.get()) updateStepAfter(true);
+		
 		// remove current series that are not part of the new data
 		for (MultiKey key : _currentSpec.seriesMap.keySet()) {
 			if (!dataMap.containsKey(key)) {
@@ -560,8 +563,46 @@ public class ChartView extends CyclistViewBase {
 		_currentSpec = spec;
 		
 		checkForInfinities(dataMap.keySet());
-		
 	}
+	
+	private void updateStepAfter(boolean add) {
+		for ( Map.Entry<MultiKey, ObservableList<XYChart.Data<Object, Object>>> entry : _currentSpec.dataMap.entrySet()) {
+			if (entry.getValue().size() > 0 && entry.getValue().get(0).getXValue() instanceof Integer) {
+				ObservableList<XYChart.Data<Object, Object>> updated = FXCollections.observableArrayList(); 
+		
+				if (add) {
+					for (XYChart.Data<Object, Object> pt : entry.getValue()) {
+						if (!updated.isEmpty()) {
+							// add previous value to cause the chart to look like step-after
+							Object x = pt.getXValue();
+							x = ((Integer) x)-0.1;
+							updated.add(new XYChart.Data<Object, Object>(x, updated.get(updated.size()-1).getYValue()));
+						}
+						updated.add(pt);
+					}
+				} else {
+					boolean even = true;
+					for (XYChart.Data<Object, Object> pt : entry.getValue()) {
+						if (even) updated.add(pt);
+						even = !even;
+					}
+				}
+				_currentSpec.dataMap.replace(entry.getKey(), updated);
+			}
+		}
+	}
+	
+	private void setStepAfter(boolean on) {
+		updateStepAfter(on);
+		ObservableList<XYChart.Series<Object, Object>> list = FXCollections.observableArrayList(); 
+		for (Map.Entry<MultiKey, XYChart.Series<Object, Object>> entry : _currentSpec.seriesMap.entrySet()) {
+			entry.getValue().setData(_currentSpec.dataMap.get(entry.getKey()));
+			list.add(entry.getValue());
+		}
+		
+		getChart().getData().setAll(list);
+	}
+ 
 	
 	private void checkForInfinities(Collection<MultiKey> keys ) {
 		String s = "";
@@ -1114,8 +1155,19 @@ public class ChartView extends CyclistViewBase {
             }
 		});
 		marker.getGraphic().visibleProperty().bind(_showSymbols);
-
 		menu.getItems().add(marker);
+		
+		item = new MenuItem("Step-after", GlyphRegistry.get(AwesomeIcon.CHECK));
+		item.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+            public void handle(ActionEvent event) {
+				_stepChart.set(!_stepChart.get());
+				setStepAfter(_stepChart.get());
+            }
+		});
+		item.getGraphic().visibleProperty().bind(_stepChart);
+
+		menu.getItems().add(item);
 		
 		return btn;
 	}
