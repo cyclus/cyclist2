@@ -23,6 +23,7 @@ import edu.utah.sci.cyclist.core.model.DataType.Classification;
 import edu.utah.sci.cyclist.core.model.DataType.FilterType;
 import edu.utah.sci.cyclist.core.model.DataType.Role;
 import edu.utah.sci.cyclist.core.model.DataType.Type;
+import edu.utah.sci.cyclist.neup.model.Nuclide;
 
 public class Filter implements Observable, Resource {
 	static Logger log = Logger.getLogger(Filter.class);
@@ -178,7 +179,7 @@ public class Filter implements Observable, Resource {
     		group = memento.createChild("selected");
     		// TODO: can save the class only once
     		for (Object value : _selectedItems) {
-    			if (value instanceof Number || value instanceof String) {
+    			if (value instanceof Number || value instanceof String || value instanceof Nuclide) {
     				saveObj(group.createChild("value"), value);		
     			} 
     		}
@@ -201,6 +202,8 @@ public class Filter implements Observable, Resource {
 			return Integer.valueOf(str);
 		} else if (cls.equals(Double.class.toString())) {
 			return Double.valueOf(str);
+		} else if (cls.equals(Nuclide.class.toString())) {
+			return Nuclide.create(str);
 		} else {
 			log.warn("*** unknown value class: "+cls);
 			return str;

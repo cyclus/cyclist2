@@ -36,7 +36,7 @@
 		</copy>
 		<copy todir="deploy/externalLibs">
 			<fileset dir="${basedir}\cyclist\lib">
-				<filename name="sqlite-jdbc-3.8.10.1.jar"/>	
+				<filename name="sqlite-jdbc-3.8.11.2.jar"/>	
 			</fileset>
 		</copy>
 		<copy todir="deploy/externalLibs">
@@ -120,7 +120,7 @@
 				<include name="log4j-1.2.16.jar"/>
 				<include name="mysql-connector-java-5.1.18-bin.jar"/>
 				<include name="commons-collections-3.2.1.jar"/>
-				<include name="sqlite-jdbc-3.8.5-pre1.jar"/>
+				<include name="sqlite-jdbc-3.8.11.2.jar"/>
 				<include name="javax.json-1.0.4.jar"/>
 				<include name="commons-io-2.4.jar"/>
 				<include name="commons-codec-1.6.jar"/>

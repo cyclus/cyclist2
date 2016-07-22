@@ -280,12 +280,16 @@ public class FilterPanel extends TitledPanel {
 			SortedList<Object> sorted = new SortedList<Object>(_valuesProperty.get(), new Comparator<Object>() {
 				@Override
                 public int compare(Object o1, Object o2) {
+					if (o1 == null || o2 == null) {
+						return o1 != null ? -1 :o2 != null ? 1 : 0;
+					}	
 					return o1.toString().compareToIgnoreCase(o2.toString());
                 }
 			});
 			for (Object item: sorted) {
 //				System.out.println("FilterPanel: populate value:"+item.toString());
-				_cbBox.getChildren().add(createEntry(item));
+				if (item != null)
+					_cbBox.getChildren().add(createEntry(item));
 			}
 		}
 	}

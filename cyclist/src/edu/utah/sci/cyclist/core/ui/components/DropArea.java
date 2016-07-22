@@ -122,6 +122,13 @@ public class DropArea extends HBox implements Observable {
 		_preOccupiedFields.addAll(fields);
 	}
 	
+	public boolean hasFieldName(String name) {
+		for (Field field : getFields()) {
+			if (field.getName().equals(name)) return true;
+		}
+		return false;
+	}
+	
 	private boolean compatible() {
 		Field field = getLocalClipboard().get(DnD.FIELD_FORMAT, Field.class);
 		if (field == null

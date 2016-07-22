@@ -248,7 +248,8 @@ public class Table implements Resource {
 	public void restoreSimulated(IMemento memento, Context ctx){
 		_id = memento.getString("UID");
 		setName(memento.getString("name"));
-		if (_id == null) _id = getName();
+		if (_id == null) _id = getName(); //UUID.randomUUID().toString();
+		
 		ctx.put(_id, this);
 //		System.out.println("restore table: "+_id);
 		
@@ -636,7 +637,7 @@ public class Table implements Resource {
 		 FieldNode.putString("name", fieldName);
 		 FieldNode.putString("type", fieldType);
 		 FieldNode.putString("role", fieldRole);
-		 if (values.size() > 0) {
+		 if (values.size() > 0 && values.get(0) != null) {
 			 FieldNode.putString("class", values.get(0).getClass().getCanonicalName());
 		 }
 		 StringBuilder sb = new StringBuilder(); 
