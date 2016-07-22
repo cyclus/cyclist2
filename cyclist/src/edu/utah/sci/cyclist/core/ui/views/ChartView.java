@@ -1014,11 +1014,11 @@ public class ChartView extends CyclistViewBase {
 					for (Filter f : change.getRemoved()) {
 						update = update || f.isActive();
 						f.removeListener(_filterListener);
+
 					}
 					for (Filter f : change.getAddedSubList()) {
 						//For a new filter - add the current data source as its data source.
 						f.setDatasource(ds);
-							
 						update = update || f.isActive();
 						f.addListener(_filterListener);
 					}
@@ -1438,8 +1438,7 @@ public class ChartView extends CyclistViewBase {
 			Filter filter = (Filter) o;		
 			// LOD filters only show/hide data. No need to fetch new data 
 			// TODO: is this true only for classification == C? Seems to be true for any field that is not range
-			if(_currentSpec != null && isInLodArea(filter.getField()) && filter.getField().getClassification() == Classification.C ) {
-//				invalidateLODFilters(filter);
+			if(isInLodArea(filter.getField()) && filter.getField().getClassification() == Classification.C ) {
 				filter.setValid(true);
 				reassignData(filter);
 			} else {
@@ -1582,6 +1581,8 @@ public class ChartView extends CyclistViewBase {
 	
 	@SuppressWarnings("unchecked")
     private void reassignData(Filter filter) {
+		if (_currentSpec == null) return;
+		
 		int idx = 0;
 		String name = filter.getField().getName();
 		for (FieldInfo info : _currentSpec.lod) {

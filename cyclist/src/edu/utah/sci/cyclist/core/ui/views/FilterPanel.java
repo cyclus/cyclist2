@@ -226,20 +226,14 @@ public class FilterPanel extends TitledPanel {
 			}
 		});
 		
-//		System.out.println("FilterPanel: bind");
 		_valuesProperty.bind(_filter.valuesProperty());		
-//		System.out.println("FilterPanel: after bind");
 		
 		if (!_filter.isValid()) {
-//			System.out.println("FilterPanel: filter is not valid. Fetch data");
 			Field field = _filter.getField();
 			Table table = field.getTable();
 			
 			Task<ObservableList<Object>> task = table.getFieldValues(_filter.getDatasource(),field);
 			setTask(task);
-//			task.valueProperty().addListener(l->{
-//				
-//			});
 			field.valuesProperty().bind(task.valueProperty());
 			Thread th = new Thread(task);
 			th.setDaemon(true);
