@@ -2,22 +2,41 @@
 -- general post processing
 --
 
+drop table if exists prototypes;
+create table Prototypes as
+    select SimID, Prototype, AgentId, Kind, Spec, min(EnterTime) as EnterTime, max(ExitTime) as ExitTime
+    from Agents
+    group by SimID, Prototype;
+    
 --
 --Power
 --
+drop table if exists Power_base;
+create table Power_base as
+    select p.SimID as SimID, p.Time as Time, Prototype, total(p.value) as Power
+	    from timeseriespower as p
+	        natural join agents
+	    group by p.SimID, p.Time, Prototype;
 
-drop view if exists Power;
-create view Power
-    as SELECT sub.simid as SimID, tl.Time AS Time, TOTAL(sub.Power) AS Power, Prototype
-    FROM timelist as tl LEFT JOIN (
-        SELECT p.simid AS simid,p.Time AS Time, TOTAL(p.Value) AS Power, a.prototype as Prototype
-        FROM timeseriespower AS p
-        JOIN agents as a on a.agentid=p.agentid AND a.simid=p.simid
-         WHERE sub.simid IS NOT NULL
-        GROUP BY p.Time, a.prototype, p.simid
-    ) AS sub ON tl.time=sub.time AND tl.simid=sub.simid
+drop table if exists Power_keys;
+create table Power_keys as
+    select t.SimID as SimID, t.Time as Time, Prototype
+	    from timeseriespower as t
+	        join prototypes as p
+	    where
+		    p.kind = 'Facility' and t.time >= p.EnterTime and t.time <= p.ExitTime;
 
-    GROUP BY sub.SimID, tl.Time, Prototype;
+drop table if exists Power;
+create table Power as
+    select keys.simid as simid, keys.time as time, keys.prototype as prototype, power
+    from Power_keys as keys
+	left join Power_base as data
+	on keys.simid = data.simid and keys.time = data.time and keys.prototype = data.prototype;
+
+create index if not exists power_idx on Power (SimID, Time);
+create index if not exists power_prototype_idx on Power (SimID, Time, Prototype);
+	        
+
 
 --
 --Built

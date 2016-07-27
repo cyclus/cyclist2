@@ -6,9 +6,9 @@
 
 drop view if exists PowerPerYear;
 create view PowerPerYear as
-    select SimID, InitialYear+Time/12 as Year, Power/1000 as Power, Prototype
+    select Power.SimID, InitialYear+Time/12 as Year, Power/1000 as Power, Prototype
     from Power, Info
-    where Time % 12 = 0 and Power.Simd = Info.SimId; 
+    where Time % 12 = 0 and Power.SimID = Info.SimID;
 
 drop view if exists FlowPerYear;
 create view FlowPerYear as
