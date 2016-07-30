@@ -367,23 +367,6 @@
 			</field>
 		</Schema>
 	</Table>	
-
-	<!-- <Table name="InventoryQuantity">
-		<Schema>
-			<field name="SimID">
-				<datatype role="DIMENSION" type="TEXT"/>
-			</field>
-			<field name="Time">
-				<datatype role="INT_TIME" type="INT_TIME"/>
-			</field>
-			<field name="Quantity">
-				<datatype role="MEASURE" type="NUMERIC"/>
-			</field>
-			<field name="Prototype">
-				<datatype role="DIMENSION" type="TEXT"/>
-			</field>	
-		</Schema>
-	</Table> -->
 	
 	<Table name="InventoryDetails">
 		<Schema>
@@ -425,23 +408,6 @@
 	</Table>
 	
 	<Table name="DeployedPerYear">
-		<Schema>
-			<field name="SimID">
-				<datatype role="DIMENSION" type="TEXT"/>
-			</field>
-			<field name="Year">
-				<datatype role="INT_TIME" type="INT_TIME"/>
-			</field>
-			<field name="N">
-				<datatype role="MEASURE" type="NUMERIC"/>
-			</field>
-			<field name="Prototype">
-				<datatype role="DIMENSION" type="TEXT"/>
-			</field>
-		</Schema>
-	</Table>
-
-	<Table name="RetiredPerYear">
 		<Schema>
 			<field name="SimID">
 				<datatype role="DIMENSION" type="TEXT"/>
@@ -498,24 +464,7 @@
 		</Schema>
 	</Table>	
 	
-	<!-- <Table name="InventoryQuantityPerYear">
-		<Schema>
-			<field name="SimID">
-				<datatype role="DIMENSION" type="TEXT"/>
-			</field>
-			<field name="Year">
-				<datatype role="INT_TIME" type="INT_TIME"/>
-			</field>
-			<field name="Quantity">
-				<datatype role="MEASURE" type="NUMERIC"/>
-			</field>
-			<field name="Prototype">
-				<datatype role="DIMENSION" type="TEXT"/>
-			</field>	
-		</Schema>
-	</Table> -->
-	
-		<Table name="InventoryDetailsPerYear">
+	<Table name="InventoryDetailsPerYear">
 		<Schema>
 			<field name="SimID">
 				<datatype role="DIMENSION" type="TEXT"/>
@@ -535,7 +484,6 @@
 		</Schema>
 	</Table>
 	
-<!-- CapacityPerYear -->	
 	
 	<Table name="CapacityPerYear">
 		<Schema>
