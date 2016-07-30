@@ -80,5 +80,16 @@ create index if not exists Facilities_idx on Facilities (SimId ASC, AgentId ASC)
 --
 -- indicate cyclist post processing was done on this db
 --
+
+drop table if exists prototypes;
+create table Prototypes as
+    select SimID, Prototype, AgentId, Kind, Spec, min(EnterTime) as EnterTime, max(ExitTime) as ExitTime
+    from Agents
+    group by SimID, Prototype;
+    
+--
+-- Inform Cyclist not post process this db
+--
+    
 create table if not exists UpdatedIndication (flag INTEGER DEFAULT 1);
 			 	

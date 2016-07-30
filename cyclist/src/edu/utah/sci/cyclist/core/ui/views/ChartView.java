@@ -77,6 +77,7 @@ import edu.utah.sci.cyclist.core.event.ui.FilterEvent;
 import edu.utah.sci.cyclist.core.model.Context;
 import edu.utah.sci.cyclist.core.model.CyclistData;
 import edu.utah.sci.cyclist.core.model.CyclistDatasource;
+import edu.utah.sci.cyclist.core.model.DataType;
 import edu.utah.sci.cyclist.core.model.DataType.Classification;
 import edu.utah.sci.cyclist.core.model.DataType.Role;
 import edu.utah.sci.cyclist.core.model.Field;
@@ -536,7 +537,7 @@ public class ChartView extends CyclistViewBase {
 		
 		if (_stepChart.get()) updateStepAfter(true);
 		
-		// remove current series that are not part of the new data
+		// remove from the chart current series that are not part of the new data
 		for (MultiKey key : _currentSpec.seriesMap.keySet()) {
 			if (!dataMap.containsKey(key)) {
 				getChart().getData().remove(_currentSpec.seriesMap.get(key));
@@ -675,6 +676,14 @@ public class ChartView extends CyclistViewBase {
 					if (pt == null) {
 						_seriesWithInfinity.add(key); 
 					} else {
+						if (xInfo.field.getRole() == DataType.Role.INT_TIME && yInfo.field.getRole() == DataType.Role.MEASURE) {
+							if (!series.isEmpty()) {
+								Integer x0 = (Integer) series.get(series.size()-1).getXValue();
+								Integer x1 = (Integer) pt.getXValue();
+								for (x0++; x0< x1; x0++)
+									series.add(new XYChart.Data<Object,Object>(x0, 0));
+							}
+						}
 //						if (!series.isEmpty()) {
 //							// add previous value to cause the chart to look like step-after
 //							Object x = pt.getXValue();
