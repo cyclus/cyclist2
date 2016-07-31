@@ -15,8 +15,9 @@ update Agents
 --
 -- Facilities
 --
-	
-create table if not exists Facilities (SimID BLOB,
+
+drop table is exists Facitlities;
+create table Facilities (SimID BLOB,
 	AgentId INTEGER,
 	Spec TEXT,
 	Prototype TEXT,
@@ -26,7 +27,7 @@ create table if not exists Facilities (SimID BLOB,
 	ExitTime INTEGER,
 	Lifetime INTEGER);
 	
-replace into Facilities(SimID,AgentId,Spec,Prototype,InstitutionId,RegionId,EnterTime,ExitTime,Lifetime) 
+Insert into Facilities(SimID,AgentId,Spec,Prototype,InstitutionId,RegionId,EnterTime,ExitTime,Lifetime) 
 	select f.SimId, f.AgentId, f.Spec, f.Prototype, i.AgentId, 
 		cast(-1 as INTEGER), f.EnterTime, f.ExitTime, f.Lifetime from Agents as f, Agents as i 
 	where f.Kind = 'Facility' and i.Kind = 'Inst' and f.ParentId = i.AgentId and f.SimId = i.SimId;
@@ -46,7 +47,6 @@ create index if not exists Facilities_idx on Facilities (SimId ASC, AgentId ASC)
 --		INNER JOIN Agents AS ag ON ag.AgentId = inv.AgentId AND ag.SimId=tl.SimId
 --		INNER JOIN Compositions AS cmp ON cmp.QualId = inv.QualId AND cmp.SimId=tl.SimId
 -- 	GROUP BY inv.SimId, tl.Time,ag.AgentId,cmp.NucId;
- 	
  	
 --
 -- Transactions

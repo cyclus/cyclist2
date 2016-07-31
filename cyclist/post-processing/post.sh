@@ -1,5 +1,6 @@
 #!/bin/bash
-FILES="cyclist reactor power flow capacity inventory"
+FILES="cyclist reactor power capacity inventory flow"
+
 BASE=${0/\/post.sh/}
 TIMEFORMAT=%R
 
