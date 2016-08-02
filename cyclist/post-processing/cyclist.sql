@@ -16,7 +16,7 @@ update Agents
 -- Facilities
 --
 
-drop table is exists Facitlities;
+drop table if exists Facitlities;
 create table Facilities (SimID BLOB,
 	AgentId INTEGER,
 	Spec TEXT,
