@@ -28,19 +28,19 @@ drop table if exists InventoryDetails;
     
 drop table if exists InventoryDetails;
 create table InventoryDetails as
-select inv.simid as simid, inv.starttime as starttime, inv.endtime as endtime, total(inv.Quantity*c.MassFrac) AS Quantity, Prototype, NucID
-from inventories as inv
-JOIN compositions as c on c.qualid=inv.qualid AND c.simid=inv.simid
-JOIN agents as a on a.agentid=inv.agentid AND a.simid=inv.simid
-group by inv.simid, starttime, endtime, Prototype, NucID;
+	select inv.simid as simid, inv.starttime as starttime, inv.endtime as endtime, total(inv.Quantity*c.MassFrac) AS Quantity, Prototype, NucID
+	  from inventories as inv
+	 	   join compositions as c on c.qualid=inv.qualid AND c.simid=inv.simid
+		   join agents as a on a.agentid=inv.agentid AND a.simid=inv.simid
+	 group by inv.simid, starttime, endtime, Prototype, NucID;
 
 
 drop view if exists InventoryDetailsPerMonth;
 create view InventoryDetailsPerMonth as
 select tl.simid as simid, tl.time as time, prototype, nucid, total(quantity)/1000 as quantity
-from timelist as tl
-   join InventoryDetails as inv on UNLIKELY(inv.starttime <= tl.time) AND inv.endtime > tl.time AND tl.simid=inv.simid
-   group by tl.simid, tl.time, prototype, nucid;
+  from timelist as tl
+       join InventoryDetails as inv on UNLIKELY(inv.starttime <= tl.time) AND inv.endtime > tl.time AND tl.simid=inv.simid
+  group by tl.simid, tl.time, prototype, nucid;
    
    
 drop table if exists InventoryDetailsPerYear;

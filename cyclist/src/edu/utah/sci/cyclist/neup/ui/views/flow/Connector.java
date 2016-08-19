@@ -80,6 +80,9 @@ public class Connector extends Group {
 		FlowNode src = _from.isSRC() ? _from : _to;
 		FlowNode dest = _from.isSRC() ? _to : _from;
 		
+		if (src == null ||src.getParent() == null || dest == null || dest.getParent() == null) {
+			System.out.println("Connector.build found a null: "+src+" "+ dest);
+		}
 		
 		_curve.startXProperty().bind(src.anchorXProperty().add(src.getParent().translateXProperty()));
 		_curve.startYProperty().bind(src.anchorYProperty().add(src.getParent().translateYProperty()));

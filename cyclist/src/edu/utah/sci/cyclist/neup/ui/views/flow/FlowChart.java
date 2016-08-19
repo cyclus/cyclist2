@@ -264,6 +264,7 @@ public class FlowChart extends VBox {
 		_xAxis = new NumberAxis();
 		_xAxis.setLabel("time");
 		_xAxis.setAnimated(false);
+		_xAxis.setForceZeroInRange(false);
 		
 		_yAxis = new CyclistAxis(CyclistAxis.Mode.LOG);
 		_yAxis.setLabel("Cummulative");
